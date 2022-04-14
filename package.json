@@ -1,0 +1,22 @@
+{
+  "name": "epsilon",
+  "version": "1.0.0",
+  "description": "Quick way to gather KPI information from Canvas",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Typiqally/epsilon.git"
+  },
+  "author": "Jelle Maas",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Typiqally/epsilon/issues"
+  },
+  "homepage": "https://github.com/Typiqally/epsilon#readme",
+  "dependencies": {
+    "axios": "^0.26.1"
+  }
+}
