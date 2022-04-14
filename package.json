@@ -2,6 +2,7 @@
   "name": "epsilon",
   "version": "1.0.0",
   "description": "Quick way to gather KPI information from Canvas",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
