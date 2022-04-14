@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/Typiqally/epsilon#readme",
   "dependencies": {
-    "axios": "^0.26.1"
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0"
   }
 }
