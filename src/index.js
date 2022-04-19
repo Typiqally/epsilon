@@ -1,106 +1,76 @@
 import client from "./client/AxiosClient.js"
 import 'dotenv/config'
+import DataCollector from "./DataCollector.js";
+import CanvasApi from "./CanvasApi.js";
 
-const getOutcomesAndAssignmentsFromResults = async (results) => {
-    let outcomes = {}
-    let assignments = {}
 
-    for (const result of results) {
-        const outcomeId = result.links.learning_outcome
-        let outcome = outcomes[outcomeId]
 
-        if (outcome === undefined) {
-            outcome = await getOutcome(outcomeId)
-            outcomes[outcomeId] = outcome
+const groupOutcomesWithAssignment = async (results) => {
+    let GroupedByAssignment = {}
+
+    for (const result of results){
+        if (result.links.assignment !== undefined){
+            const assignmentId = result.links.assignment.substring('assignment_'.length)
+            if (GroupedByAssignment[assignmentId.toString()] === undefined){
+                GroupedByAssignment[assignmentId.toString()] = []
+            }
+            GroupedByAssignment[assignmentId.toString()].push(result)
         }
-
-        const assignmentId = result.links.assignment.substring('assignment_'.length)
-        let assignment = assignments[assignmentId]
-
-        if (assignment === undefined) {
-            assignment = await getAssignment(assignmentId)
-            assignments[assignmentId] = assignment
-        }
-
-        if (outcome["assignments"] === undefined) {
-            outcome["assignments"] = []
-        }
-
-        outcome["assignments"].push(assignment)
-
-        if (assignment["outcomes"] === undefined) {
-            assignment["outcomes"] = []
-        }
-
-        assignment["outcomes"].push(outcome)
     }
 
-    return {
-        outcomes: outcomes, assignments: assignments
+    return GroupedByAssignment
+}
+
+const mergeDataSources = async () => {
+    for (const module of modules) {
+        let moduleItems = await canvasApi.getModuleItems(courseId, module.id);
+        dataCollector.addModule(module)
+        for (const item of moduleItems){
+            //Is the item an assignment
+            if (item.type === "Assignment") {
+                let assignment = await canvasApi.getAssignment(courseId,item.content_id)
+                //Has the assignment results that are mastered
+                if (masteredOutcomes[assignment.id] !== undefined){
+                    assignment.results = masteredOutcomes[assignment.id]
+                    assignment.results.forEach((async (outcome, index) => {
+                        assignment.results[index].outcome = await canvasApi.getOutcome(outcome.links.learning_outcome);
+                    }))
+                    dataCollector.addAssignment(module, assignment)
+                }
+            }
+        }
     }
 }
 
-const getOutcome = async (id) => {
-    process.stdout.write(`Fetching outcome ${id}... `)
-
-    return client.get(`v1/outcomes/${id}`)
-        .then((response) => {
-            const data = response.data
-            console.log('\x1b[32m%s\x1b[0m', `done ${data.title}`)
-
-            return data
-        })
-}
-
-const getAssignment = async (id) => {
-    process.stdout.write(`Fetching assignment ${id}... `)
-
-    return client.get(`v1/courses/${courseId}/assignments/${id}`)
-        .then((response) => {
-            const data = response.data
-            console.log('\x1b[32m%s\x1b[0m', `done ${data.name}`)
-
-            return data
-        })
-}
-
-const logOutcomes = (outcomes) => {
-    Object.values(outcomes).forEach(outcome => {
-        console.log(`Outcome: ${outcome.title}`)
-
-        outcome.assignments.forEach(assignment => {
-            console.log(`- ${assignment.name}`)
-        })
-
+const logResults = () => {
+    Object.values(dataCollector.getList()).forEach((Module => {
+        console.log('Module', Module.name)
+        if (Object.keys(Module.assignments).length > 0){
+            Object.values(Module.assignments).forEach(assignment => {
+                console.log('   ',assignment.name)
+                Object.values(assignment.results).forEach(item => {
+                    console.log('       ', item.outcome.title)
+                })
+            });
+        } else {
+            console.log('   No assignments could be found')
+        }
         console.log('\n===========================================\n')
-    })
-}
-
-const logAssignments = (assignments) => {
-    Object.values(assignments).forEach(assignment => {
-        console.log(`Assignment ${assignment.id}, link: ${assignment.html_url}`)
-        console.log(`Name = ${assignment.name}\n`)
-
-        assignment.outcomes.forEach(outcome => {
-            console.log(`- ${outcome.title}`)
-        })
-
-        console.log('\n===========================================\n')
-    })
+    }))
 }
 
 // Get Canvas course id from the .env file
 const courseId = process.env.CANVAS_COURSE_ID
 console.log(`Targeting course: ${courseId}`)
 
-// Fetch outcome results for the targeted course, this will return all the graded outcomes of the course
-client.get(`v1/courses/${courseId}/outcome_results?per_page=500`)
-    .then(async (response) => {
-        const data = response.data
-        const outcomeResults = data.outcome_results.filter(result => result.mastery)
+let dataCollector = new DataCollector()
+let canvasApi = new CanvasApi()
+//Get modules form course
+let modules = await canvasApi.getModules(courseId);
 
-        const result = await getOutcomesAndAssignmentsFromResults(outcomeResults)
+// fetch all mastered outcomes and group them on assigment.
+let masteredOutcomes = await groupOutcomesWithAssignment(await canvasApi.getMasteredOutcomes(courseId));
 
-        logOutcomes(result.outcomes)
-        logAssignments(result.assignments)
-    })
+await mergeDataSources()
+//Write gathered data
+logResults()
