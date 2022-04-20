@@ -21,7 +21,7 @@ This file contains all the nescessary settings for the application to work.
 
 ### 3. Canvas access token
 
-Go to [https://fhict.instructure.com/profile/settings](https://fhict.instructure.com/profile/settings), navigate to "Approved Interrogations" and create an new access token.
+Go to [https://fhict.instructure.com/profile/settings](https://fhict.instructure.com/profile/settings), navigate to "Approved Integrations" and generate a new access token.
 After that, copy the access token and paste it in the duplicated `.env` file, under the `CANVAS_TOKEN` setting.
 
 ![Canvas access token generation](https://i.imgur.com/0ukmuMF.png)
