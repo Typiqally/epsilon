@@ -21,17 +21,17 @@ const groupOutcomesWithAssignment = async (results) => {
 
 const mergeDataSources = async () => {
     for (const module of modules) {
-        let moduleItems = await canvasApi.getModuleItems(courseId, module.id);
+        let moduleItems = await CanvasApi.getModuleItems(courseId, module.id);
         dataCollector.addModule(module)
         for (const item of moduleItems) {
             //Is the item an assignment
             if (item.type === "Assignment") {
-                let assignment = await canvasApi.getAssignment(courseId, item.content_id)
+                let assignment = await CanvasApi.getAssignment(courseId, item.content_id)
                 //Has the assignment results that are mastered
                 if (masteredOutcomes[assignment.id] !== undefined) {
                     assignment.results = masteredOutcomes[assignment.id]
                     assignment.results.forEach((async (outcome, index) => {
-                        assignment.results[index].outcome = await canvasApi.getOutcome(outcome.links.learning_outcome);
+                        assignment.results[index].outcome = await CanvasApi.getOutcome(outcome.links.learning_outcome);
                     }))
                     dataCollector.addAssignment(module, assignment)
                 }
@@ -62,12 +62,11 @@ const courseId = process.env.CANVAS_COURSE_ID
 console.log(`Targeting course: ${courseId}`)
 
 let dataCollector = new DataCollector()
-let canvasApi = new CanvasApi()
 //Get modules form course
-let modules = await canvasApi.getModules(courseId);
+let modules = await CanvasApi.getModules(courseId);
 
 // fetch all mastered outcomes and group them on assigment.
-let masteredOutcomes = await groupOutcomesWithAssignment(await canvasApi.getMasteredOutcomes(courseId));
+let masteredOutcomes = await groupOutcomesWithAssignment(await CanvasApi.getMasteredOutcomes(courseId));
 
 await mergeDataSources()
 //Write gathered data
