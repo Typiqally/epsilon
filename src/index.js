@@ -44,19 +44,19 @@ const mergeDataSources = async (modules, outcomes) => {
 
 const logResults = () => {
     Object.values(dataCollector.getList()).forEach(module => {
-        console.log('Module', module.name)
+        console.log('\n===========================================\n')
+
+        console.log(`Module: ${module.name}\n`)
         if (Object.keys(module.assignments).length > 0) {
             Object.values(module.assignments).forEach(assignment => {
-                console.log('\t', assignment.name)
+                console.log(assignment.name)
                 Object.values(assignment.results).forEach(item => {
-                    console.log('\t\t', item.outcome.title)
+                    console.log('\t', item.outcome.title)
                 })
             });
         } else {
-            console.log('\tNo assignments could be found')
+            console.log('No assignments could be found')
         }
-
-        console.log('\n===========================================\n')
     })
 }
 
