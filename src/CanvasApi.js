@@ -15,7 +15,7 @@ let CanvasApi = class {
             }).catch((response => console.log(response)))
     }
 
-    getAssignment = async (courseId,id) => {
+    getAssignment = async (courseId, id) => {
         process.stdout.write(`Fetching assignment ${id}... `)
 
         return this.client.get(`v1/courses/${courseId}/assignments/${id}`)
@@ -30,7 +30,7 @@ let CanvasApi = class {
     getMasteredOutcomes = async (courseId) => {
         return await client.get(`v1/courses/${courseId}/outcome_results?per_page=69420`)
             .then(async (response) => {
-                return  response.data.outcome_results.filter(result => result.mastery)
+                return response.data.outcome_results.filter(result => result.mastery)
             })
     }
 

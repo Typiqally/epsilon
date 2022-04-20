@@ -3,15 +3,13 @@ import 'dotenv/config'
 import DataCollector from "./DataCollector.js";
 import CanvasApi from "./CanvasApi.js";
 
-
-
 const groupOutcomesWithAssignment = async (results) => {
     let GroupedByAssignment = {}
 
-    for (const result of results){
-        if (result.links.assignment !== undefined){
+    for (const result of results) {
+        if (result.links.assignment !== undefined) {
             const assignmentId = result.links.assignment.substring('assignment_'.length)
-            if (GroupedByAssignment[assignmentId.toString()] === undefined){
+            if (GroupedByAssignment[assignmentId.toString()] === undefined) {
                 GroupedByAssignment[assignmentId.toString()] = []
             }
             GroupedByAssignment[assignmentId.toString()].push(result)
@@ -25,12 +23,12 @@ const mergeDataSources = async () => {
     for (const module of modules) {
         let moduleItems = await canvasApi.getModuleItems(courseId, module.id);
         dataCollector.addModule(module)
-        for (const item of moduleItems){
+        for (const item of moduleItems) {
             //Is the item an assignment
             if (item.type === "Assignment") {
-                let assignment = await canvasApi.getAssignment(courseId,item.content_id)
+                let assignment = await canvasApi.getAssignment(courseId, item.content_id)
                 //Has the assignment results that are mastered
-                if (masteredOutcomes[assignment.id] !== undefined){
+                if (masteredOutcomes[assignment.id] !== undefined) {
                     assignment.results = masteredOutcomes[assignment.id]
                     assignment.results.forEach((async (outcome, index) => {
                         assignment.results[index].outcome = await canvasApi.getOutcome(outcome.links.learning_outcome);
@@ -45,9 +43,9 @@ const mergeDataSources = async () => {
 const logResults = () => {
     Object.values(dataCollector.getList()).forEach((Module => {
         console.log('Module', Module.name)
-        if (Object.keys(Module.assignments).length > 0){
+        if (Object.keys(Module.assignments).length > 0) {
             Object.values(Module.assignments).forEach(assignment => {
-                console.log('   ',assignment.name)
+                console.log('   ', assignment.name)
                 Object.values(assignment.results).forEach(item => {
                     console.log('       ', item.outcome.title)
                 })
