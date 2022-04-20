@@ -1,6 +1,9 @@
 import 'dotenv/config'
 import DataCollector from "./DataCollector.js";
-import CanvasApi from "./CanvasApi.js";
+
+import AssignmentRepository from "./repository/AssignmentRepository.js";
+import ModuleRepository from "./repository/ModuleRepository.js";
+import OutcomeRepository from "./repository/OutcomeRepository.js";
 
 const groupOutcomesWithAssignment = async outcomes => {
     let assignments = {}
@@ -20,20 +23,20 @@ const groupOutcomesWithAssignment = async outcomes => {
 
 const mergeDataSources = async (modules, outcomes) => {
     for (const module of modules) {
-        const items = await CanvasApi.getModuleItems(courseId, module.id);
+        const items = await ModuleRepository.getItems(courseId, module.id);
         const assignmentItem = items.filter(item => item.type === "Assignment");
 
         dataCollector.addModule(module)
 
         for (const item of assignmentItem) {
             //Is the item an assignment
-            const assignment = await CanvasApi.getAssignment(courseId, item.content_id)
+            const assignment = await AssignmentRepository.get(courseId, item.content_id)
 
             //Has the assignment results that are mastered
             if (outcomes[assignment.id] !== undefined) {
                 assignment.results = outcomes[assignment.id]
                 assignment.results.forEach((async (outcome, index) => {
-                    assignment.results[index].outcome = await CanvasApi.getOutcome(outcome.links.learning_outcome);
+                    assignment.results[index].outcome = await OutcomeRepository.get(outcome.links.learning_outcome);
                 }))
 
                 dataCollector.addAssignment(module, assignment)
@@ -66,8 +69,8 @@ console.log(`Targeting course: ${courseId}`)
 
 let dataCollector = new DataCollector()
 
-const modules = await CanvasApi.getModules(courseId);
-const outcomes = await CanvasApi.getMasteredOutcomes(courseId);
+const modules = await ModuleRepository.get(courseId);
+const outcomes = await OutcomeRepository.getMasteredResults(courseId);
 const outcomesWithAssignments = await groupOutcomesWithAssignment(outcomes);
 
 await mergeDataSources(modules, outcomesWithAssignments)
