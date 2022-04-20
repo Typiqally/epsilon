@@ -26,7 +26,7 @@ const mergeDataSources = async (modules, outcomes) => {
         const items = await ModuleRepository.getItems(courseId, module.id)
         const assignmentItem = items.filter(item => item.type === "Assignment")
 
-        dataCollector.addModule(module)
+        DataCollector.addModule(module)
 
         for (const item of assignmentItem) {
             //Is the item an assignment
@@ -39,14 +39,14 @@ const mergeDataSources = async (modules, outcomes) => {
                     assignment.results[index].outcome = await OutcomeRepository.get(outcome.links.learning_outcome)
                 }))
 
-                dataCollector.addAssignment(module, assignment)
+                DataCollector.addAssignment(module, assignment)
             }
         }
     }
 }
 
 const logResults = () => {
-    Object.values(dataCollector.getList()).forEach(module => {
+    Object.values(DataCollector.outcomes).forEach(module => {
         console.log('\n===========================================\n')
 
         console.log(`Module: ${module.name}`)
@@ -67,8 +67,6 @@ const logResults = () => {
 // Get Canvas course id from the .env file
 const courseId = process.env.CANVAS_COURSE_ID
 console.log(`Targeting course: ${courseId}`)
-
-let dataCollector = new DataCollector()
 
 const modules = await ModuleRepository.get(courseId)
 const outcomes = await OutcomeRepository.getMasteredResults(courseId)
