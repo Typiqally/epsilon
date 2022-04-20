@@ -32,5 +32,5 @@ Install the required dependencies with NPM by executing the following command in
 
 ### 6. Run the application
 
-To run the application, execute the following command: `npm index`.
+To run the application, execute the following command: `npm run index`.
 This will create an index of all your KPI's and output them in the desired format.
