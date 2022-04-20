@@ -42,3 +42,7 @@ Install the required dependencies with NPM by executing the following command in
 
 To run the application, execute the following command: `npm run index`.
 This will create an index of all your KPI's and output them in the desired format.
+
+## License
+
+Epsilon is licensed under the terms of GPL v3. See [LICENSE](LICENSE) for details.
