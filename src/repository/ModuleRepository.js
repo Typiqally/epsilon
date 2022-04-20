@@ -7,7 +7,7 @@ export default {
                 return response.data
             })
     }, getItems: async (courseId, moduleId) => {
-        return await client.get(`v1/courses/${courseId}/modules/${moduleId}/items`)
+        return await client.get(`v1/courses/${courseId}/modules/${moduleId}/items?per_page=69420`)
             .then(async response => {
                 return response.data
             })
