@@ -1,9 +1,9 @@
 import 'dotenv/config'
-import DataCollector from "./DataCollector.js";
+import DataCollector from "./DataCollector.js"
 
-import AssignmentRepository from "./repository/AssignmentRepository.js";
-import ModuleRepository from "./repository/ModuleRepository.js";
-import OutcomeRepository from "./repository/OutcomeRepository.js";
+import AssignmentRepository from "./repository/AssignmentRepository.js"
+import ModuleRepository from "./repository/ModuleRepository.js"
+import OutcomeRepository from "./repository/OutcomeRepository.js"
 
 const groupOutcomesWithAssignment = async outcomes => {
     let assignments = {}
@@ -23,8 +23,8 @@ const groupOutcomesWithAssignment = async outcomes => {
 
 const mergeDataSources = async (modules, outcomes) => {
     for (const module of modules) {
-        const items = await ModuleRepository.getItems(courseId, module.id);
-        const assignmentItem = items.filter(item => item.type === "Assignment");
+        const items = await ModuleRepository.getItems(courseId, module.id)
+        const assignmentItem = items.filter(item => item.type === "Assignment")
 
         dataCollector.addModule(module)
 
@@ -36,7 +36,7 @@ const mergeDataSources = async (modules, outcomes) => {
             if (outcomes[assignment.id] !== undefined) {
                 assignment.results = outcomes[assignment.id]
                 assignment.results.forEach((async (outcome, index) => {
-                    assignment.results[index].outcome = await OutcomeRepository.get(outcome.links.learning_outcome);
+                    assignment.results[index].outcome = await OutcomeRepository.get(outcome.links.learning_outcome)
                 }))
 
                 dataCollector.addAssignment(module, assignment)
@@ -57,7 +57,7 @@ const logResults = () => {
                 assignment.results.forEach(result => {
                     console.log('\t-', result.outcome.title)
                 })
-            });
+            })
         } else {
             console.log('No assignments could be found')
         }
@@ -70,9 +70,9 @@ console.log(`Targeting course: ${courseId}`)
 
 let dataCollector = new DataCollector()
 
-const modules = await ModuleRepository.get(courseId);
-const outcomes = await OutcomeRepository.getMasteredResults(courseId);
-const outcomesWithAssignments = await groupOutcomesWithAssignment(outcomes);
+const modules = await ModuleRepository.get(courseId)
+const outcomes = await OutcomeRepository.getMasteredResults(courseId)
+const outcomesWithAssignments = await groupOutcomesWithAssignment(outcomes)
 
 await mergeDataSources(modules, outcomesWithAssignments)
 

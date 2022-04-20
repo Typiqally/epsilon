@@ -7,4 +7,4 @@ const token = process.env.CANVAS_TOKEN
 axios.defaults.baseURL = baseUrl
 axios.defaults.headers.common = {'Authorization': `Bearer ${token}`}
 
-export default axios;
+export default axios

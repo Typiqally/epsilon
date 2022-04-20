@@ -1,5 +1,5 @@
 let DataCollector = class {
-    fullListOfOutcomes = {};
+    fullListOfOutcomes = {}
 
     getList() {
         return this.fullListOfOutcomes;
