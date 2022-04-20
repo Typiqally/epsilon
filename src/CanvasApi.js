@@ -2,25 +2,19 @@ import client from "./client/AxiosClient.js"
 
 export default {
     getOutcome: async (id) => {
-        process.stdout.write(`Fetching outcome ${id}... `)
+        console.log('Fetching outcome \x1b[34m%s\x1b[0m...', id)
 
         return client.get(`v1/outcomes/${id}`)
             .then(response => {
-                const data = response.data
-                console.log('\x1b[32m%s\x1b[0m', `done ${data.title}`)
-
                 return response.data
             })
             .catch(response => console.log(response))
     }, getAssignment: async (courseId, id) => {
-        process.stdout.write(`Fetching assignment ${id}... `)
+        console.log('Fetching assignment \x1b[34m%s\x1b[0m...', id)
 
         return client.get(`v1/courses/${courseId}/assignments/${id}`)
             .then(response => {
-                const data = response.data
-                console.log('\x1b[32m%s\x1b[0m', `done ${data.name}`)
-
-                return data
+                return response.data
             })
     }, getMasteredOutcomes: async (courseId) => {
         return await client.get(`v1/courses/${courseId}/outcome_results?per_page=69420`)
