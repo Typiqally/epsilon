@@ -45,13 +45,13 @@ const logResults = () => {
         console.log('Module', Module.name)
         if (Object.keys(Module.assignments).length > 0) {
             Object.values(Module.assignments).forEach(assignment => {
-                console.log('   ', assignment.name)
+                console.log('\t', assignment.name)
                 Object.values(assignment.results).forEach(item => {
-                    console.log('       ', item.outcome.title)
+                    console.log('\t\t', item.outcome.title)
                 })
             });
         } else {
-            console.log('   No assignments could be found')
+            console.log('\tNo assignments could be found')
         }
         console.log('\n===========================================\n')
     }))
