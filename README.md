@@ -22,17 +22,19 @@ This file contains all the nescessary settings for the application to work.
 ### 3. Canvas access token
 
 Go to [https://fhict.instructure.com/profile/settings](https://fhict.instructure.com/profile/settings), navigate to "Approved Integrations" and generate a new access token.
-After that, copy the access token and paste it in the duplicated `.env` file, under the `CANVAS_TOKEN` setting.
 
 ![Canvas access token generation](https://i.imgur.com/0ukmuMF.png)
+
+After that, copy the access token and paste it in the duplicated `.env` file, under the `CANVAS_TOKEN` setting.
 
 ### 4. Personal course ID
 
 First, navigate to your personal course in Canvas. The identifier of your personal course can be found in the URL.
 For example, `https://fhict.instructure.com/courses/00001`, in this case `00001` is your personal course identifier.
-Paste this identifier in the `.env` file, under the `CANVAS_COURSE_ID` setting.
 
 ![Canvas personal identifier URL](https://i.imgur.com/BkjDNtB.png)
+
+Paste this identifier in the `.env` file, under the `CANVAS_COURSE_ID` setting.
 
 ### 5. Install packages
 
