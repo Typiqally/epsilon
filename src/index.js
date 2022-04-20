@@ -9,10 +9,12 @@ const groupOutcomesWithAssignment = async (results) => {
     for (const result of results) {
         if (result.links.assignment !== undefined) {
             const assignmentId = result.links.assignment.substring('assignment_'.length)
-            if (GroupedByAssignment[assignmentId.toString()] === undefined) {
-                GroupedByAssignment[assignmentId.toString()] = []
+
+            if (GroupedByAssignment[assignmentId] === undefined) {
+                GroupedByAssignment[assignmentId] = []
             }
-            GroupedByAssignment[assignmentId.toString()].push(result)
+
+            GroupedByAssignment[assignmentId].push(result)
         }
     }
 

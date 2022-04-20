@@ -6,12 +6,12 @@ let DataCollector = class {
     }
 
     addModule(module) {
-        this.fullListOfOutcomes[module.id.toString()] = module
-        this.fullListOfOutcomes[module.id.toString()]["assignments"] = {}
+        this.fullListOfOutcomes[module.id] = module
+        this.fullListOfOutcomes[module.id]["assignments"] = {}
     }
 
     addAssignment(module, assignment) {
-        this.fullListOfOutcomes[module.id.toString()]["assignments"][assignment.id.toString()] = assignment
+        this.fullListOfOutcomes[module.id]["assignments"][assignment.id] = assignment
     }
 }
 
