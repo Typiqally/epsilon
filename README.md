@@ -4,11 +4,15 @@ These students usually have a personal course within Canvas (from Instructure), 
 During each semester, it is requested to take note of all KPI's which have been proven.
 To aid in these efforts, this application will gather all your mastered/proven [KPI's](https://hbo-i.nl/domeinbeschrijving/) and export your KPI's to a file format (e.g., JSON, Exel, CSV).
 
+![Application demo](https://i.imgur.com/b2w6PNl.gif)
+
 ## Setup
 
 ### 1. Cloning
 
 First of all, clone the project using the following command: `git clone https://github.com/Typiqally/epsilon.git`
+
+![GitHub cloning](https://i.imgur.com/wVNiZsk.png)
 
 ### 2. Duplicate environment file
 
@@ -20,11 +24,15 @@ This file contains all the nescessary settings for the application to work.
 Go to [https://fhict.instructure.com/profile/settings](https://fhict.instructure.com/profile/settings), navigate to "Approved Interrogations" and create an new access token.
 After that, copy the access token and paste it in the duplicated `.env` file, under the `CANVAS_TOKEN` setting.
 
+![Canvas access token generation](https://i.imgur.com/0ukmuMF.png)
+
 ### 4. Personal course ID
 
 First, navigate to your personal course in Canvas. The identifier of your personal course can be found in the URL.
-For example, `https://fhict.instructure.com/courses/00001/modules`, in this case `00001` is your personal course identifier.
+For example, `https://fhict.instructure.com/courses/00001`, in this case `00001` is your personal course identifier.
 Paste this identifier in the `.env` file, under the `CANVAS_COURSE_ID` setting.
+
+![Canvas personal identifier URL](https://i.imgur.com/BkjDNtB.png)
 
 ### 5. Install packages
 
