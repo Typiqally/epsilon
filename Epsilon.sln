@@ -2,7 +2,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Cli", "Epsilon.Cli\Epsilon.Cli.csproj", "{358E6BB1-E2A2-4397-A831-A2194604D532}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Data.Canvas", "Epsilon.Data.Canvas\Epsilon.Data.Canvas.csproj", "{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Canvas", "Epsilon.Canvas\Epsilon.Canvas.csproj", "{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
