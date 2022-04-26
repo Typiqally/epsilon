@@ -6,8 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj" />
-    </ItemGroup>
-
 </Project>
