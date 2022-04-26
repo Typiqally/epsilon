@@ -1,7 +1,11 @@
-﻿using Epsilon.Cli;
+﻿using System.Net.Http.Headers;
+using Epsilon.Cli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+
+const string canvasHttpClient = "canvas";
 
 IHostBuilder CreateHostBuilder(string[] args) =>
     Host.CreateDefaultBuilder(args)
@@ -13,6 +17,14 @@ IHostBuilder CreateHostBuilder(string[] args) =>
         .ConfigureServices(static (context, services) =>
         {
             services.Configure<CanvasSettings>(context.Configuration.GetSection("Canvas"));
+            services.AddHttpClient(
+                canvasHttpClient, static (provider, client) =>
+                {
+                    var settings = provider.GetRequiredService<IOptions<CanvasSettings>>().Value;
+
+                    client.BaseAddress = settings.ApiUrl;
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.AccessToken);
+                });
             services.AddHostedService<Startup>();
         });
 
