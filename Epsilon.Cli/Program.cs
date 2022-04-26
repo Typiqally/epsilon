@@ -10,7 +10,11 @@ IHostBuilder CreateHostBuilder(string[] args) =>
             config.SetBasePath(Directory.GetCurrentDirectory());
             config.AddJsonFile("appsettings.json");
         })
-        .ConfigureServices(static (_, services) => { services.AddHostedService<Startup>(); });
+        .ConfigureServices(static (context, services) =>
+        {
+            services.Configure<CanvasSettings>(context.Configuration.GetSection("Canvas"));
+            services.AddHostedService<Startup>();
+        });
 
 await CreateHostBuilder(args)
     .Build()
