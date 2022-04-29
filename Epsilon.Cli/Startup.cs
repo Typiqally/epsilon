@@ -101,20 +101,17 @@ public class Startup : IHostedService
     {
         foreach (var module in modules)
         {
-            var builder = new StringBuilder();
-            builder.AppendLine($"================ {module.Name} ================" + Environment.NewLine);
+            _logger.LogInformation("================ {ModuleName} ================", module.Name);
 
             foreach (var assignment in module.Assignments)
             {
-                builder.AppendLine(Environment.NewLine + assignment.Name + Environment.NewLine);
+                _logger.LogInformation("{AssignmentName}", assignment.Name);
 
                 foreach (var outcomeResult in assignment.OutcomeResults)
                 {
-                    builder.AppendLine($"\t- {outcomeResult.Outcome?.Title}");
+                    _logger.LogInformation("\t- {OutcomeTitle}", outcomeResult.Outcome?.Title);
                 }
             }
-
-            _logger.LogInformation("{Result}{NewLine}", builder, Environment.NewLine);
         }
     }
 }
