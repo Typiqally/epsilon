@@ -1,5 +1,6 @@
 ﻿using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Response;
 using Epsilon.Http.Abstractions;
 using Epsilon.Http.Json;
 
@@ -22,8 +23,8 @@ public class OutcomeService : HttpService, IOutcomeService
     public async Task<IEnumerable<OutcomeResult>?> AllResults(int courseId, int count = 1000)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results?per_page={count}");
-        var (response, value) = await Client.SendAsync<IEnumerable<OutcomeResult>>(request);
+        var (response, value) = await Client.SendAsync<OutcomeResultResponse>(request);
 
-        return value;
+        return value?.OutcomeResults;
     }
 }
