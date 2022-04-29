@@ -6,6 +6,6 @@ public record ModuleItem(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("title")] string Title,
     [property: JsonPropertyName("type"), JsonConverter(typeof(JsonStringEnumConverter))]
-    ModuleItemType Type,
+    ModuleItemType? Type,
     [property: JsonPropertyName("content_id")] int? ContentId
 );
