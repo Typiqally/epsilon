@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Epsilon.Canvas;
+﻿using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Data;
 using Microsoft.Extensions.Hosting;
