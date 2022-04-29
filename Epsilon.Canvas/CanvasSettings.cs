@@ -1,4 +1,4 @@
-﻿namespace Epsilon.Cli;
+﻿namespace Epsilon.Canvas;
 
 public record CanvasSettings
 {
