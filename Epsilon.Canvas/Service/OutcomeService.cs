@@ -5,7 +5,7 @@ using Epsilon.Http.Abstractions;
 using Epsilon.Http.Json;
 using Microsoft.Extensions.Logging;
 
-namespace Epsilon.Canvas;
+namespace Epsilon.Canvas.Service;
 
 public class OutcomeService : HttpService, IOutcomeService
 {
