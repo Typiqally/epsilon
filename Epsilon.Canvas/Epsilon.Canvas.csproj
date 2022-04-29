@@ -11,4 +11,8 @@
       <ProjectReference Include="..\Epsilon.Http\Epsilon.Http.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+    </ItemGroup>
+
 </Project>
