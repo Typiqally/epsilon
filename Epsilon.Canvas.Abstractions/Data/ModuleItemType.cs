@@ -3,6 +3,7 @@
 public enum ModuleItemType
 {
     Unknown,
+    Page,
     Assignment,
     SubHeader,
 }
