@@ -1,6 +1,7 @@
 ﻿using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

@@ -1,6 +1,6 @@
 ﻿using Epsilon.Canvas.Abstractions.Data;
 
-namespace Epsilon.Canvas.Abstractions;
+namespace Epsilon.Canvas.Abstractions.Services;
 
 public interface IAssignmentService
 {
