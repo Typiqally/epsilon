@@ -22,7 +22,7 @@ public class Startup : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting Epsilon, targeting course: {courseId}", _settings.CourseId);
+        _logger.LogInformation("Starting Epsilon, targeting course: {CourseId}", _settings.CourseId);
 
         _lifetime.ApplicationStarted.Register(() => Task.Run(ExecuteAsync, cancellationToken));
 
