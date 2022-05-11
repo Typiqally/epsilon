@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Http.Abstractions",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Http", "Epsilon.Http\Epsilon.Http.csproj", "{E1A47E69-DD5C-4F2A-A576-4F6F04D31632}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Formats", "Epsilon.Formats\Epsilon.Formats.csproj", "{71489128-3644-4FB5-ADEC-9BCE650FFCD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Formats.Abstractions", "Epsilon.Formats.Abstractions\Epsilon.Formats.Abstractions.csproj", "{33ACABE7-20F5-4DE4-A1D7-0F8EF62F2A8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +46,13 @@ Global
 		{E1A47E69-DD5C-4F2A-A576-4F6F04D31632}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1A47E69-DD5C-4F2A-A576-4F6F04D31632}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1A47E69-DD5C-4F2A-A576-4F6F04D31632}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71489128-3644-4FB5-ADEC-9BCE650FFCD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71489128-3644-4FB5-ADEC-9BCE650FFCD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71489128-3644-4FB5-ADEC-9BCE650FFCD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71489128-3644-4FB5-ADEC-9BCE650FFCD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33ACABE7-20F5-4DE4-A1D7-0F8EF62F2A8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33ACABE7-20F5-4DE4-A1D7-0F8EF62F2A8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33ACABE7-20F5-4DE4-A1D7-0F8EF62F2A8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33ACABE7-20F5-4DE4-A1D7-0F8EF62F2A8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
