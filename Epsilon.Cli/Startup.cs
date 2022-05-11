@@ -2,6 +2,7 @@
 using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
+using Epsilon.Formats.Abstractions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,7 @@ public class Startup : IHostedService
     private readonly IModuleService _moduleService;
     private readonly IOutcomeService _outcomeService;
     private readonly IAssignmentService _assignmentService;
+    private readonly ICsvFormat _csvFormat;
 
     public Startup(
         ILogger<Startup> logger,
@@ -23,7 +25,8 @@ public class Startup : IHostedService
         IOptions<CanvasSettings> options,
         IModuleService moduleService,
         IOutcomeService outcomeService,
-        IAssignmentService assignmentService)
+        IAssignmentService assignmentService,
+        ICsvFormat csvFormat)
     {
         _logger = logger;
         _lifetime = lifetime;
@@ -31,6 +34,7 @@ public class Startup : IHostedService
         _moduleService = moduleService;
         _outcomeService = outcomeService;
         _assignmentService = assignmentService;
+        _csvFormat = csvFormat;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -80,19 +84,29 @@ public class Startup : IHostedService
 
         foreach (var module in modules)
         {
-            var items = await _moduleService.AllItems(_settings.CourseId, module.Id) ?? throw new InvalidOperationException();
-            var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
-
-            foreach (var item in assignmentItems)
+            Console.WriteLine(module.Name);
+            var items = await _moduleService.AllItems(_settings.CourseId, module.Id);
+            Console.WriteLine(items);
+            if (items != null)
             {
-                if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
+                
+                var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
+
+                foreach (var item in assignmentItems)
                 {
-                    module.Assignments.Add(assignment);
+                    Console.WriteLine(item);
+                    if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
+                    {
+                        module.Assignments.Add(assignment);
+                    }
                 }
             }
+
         }
 
-        LogResults(modules);
+        // LogResults(modules);
+        
+        ReadArguments(modules);
 
         _lifetime.StopApplication();
     }
@@ -110,6 +124,36 @@ public class Startup : IHostedService
                 foreach (var outcomeResult in assignment.OutcomeResults)
                 {
                     _logger.LogInformation("\t- {OutcomeTitle}", outcomeResult.Outcome?.Title);
+                }
+            }
+        }
+    }
+
+    private void ReadArguments(IEnumerable<Module> modules)
+    {
+        string[] arguments = Environment.GetCommandLineArgs();
+
+        foreach (string argument in arguments)
+        {
+            if (argument.Contains("="))
+            {
+                if (argument.ToLower().StartsWith("format="))
+                {
+                    string format = argument.ToLower().Substring("format=".Length);
+                    string filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
+                    switch (format)
+                    {
+                        default:
+                            Console.WriteLine("No format given");
+                            break;
+                        case "pdf":
+                            Console.WriteLine("PDF format");
+                            break;
+                        case "csv":
+                            Console.WriteLine("csv format");
+                            _csvFormat.FormatFile(modules).CreateDocument(filename);
+                            break;
+                    }
                 }
             }
         }

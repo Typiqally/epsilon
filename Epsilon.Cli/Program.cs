@@ -1,5 +1,7 @@
 ﻿using Epsilon.Canvas;
 using Epsilon.Cli;
+using Epsilon.Formats;
+using Epsilon.Formats.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,10 +22,10 @@ IHostBuilder CreateHostBuilder(string[] args)
                 .CreateLogger();
 
             services.AddCanvas(context.Configuration.GetSection("Canvas"));
+            services.AddScoped<ICsvFormat, CsvFormat>();
             services.AddHostedService<Startup>();
         });
 }
-
 await CreateHostBuilder(args)
     .UseSerilog()
     .Build()
