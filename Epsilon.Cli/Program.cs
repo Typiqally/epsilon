@@ -1,7 +1,7 @@
-﻿using Epsilon.Canvas;
+﻿using Epsilon.Abstractions.Format;
+using Epsilon.Canvas;
 using Epsilon.Cli;
-using Epsilon.Formats;
-using Epsilon.Formats.Abstractions;
+using Epsilon.Format;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

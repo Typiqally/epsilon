@@ -1,4 +1,4 @@
-﻿namespace Epsilon.Formats.Abstractions;
+﻿namespace Epsilon.Abstractions.Format;
 
 public interface ICsvFormat : IFileFormat
 {

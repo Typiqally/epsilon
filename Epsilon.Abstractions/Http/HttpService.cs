@@ -1,4 +1,4 @@
-﻿namespace Epsilon.Http.Abstractions;
+﻿namespace Epsilon.Abstractions.Http;
 
 public abstract class HttpService
 {

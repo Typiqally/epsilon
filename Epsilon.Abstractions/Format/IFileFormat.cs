@@ -1,6 +1,6 @@
 ﻿using Epsilon.Canvas.Abstractions.Data;
 
-namespace Epsilon.Formats.Abstractions;
+namespace Epsilon.Abstractions.Format;
 
 public interface IFileFormat
 {

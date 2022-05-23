@@ -1,9 +1,8 @@
 ﻿using System.Data;
-using System.Runtime.InteropServices;
-using Epsilon.Formats.Abstractions;
+using Epsilon.Abstractions.Format;
 using Epsilon.Canvas.Abstractions.Data;
 
-namespace Epsilon.Formats;
+namespace Epsilon.Format;
 
 public class CsvFormat : ICsvFormat
 {
