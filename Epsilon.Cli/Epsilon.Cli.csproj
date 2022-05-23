@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Epsilon\Epsilon.csproj" />
       <ProjectReference Include="..\Epsilon.Canvas\Epsilon.Canvas.csproj" />
       <ProjectReference Include="..\Epsilon.Formats.Abstractions\Epsilon.Formats.Abstractions.csproj" />
       <ProjectReference Include="..\Epsilon.Formats\Epsilon.Formats.csproj" />

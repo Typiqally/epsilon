@@ -6,4 +6,5 @@ public enum ModuleItemType
     Page,
     Assignment,
     SubHeader,
+    File,
 }
