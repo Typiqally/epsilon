@@ -2,7 +2,6 @@
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
-using Epsilon.Formats.Abstractions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -84,9 +83,7 @@ public class Startup : IHostedService
 
         foreach (var module in modules)
         {
-            Console.WriteLine(module.Name);
             var items = await _moduleService.AllItems(_settings.CourseId, module.Id);
-            Console.WriteLine(items);
             if (items != null)
             {
                 
@@ -94,7 +91,6 @@ public class Startup : IHostedService
 
                 foreach (var item in assignmentItems)
                 {
-                    Console.WriteLine(item);
                     if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
                     {
                         module.Assignments.Add(assignment);

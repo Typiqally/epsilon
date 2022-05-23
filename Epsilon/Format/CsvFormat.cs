@@ -29,7 +29,7 @@ public class CsvFormat : ICsvFormat
 
     public bool CreateDocument(string fileName)
     {
-        Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +  $"\\{fileName}.csv");
+        Console.WriteLine("File: " + Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +  $"\\{fileName}.csv");
         ToCSV(_dataTable,Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +  $"\\{fileName}.csv");
         return true;
     }
