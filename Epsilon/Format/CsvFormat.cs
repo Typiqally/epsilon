@@ -14,6 +14,7 @@ public class CsvFormat : ICsvFormat
         _dataTable.Columns.Add("Assignment", typeof(string));
         _dataTable.Columns.Add("KPI", typeof(string));
         _dataTable.Columns.Add("Module", typeof(string));
+        
         foreach (var module in modules)
         {
             foreach (var assignment in module.Assignments)
@@ -29,12 +30,16 @@ public class CsvFormat : ICsvFormat
 
     public bool CreateDocument(string fileName)
     {
-        Console.WriteLine("File: " + Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +  $"\\{fileName}.csv");
-        ToCSV(_dataTable,Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) +  $"\\{fileName}.csv");
+        string fileLocation = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"\\{fileName}.csv";
+        
+        Console.WriteLine("File: " + fileLocation);
+        
+        ToCSV(_dataTable,fileLocation);
+        
         return true;
     }
     
-    public static void ToCSV(DataTable dtDataTable, string strFilePath) {  
+    private static void ToCSV(DataTable dtDataTable, string strFilePath) {  
         StreamWriter sw = new StreamWriter(strFilePath, false);  
         //headers    
         for (int i = 0; i < dtDataTable.Columns.Count; i++) {  
