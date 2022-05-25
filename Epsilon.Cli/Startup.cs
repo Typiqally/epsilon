@@ -100,7 +100,7 @@ public class Startup : IHostedService
 
         }
 
-        // LogResults(modules);
+        LogResults(modules);
         
         ReadArguments(modules);
 
