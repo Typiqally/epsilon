@@ -22,7 +22,7 @@ IHostBuilder CreateHostBuilder(string[] args)
                 .CreateLogger();
 
             services.AddCanvas(context.Configuration.GetSection("Canvas"));
-            services.AddScoped<ICsvFormat, CsvFormat>();
+            services.AddFormat(context.Configuration.GetSection("Export"));
             services.AddHostedService<Startup>();
         });
 }

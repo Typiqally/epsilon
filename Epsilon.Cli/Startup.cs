@@ -2,6 +2,7 @@
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
+using Epsilon.Format;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,16 +13,18 @@ public class Startup : IHostedService
 {
     private readonly ILogger<Startup> _logger;
     private readonly IHostApplicationLifetime _lifetime;
-    private readonly CanvasSettings _settings;
     private readonly IModuleService _moduleService;
     private readonly IOutcomeService _outcomeService;
     private readonly IAssignmentService _assignmentService;
     private readonly ICsvFormat _csvFormat;
+    private readonly ExportSettings _exportSettings;
+    private readonly CanvasSettings _canvasSettings;
 
     public Startup(
         ILogger<Startup> logger,
         IHostApplicationLifetime lifetime,
-        IOptions<CanvasSettings> options,
+        IOptions<CanvasSettings> canvasSettings,
+        IOptions<ExportSettings> exportSettings,
         IModuleService moduleService,
         IOutcomeService outcomeService,
         IAssignmentService assignmentService,
@@ -29,7 +32,8 @@ public class Startup : IHostedService
     {
         _logger = logger;
         _lifetime = lifetime;
-        _settings = options.Value;
+        _canvasSettings = canvasSettings.Value;
+        _exportSettings = exportSettings.Value;
         _moduleService = moduleService;
         _outcomeService = outcomeService;
         _assignmentService = assignmentService;
@@ -38,7 +42,7 @@ public class Startup : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting Epsilon, targeting course: {CourseId}", _settings.CourseId);
+        _logger.LogInformation("Starting Epsilon, targeting course: {CourseId}", _canvasSettings.CourseId);
 
         _lifetime.ApplicationStarted.Register(() => Task.Run(ExecuteAsync, cancellationToken));
 
@@ -52,7 +56,7 @@ public class Startup : IHostedService
 
     private async Task ExecuteAsync()
     {
-        var outcomeResults = await _outcomeService.AllResults(_settings.CourseId) ?? throw new InvalidOperationException();
+        var outcomeResults = await _outcomeService.AllResults(_canvasSettings.CourseId) ?? throw new InvalidOperationException();
         var masteredOutcomeResults = outcomeResults.Where(static result => result.Mastery.HasValue && result.Mastery.Value);
 
         var assignments = new Dictionary<int, Assignment>();
@@ -72,18 +76,18 @@ public class Startup : IHostedService
             var assignmentId = int.Parse(outcomeResult.Links["assignment"]["assignment_".Length..]);
             if (!assignments.TryGetValue(assignmentId, out var assignment))
             {
-                assignment = await _assignmentService.Find(_settings.CourseId, assignmentId) ?? throw new InvalidOperationException();
+                assignment = await _assignmentService.Find(_canvasSettings.CourseId, assignmentId) ?? throw new InvalidOperationException();
                 assignments.Add(assignmentId, assignment);
             }
 
             assignment.OutcomeResults.Add(outcomeResult);
         }
 
-        var modules = (await _moduleService.All(_settings.CourseId) ?? throw new InvalidOperationException()).ToList();
+        var modules = (await _moduleService.All(_canvasSettings.CourseId) ?? throw new InvalidOperationException()).ToList();
 
         foreach (var module in modules)
         {
-            var items = await _moduleService.AllItems(_settings.CourseId, module.Id);
+            var items = await _moduleService.AllItems(_canvasSettings.CourseId, module.Id);
             if (items != null)
             {
                 
@@ -127,31 +131,19 @@ public class Startup : IHostedService
 
     private void ReadArguments(IEnumerable<Module> modules)
     {
-        string[] arguments = Environment.GetCommandLineArgs();
-
-        foreach (string argument in arguments)
+        string filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
+        switch (_exportSettings.Format)
         {
-            if (argument.Contains("="))
-            {
-                if (argument.ToLower().StartsWith("format="))
-                {
-                    string format = argument.ToLower().Substring("format=".Length);
-                    string filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
-                    switch (format)
-                    {
-                        default:
-                            Console.WriteLine("No format given");
-                            break;
-                        case "pdf":
-                            Console.WriteLine("PDF format");
-                            break;
-                        case "csv":
-                            Console.WriteLine("csv format");
-                            _csvFormat.FormatFile(modules).CreateDocument(filename);
-                            break;
-                    }
-                }
-            }
+            default:
+                Console.WriteLine("No format given");
+                break;
+            case "pdf":
+                Console.WriteLine("PDF format");
+                break;
+            case "csv":
+                Console.WriteLine("csv format");
+                _csvFormat.FormatFile(modules).CreateDocument(filename);
+                break;
         }
     }
 }
