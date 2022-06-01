@@ -17,7 +17,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Epsilon.Cli - Windows
-          path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/win-x64/publish/Epsilon.Cli.exe
+          path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/win-x64/publish/
   
   Linux:
     name: Linux
@@ -34,4 +34,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: Epsilon.Cli - Linux
-          path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/linux-x64/publish/Epsilon.Cli.exe
+          path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/linux-x64/publish
