@@ -1,5 +1,4 @@
-﻿using Epsilon.Abstractions.Format;
-using Epsilon.Canvas;
+﻿using Epsilon.Canvas;
 using Epsilon.Cli;
 using Epsilon.Format;
 using Microsoft.Extensions.Configuration;
@@ -10,10 +9,11 @@ using Serilog;
 IHostBuilder CreateHostBuilder(string[] args)
 {
     return Host.CreateDefaultBuilder(args)
-        .ConfigureAppConfiguration(static config =>
+        .ConfigureAppConfiguration(config =>
         {
             config.SetBasePath(Directory.GetCurrentDirectory());
             config.AddJsonFile("appsettings.json");
+            config.AddCommandLine(args);
         })
         .ConfigureServices(static (context, services) =>
         {
@@ -26,6 +26,7 @@ IHostBuilder CreateHostBuilder(string[] args)
             services.AddHostedService<Startup>();
         });
 }
+
 await CreateHostBuilder(args)
     .UseSerilog()
     .Build()
