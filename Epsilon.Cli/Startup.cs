@@ -1,7 +1,8 @@
-﻿using Epsilon.Canvas;
-using Epsilon.Canvas.Abstractions;
+﻿using Epsilon.Abstractions.Export;
+using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
+using Epsilon.Export;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,30 +13,37 @@ public class Startup : IHostedService
 {
     private readonly ILogger<Startup> _logger;
     private readonly IHostApplicationLifetime _lifetime;
-    private readonly CanvasSettings _settings;
+    private readonly ExportSettings _exportSettings;
+    private readonly CanvasSettings _canvasSettings;
     private readonly IModuleService _moduleService;
     private readonly IOutcomeService _outcomeService;
     private readonly IAssignmentService _assignmentService;
+    private readonly IEnumerable<ICanvasModuleFileExporter> _fileExporters;
 
     public Startup(
         ILogger<Startup> logger,
         IHostApplicationLifetime lifetime,
-        IOptions<CanvasSettings> options,
+        IOptions<CanvasSettings> canvasSettings,
+        IOptions<ExportSettings> exportSettings,
         IModuleService moduleService,
         IOutcomeService outcomeService,
-        IAssignmentService assignmentService)
+        IAssignmentService assignmentService,
+        IEnumerable<ICanvasModuleFileExporter> fileExporters)
     {
         _logger = logger;
         _lifetime = lifetime;
-        _settings = options.Value;
+        _canvasSettings = canvasSettings.Value;
+        _exportSettings = exportSettings.Value;
         _moduleService = moduleService;
         _outcomeService = outcomeService;
         _assignmentService = assignmentService;
+        _fileExporters = fileExporters;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Starting Epsilon, targeting course: {CourseId}", _settings.CourseId);
+        _logger.LogInformation("Starting Epsilon, targeting course: {CourseId}", _canvasSettings.CourseId);
+        _logger.LogInformation("Using export format: {format}", _exportSettings.Format);
 
         _lifetime.ApplicationStarted.Register(() => Task.Run(ExecuteAsync, cancellationToken));
 
@@ -49,7 +57,7 @@ public class Startup : IHostedService
 
     private async Task ExecuteAsync()
     {
-        var outcomeResults = await _outcomeService.AllResults(_settings.CourseId) ?? throw new InvalidOperationException();
+        var outcomeResults = await _outcomeService.AllResults(_canvasSettings.CourseId) ?? throw new InvalidOperationException();
         var masteredOutcomeResults = outcomeResults.Where(static result => result.Mastery.HasValue && result.Mastery.Value);
 
         var assignments = new Dictionary<int, Assignment>();
@@ -69,48 +77,48 @@ public class Startup : IHostedService
             var assignmentId = int.Parse(outcomeResult.Links["assignment"]["assignment_".Length..]);
             if (!assignments.TryGetValue(assignmentId, out var assignment))
             {
-                assignment = await _assignmentService.Find(_settings.CourseId, assignmentId) ?? throw new InvalidOperationException();
+                assignment = await _assignmentService.Find(_canvasSettings.CourseId, assignmentId) ?? throw new InvalidOperationException();
                 assignments.Add(assignmentId, assignment);
             }
 
             assignment.OutcomeResults.Add(outcomeResult);
         }
 
-        var modules = (await _moduleService.All(_settings.CourseId) ?? throw new InvalidOperationException()).ToList();
+        var modules = (await _moduleService.All(_canvasSettings.CourseId) ?? throw new InvalidOperationException()).ToList();
 
         foreach (var module in modules)
         {
-            var items = await _moduleService.AllItems(_settings.CourseId, module.Id) ?? throw new InvalidOperationException();
-            var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
-
-            foreach (var item in assignmentItems)
+            var items = await _moduleService.AllItems(_canvasSettings.CourseId, module.Id);
+            if (items != null)
             {
-                if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
+                var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
+
+                foreach (var item in assignmentItems)
                 {
-                    module.Assignments.Add(assignment);
+                    if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
+                    {
+                        module.Assignments.Add(assignment);
+                    }
                 }
             }
         }
 
-        LogResults(modules);
+        Export(modules);
 
         _lifetime.StopApplication();
     }
 
-    private void LogResults(IEnumerable<Module> modules)
+    private void Export(IEnumerable<Module> modules)
     {
-        foreach (var module in modules)
+        var filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
+        var format = _exportSettings.Format.ToLower();
+
+        foreach (var fileExporter in _fileExporters)
         {
-            _logger.LogInformation("================ {ModuleName} ================", module.Name);
-
-            foreach (var assignment in module.Assignments)
+            if (fileExporter.CanExport(format))
             {
-                _logger.LogInformation("{AssignmentName}", assignment.Name);
-
-                foreach (var outcomeResult in assignment.OutcomeResults)
-                {
-                    _logger.LogInformation("\t- {OutcomeTitle}", outcomeResult.Outcome?.Title);
-                }
+                fileExporter.Export(modules, filename);
+                break;
             }
         }
     }

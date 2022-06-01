@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Epsilon.Http.Abstractions\Epsilon.Http.Abstractions.csproj" />
+      <ProjectReference Include="..\Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

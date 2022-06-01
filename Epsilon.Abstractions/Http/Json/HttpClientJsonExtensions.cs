@@ -1,4 +1,4 @@
-﻿namespace Epsilon.Http.Json;
+﻿namespace Epsilon.Abstractions.Http.Json;
 
 public static class HttpClientJsonExtensions
 {
