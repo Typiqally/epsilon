@@ -15,10 +15,3 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
-      - name: Publish
-        run: dotnet publish
-      - name: Upload Build
-        uses: actions/upload-artifact@v1
-        with:
-          name: app
-          path: /home/runner/work/epsilon/epsilon

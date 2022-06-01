@@ -1,0 +1,20 @@
+﻿name: Publish
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: '6.0.x'
+      - name: Publish Windows
+        run: dotnet publish -c Release -r win10-x64
+      - name: Create Windows artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Epsilon - Windows
+          path: /home/runner/work/epsilon/epsilon
