@@ -5,14 +5,14 @@ using Epsilon.Canvas.Abstractions.Services;
 
 namespace Epsilon;
 
-public class MainLogic : IMainLogic
+public class CanvasDataStructuring : ICanvasDataStructuring
 {
     private readonly IModuleService _moduleService;
     private readonly IOutcomeService _outcomeService;
     private readonly IAssignmentService _assignmentService;
     private readonly IEnumerable<ICanvasModuleFileExporter> _fileExporters;
 
-    public MainLogic(
+    public CanvasDataStructuring(
         IModuleService moduleService,
         IOutcomeService outcomeService,
         IAssignmentService assignmentService,
@@ -22,6 +22,28 @@ public class MainLogic : IMainLogic
         _outcomeService = outcomeService;
         _assignmentService = assignmentService;
         _fileExporters = fileExporters;
+    }
+    
+    public async Task<IEnumerable<Module>> GatherData(int courseId)
+    {
+        var assignments = await GatherAssignmentsAndOutcomes(courseId);
+        var modules = await AddAssignmentsToModules(courseId, assignments);
+
+        return modules;
+    }
+
+    public void Export(IEnumerable<Module> modules, string format)
+    {
+        var filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
+
+        foreach (var fileExporter in _fileExporters)
+        {
+            if (fileExporter.CanExport(format))
+            {
+                fileExporter.Export(modules, filename);
+                break;
+            }
+        }
     }
 
     private async Task<Dictionary<int, Assignment>> GatherAssignmentsAndOutcomes(int courseId)
@@ -56,50 +78,26 @@ public class MainLogic : IMainLogic
         return assignments;
     }
 
-    private async Task<List<Module>> AddAssignmentsToModules(int courseId, Dictionary<int, Assignment> assignments)
+    private async Task<List<Module>> AddAssignmentsToModules(int courseId, IReadOnlyDictionary<int, Assignment> assignments)
     {
         var modules = (await _moduleService.All(courseId) ?? throw new InvalidOperationException()).ToList();
 
         foreach (var module in modules)
         {
             var items = await _moduleService.AllItems(courseId, module.Id);
-            if (items != null)
-            {
-                var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
+            if (items == null) continue;
+            
+            var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
 
-                foreach (var item in assignmentItems)
+            foreach (var item in assignmentItems)
+            {
+                if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
                 {
-                    if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
-                    {
-                        module.Assignments.Add(assignment);
-                    }
+                    module.Assignments.Add(assignment);
                 }
             }
         }
 
         return modules;
-    }
-    
-    public async Task<IEnumerable<Module>> GatherData(int courseId)
-    {
-        Dictionary<int, Assignment> assignments = await GatherAssignmentsAndOutcomes(courseId);
-
-        List<Module> modules = await AddAssignmentsToModules(courseId, assignments);
-
-        return modules;
-    }
-
-    public void Export(IEnumerable<Module> modules, string format)
-    {
-        var filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
-
-        foreach (var fileExporter in _fileExporters)
-        {
-            if (fileExporter.CanExport(format))
-            {
-                fileExporter.Export(modules, filename);
-                break;
-            }
-        }
     }
 }

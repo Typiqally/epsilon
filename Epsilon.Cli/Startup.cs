@@ -14,20 +14,20 @@ public class Startup : IHostedService
     private readonly IHostApplicationLifetime _lifetime;
     private readonly ExportSettings _exportSettings;
     private readonly CanvasSettings _canvasSettings;
-    private readonly IMainLogic _mainLogic;
+    private readonly ICanvasDataStructuring _canvasDataStructuring;
 
     public Startup(
         ILogger<Startup> logger,
         IHostApplicationLifetime lifetime,
         IOptions<CanvasSettings> canvasSettings,
         IOptions<ExportSettings> exportSettings,
-        IMainLogic mainLogic)
+        ICanvasDataStructuring canvasDataStructuring)
     {
         _logger = logger;
         _lifetime = lifetime;
+        _canvasDataStructuring = canvasDataStructuring;
         _canvasSettings = canvasSettings.Value;
         _exportSettings = exportSettings.Value;
-        _mainLogic = mainLogic;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -47,7 +47,7 @@ public class Startup : IHostedService
 
     private async Task ExecuteAsync()
     {
-        IEnumerable<Module> modules = await _mainLogic.GatherData(_canvasSettings.CourseId);
+        IEnumerable<Module> modules = await _canvasDataStructuring.GatherData(_canvasSettings.CourseId);
         
         Export(modules);
 
@@ -57,6 +57,6 @@ public class Startup : IHostedService
     private void Export(IEnumerable<Module> modules)
     {
         var format = _exportSettings.Format.ToLower();
-        _mainLogic.Export(modules, format);
+        _canvasDataStructuring.Export(modules, format);
     }
 }

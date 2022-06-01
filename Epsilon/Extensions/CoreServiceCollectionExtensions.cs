@@ -22,7 +22,7 @@ public static class CoreServiceCollectionExtensions
         services.Configure<ExportSettings>(config);
         services.AddScoped<ICanvasModuleFileExporter, ConsoleCanvasModuleFileExporter>();
         services.AddScoped<ICanvasModuleFileExporter, CsvCanvasModuleFileExporter>();
-        services.AddScoped<IMainLogic, MainLogic>();
+        services.AddScoped<ICanvasDataStructuring, CanvasDataStructuring>();
 
         return services;
     }
