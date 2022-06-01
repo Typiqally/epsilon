@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Epsilon.Abstractions\Epsilon.Abstractions.csproj" />
-      <ProjectReference Include="..\Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj" />
+      <ProjectReference Include="..\Epsilon.Canvas\Epsilon.Canvas.csproj" />
     </ItemGroup>
 
     <ItemGroup>
