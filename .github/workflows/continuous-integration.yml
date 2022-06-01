@@ -15,3 +15,8 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
+      - name: Upload Build
+        uses: actions/upload-artifact@v1
+        with:
+          name: app
+          path: app/build/outputs/build/windows/Epsilon.exe
