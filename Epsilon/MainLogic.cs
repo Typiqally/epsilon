@@ -23,10 +23,10 @@ public class MainLogic : IMainLogic
         _assignmentService = assignmentService;
         _fileExporters = fileExporters;
     }
-    
-    public async Task<IEnumerable<Module>> GatherData(int courseId)
+
+    private async Task<Dictionary<int, Assignment>> GatherAssignmentsAndOutcomes(int courseId)
     {
-                var outcomeResults = await _outcomeService.AllResults(courseId) ?? throw new InvalidOperationException();
+        var outcomeResults = await _outcomeService.AllResults(courseId) ?? throw new InvalidOperationException();
         var masteredOutcomeResults = outcomeResults.Where(static result => result.Mastery.HasValue && result.Mastery.Value);
 
         var assignments = new Dictionary<int, Assignment>();
@@ -53,6 +53,11 @@ public class MainLogic : IMainLogic
             assignment.OutcomeResults.Add(outcomeResult);
         }
 
+        return assignments;
+    }
+
+    private async Task<List<Module>> AddAssignmentsToModules(int courseId, Dictionary<int, Assignment> assignments)
+    {
         var modules = (await _moduleService.All(courseId) ?? throw new InvalidOperationException()).ToList();
 
         foreach (var module in modules)
@@ -71,6 +76,15 @@ public class MainLogic : IMainLogic
                 }
             }
         }
+
+        return modules;
+    }
+    
+    public async Task<IEnumerable<Module>> GatherData(int courseId)
+    {
+        Dictionary<int, Assignment> assignments = await GatherAssignmentsAndOutcomes(courseId);
+
+        List<Module> modules = await AddAssignmentsToModules(courseId, assignments);
 
         return modules;
     }
