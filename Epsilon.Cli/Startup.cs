@@ -1,8 +1,8 @@
-﻿using Epsilon.Abstractions.Format;
+﻿using Epsilon.Abstractions.Export;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
-using Epsilon.Format;
+using Epsilon.Export;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -13,12 +13,12 @@ public class Startup : IHostedService
 {
     private readonly ILogger<Startup> _logger;
     private readonly IHostApplicationLifetime _lifetime;
+    private readonly ExportSettings _exportSettings;
+    private readonly CanvasSettings _canvasSettings;
     private readonly IModuleService _moduleService;
     private readonly IOutcomeService _outcomeService;
     private readonly IAssignmentService _assignmentService;
-    private readonly ICsvFormat _csvFormat;
-    private readonly ExportSettings _exportSettings;
-    private readonly CanvasSettings _canvasSettings;
+    private readonly IEnumerable<ICanvasModuleFileExporter> _fileExporters;
 
     public Startup(
         ILogger<Startup> logger,
@@ -28,7 +28,7 @@ public class Startup : IHostedService
         IModuleService moduleService,
         IOutcomeService outcomeService,
         IAssignmentService assignmentService,
-        ICsvFormat csvFormat)
+        IEnumerable<ICanvasModuleFileExporter> fileExporters)
     {
         _logger = logger;
         _lifetime = lifetime;
@@ -37,7 +37,7 @@ public class Startup : IHostedService
         _moduleService = moduleService;
         _outcomeService = outcomeService;
         _assignmentService = assignmentService;
-        _csvFormat = csvFormat;
+        _fileExporters = fileExporters;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -91,7 +91,6 @@ public class Startup : IHostedService
             var items = await _moduleService.AllItems(_canvasSettings.CourseId, module.Id);
             if (items != null)
             {
-                
                 var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
 
                 foreach (var item in assignmentItems)
@@ -102,49 +101,25 @@ public class Startup : IHostedService
                     }
                 }
             }
-
         }
 
-        LogResults(modules);
-        
-        ReadArguments(modules);
+        Export(modules);
 
         _lifetime.StopApplication();
     }
 
-    private void LogResults(IEnumerable<Module> modules)
+    private void Export(IEnumerable<Module> modules)
     {
-        foreach (var module in modules)
-        {
-            _logger.LogInformation("================ {ModuleName} ================", module.Name);
+        var filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
+        var format = _exportSettings.Format.ToLower();
 
-            foreach (var assignment in module.Assignments)
+        foreach (var fileExporter in _fileExporters)
+        {
+            if (fileExporter.CanExport(format))
             {
-                _logger.LogInformation("{AssignmentName}", assignment.Name);
-
-                foreach (var outcomeResult in assignment.OutcomeResults)
-                {
-                    _logger.LogInformation("\t- {OutcomeTitle}", outcomeResult.Outcome?.Title);
-                }
+                fileExporter.Export(modules, filename);
+                break;
             }
-        }
-    }
-
-    private void ReadArguments(IEnumerable<Module> modules)
-    {
-        string filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
-        switch (_exportSettings.Format)
-        {
-            default:
-                Console.WriteLine("No format given");
-                break;
-            case "pdf":
-                Console.WriteLine("PDF format");
-                break;
-            case "csv":
-                Console.WriteLine("csv format");
-                _csvFormat.FormatFile(modules).CreateDocument(filename);
-                break;
         }
     }
 }
