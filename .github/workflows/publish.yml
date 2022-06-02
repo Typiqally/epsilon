@@ -21,4 +21,4 @@ jobs:
           name: Epsilon.Cli - ${{ matrix.RID }}
           path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/
       - name: Copy appsettings.json
-        run: cp /home/runner/work/epsilon/epsilon/Epsilon.Cli/appsettings.example.json /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
+        run: ls /home/runner/work/epsilon/epsilon/Epsilon.Cli/
