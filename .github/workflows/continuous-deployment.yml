@@ -1,12 +1,13 @@
 ﻿name: Continuous deployment
 on:
   release:
-  pull_request:
+  push:
     branches:
-      - master
+      - 'master'
 
 jobs:
-  Artifacts:
+  publish:
+    name: Publish
     runs-on: ubuntu-20.04
     strategy:
       matrix:
