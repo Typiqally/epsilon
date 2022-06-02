@@ -1,0 +1,29 @@
+﻿name: Continuous deployment
+on:
+  release:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
+    
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: '6.0.x'
+      - name: Publish
+        run: dotnet publish Epsilon.Cli --runtime ${{ matrix.RID }} --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
+      - name: Copy appsettings.json
+        run: cp /home/runner/work/epsilon/epsilon/Epsilon.Cli/appsettings.example.json /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
+      - name: Create artifact ${{ matrix.RID }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Epsilon.Cli - ${{ matrix.RID }}
+          path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/
