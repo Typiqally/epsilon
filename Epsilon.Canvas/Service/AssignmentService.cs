@@ -1,7 +1,7 @@
-﻿using Epsilon.Abstractions.Http;
-using Epsilon.Abstractions.Http.Json;
-using Epsilon.Canvas.Abstractions.Data;
+﻿using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
+using Epsilon.Http.Abstractions;
+using Epsilon.Http.Abstractions.Json;
 using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Canvas.Service;
