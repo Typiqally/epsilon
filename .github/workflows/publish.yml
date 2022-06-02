@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        RID: [ 'linux-x64', 'windows-x64', 'osx-x64' ]
+        RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
     
     steps:
       - uses: actions/checkout@v2
