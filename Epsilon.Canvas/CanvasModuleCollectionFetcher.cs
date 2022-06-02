@@ -1,52 +1,34 @@
-﻿using Epsilon.Abstractions;
-using Epsilon.Abstractions.Export;
+﻿using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
 
-namespace Epsilon;
+namespace Epsilon.Canvas;
 
-public class CanvasDataStructuring : ICanvasDataStructuring
+public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 {
     private readonly IModuleService _moduleService;
     private readonly IOutcomeService _outcomeService;
     private readonly IAssignmentService _assignmentService;
-    private readonly IEnumerable<ICanvasModuleFileExporter> _fileExporters;
 
-    public CanvasDataStructuring(
+    public CanvasModuleCollectionFetcher(
         IModuleService moduleService,
         IOutcomeService outcomeService,
-        IAssignmentService assignmentService,
-        IEnumerable<ICanvasModuleFileExporter> fileExporters)
+        IAssignmentService assignmentService)
     {
         _moduleService = moduleService;
         _outcomeService = outcomeService;
         _assignmentService = assignmentService;
-        _fileExporters = fileExporters;
     }
-    
-    public async Task<IEnumerable<Module>> GatherData(int courseId)
+
+    public async Task<IEnumerable<Module>> Fetch(int courseId)
     {
-        var assignments = await GatherAssignmentsAndOutcomes(courseId);
+        var assignments = await FetchAssignmentsAndOutcomes(courseId);
         var modules = await AddAssignmentsToModules(courseId, assignments);
 
         return modules;
     }
 
-    public void Export(IEnumerable<Module> modules, string format)
-    {
-        var filename = "Epsilon-Export-" + DateTime.Now.ToString("ddMMyyyyHHmmss");
-
-        foreach (var fileExporter in _fileExporters)
-        {
-            if (fileExporter.CanExport(format))
-            {
-                fileExporter.Export(modules, filename);
-                break;
-            }
-        }
-    }
-
-    private async Task<Dictionary<int, Assignment>> GatherAssignmentsAndOutcomes(int courseId)
+    private async Task<Dictionary<int, Assignment>> FetchAssignmentsAndOutcomes(int courseId)
     {
         var outcomeResults = await _outcomeService.AllResults(courseId) ?? throw new InvalidOperationException();
         var masteredOutcomeResults = outcomeResults.Where(static result => result.Mastery.HasValue && result.Mastery.Value);
@@ -86,7 +68,7 @@ public class CanvasDataStructuring : ICanvasDataStructuring
         {
             var items = await _moduleService.AllItems(courseId, module.Id);
             if (items == null) continue;
-            
+
             var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
 
             foreach (var item in assignmentItems)

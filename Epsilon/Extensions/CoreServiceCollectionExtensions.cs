@@ -1,5 +1,4 @@
-﻿using Epsilon.Abstractions;
-using Epsilon.Abstractions.Export;
+﻿using Epsilon.Abstractions.Export;
 using Epsilon.Canvas;
 using Epsilon.Export;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +21,6 @@ public static class CoreServiceCollectionExtensions
         services.Configure<ExportSettings>(config);
         services.AddScoped<ICanvasModuleFileExporter, ConsoleCanvasModuleFileExporter>();
         services.AddScoped<ICanvasModuleFileExporter, CsvCanvasModuleFileExporter>();
-        services.AddScoped<ICanvasDataStructuring, CanvasDataStructuring>();
 
         return services;
     }
