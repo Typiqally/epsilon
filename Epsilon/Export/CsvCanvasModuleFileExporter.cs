@@ -57,6 +57,7 @@ public class CsvCanvasModuleFileExporter : ICanvasModuleFileExporter
         writer.Write(writer.NewLine);
     }
 
+    // TODO: Fix code smell, cognitive complexity in if statement nesting
     private static void WriteRows(TextWriter writer, DataTable dt)
     {
         foreach (DataRow dr in dt.Rows)
