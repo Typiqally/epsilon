@@ -66,14 +66,17 @@ public class CsvCanvasModuleFileExporter : ICanvasModuleFileExporter
                 if (!Convert.IsDBNull(dr[i]))
                 {
                     var value = dr[i].ToString();
-                    if (value.Contains(','))
+                    if (value != null)
                     {
-                        value = $"\"{value}\"";
-                        writer.Write(value);
-                    }
-                    else
-                    {
-                        writer.Write(dr[i].ToString());
+                        if (value.Contains(','))
+                        {
+                            value = $"\"{value}\"";
+                            writer.Write(value);
+                        }
+                        else
+                        {
+                            writer.Write(dr[i].ToString());
+                        }
                     }
                 }
 
