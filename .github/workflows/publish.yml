@@ -1,5 +1,5 @@
 ﻿name: Publish
-on: [ push, pull_request ]
+on: [ release, pull_request ]
 
 jobs:
   Artifacts:
