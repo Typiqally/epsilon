@@ -20,3 +20,8 @@ jobs:
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
           path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/
+      - name: Copy appsettings.json
+        uses: canastro/copy-file-action@master
+        with:
+          source: /home/runner/work/epsilon/epsilon/Epsilon.Cli/appsettings.example.json
+          target: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
