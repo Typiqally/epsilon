@@ -1,18 +1,26 @@
 ﻿using System.Data;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Data;
+using Microsoft.Extensions.Options;
 
-namespace Epsilon.Export;
+namespace Epsilon.Export.Exporters;
 
-public class CsvCanvasModuleFileExporter : ICanvasModuleFileExporter
+public class CsvModuleExporter : ICanvasModuleExporter
 {
-    public bool CanExport(string format) => format == "csv";
+    private readonly ExportOptions _options;
 
-    public void Export(IEnumerable<Module> data, string path)
+    public CsvModuleExporter(IOptions<ExportOptions> options)
+    {
+        _options = options.Value;
+    }
+
+    public IEnumerable<string> Formats { get; } = new[] { "csv" };
+
+    public void Export(IEnumerable<Module> data, string format)
     {
         var dt = CreateDataTable(data);
 
-        var stream = new StreamWriter(path + ".csv", false);
+        var stream = new StreamWriter($"{_options.FormattedOutputName}.{format}", false);
         WriteHeader(stream, dt);
         WriteRows(stream, dt);
 
