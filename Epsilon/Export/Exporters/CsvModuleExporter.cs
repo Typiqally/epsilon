@@ -58,7 +58,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
             writer.Write(dt.Columns[i]);
             if (i < dt.Columns.Count - 1)
             {
-                writer.Write(",");
+                writer.Write(";");
             }
         }
 
@@ -77,7 +77,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
                     var value = dr[i].ToString();
                     if (value != null)
                     {
-                        if (value.Contains(','))
+                        if (value.Contains(';'))
                         {
                             value = $"\"{value}\"";
                             writer.Write(value);
@@ -91,7 +91,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
                 if (i < dt.Columns.Count - 1)
                 {
-                    writer.Write(",");
+                    writer.Write(";");
                 }
             }
 
