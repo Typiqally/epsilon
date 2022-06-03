@@ -36,6 +36,18 @@ public class Startup : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        if (_canvasSettings.CourseId <= 0)
+        {
+            _logger.LogError("No course id has been given");
+            return Task.FromException(new Exception("No course id has been given"));
+        }
+
+        if (_canvasSettings.AccessToken.Length <= 0)
+        {
+            _logger.LogError("No Access token has been given");
+            return Task.FromException(new Exception("No Access token has been given"));
+        }
+        
         _lifetime.ApplicationStarted.Register(() => Task.Run(ExecuteAsync, cancellationToken));
 
         return Task.CompletedTask;
