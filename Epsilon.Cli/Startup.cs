@@ -36,18 +36,6 @@ public class Startup : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        if (_canvasSettings.CourseId <= 0)
-        {
-            _logger.LogError("No course id has been given");
-            return Task.FromException(new Exception("No course id has been given"));
-        }
-
-        if (_canvasSettings.AccessToken.Length <= 0)
-        {
-            _logger.LogError("No Access token has been given");
-            return Task.FromException(new Exception("No Access token has been given"));
-        }
-        
         _lifetime.ApplicationStarted.Register(() => Task.Run(ExecuteAsync, cancellationToken));
 
         return Task.CompletedTask;
@@ -60,11 +48,13 @@ public class Startup : IHostedService
 
     private async Task ExecuteAsync()
     {
-        _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
-        _logger.LogInformation("Using export formats: {Formats}", string.Join(",", _exportOptions.Formats));
-
         try
         {
+            ValidateOptions();
+            
+            _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
+            _logger.LogInformation("Using export formats: {Formats}", string.Join(",", _exportOptions.Formats));
+
             var exporters = _exporterCollection.DetermineExporters(_exportOptions.Formats).ToArray();
             var modules = (await _collectionFetcher.Fetch(_canvasSettings.CourseId)).ToArray();
 
@@ -74,6 +64,10 @@ public class Startup : IHostedService
                 exporter.Export(modules, format);
             }
         }
+        catch (ArgumentNullException e)
+        {
+            _logger.LogCritical("Argument is required: {ParamName}", e.ParamName);
+        }
         catch (NoExportersFoundException e)
         {
             _logger.LogCritical("An error occured: {Message}", e.Message);
@@ -81,6 +75,19 @@ public class Startup : IHostedService
         finally
         {
             _lifetime.StopApplication();
+        }
+    }
+
+    private void ValidateOptions()
+    {
+        if (_canvasSettings.CourseId <= 0)
+        {
+            throw new ArgumentNullException(nameof(_canvasSettings.CourseId));
+        }
+
+        if (string.IsNullOrEmpty(_canvasSettings.AccessToken))
+        {
+            throw new ArgumentNullException(nameof(_canvasSettings.AccessToken));
         }
     }
 }
