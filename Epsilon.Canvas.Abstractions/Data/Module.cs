@@ -10,4 +10,9 @@ public record Module(
 {
     [JsonIgnore]
     public IList<Assignment> Assignments { get; set; } = new Collection<Assignment>();
+
+    public bool HasAssignments()
+    {
+        return this.Assignments.Count > 0;
+    }
 }
