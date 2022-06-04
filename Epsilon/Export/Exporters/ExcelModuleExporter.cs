@@ -1,12 +1,20 @@
 ﻿using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Data;
 using ExcelLibrary.SpreadSheet;
+using Microsoft.Extensions.Options;
 
-namespace Epsilon.Export;
+namespace Epsilon.Export.Exporters;
 
-public class ExcelCanvasModuleFileExporter : ICanvasModuleFileExporter
+public class ExcelModuleExporter : ICanvasModuleExporter
 {
-    public bool CanExport(string format) => format.ToLower() == "xls";
+    private readonly ExportOptions _options;
+
+    public ExcelModuleExporter(IOptions<ExportOptions> options)
+    {
+        _options = options.Value;
+    }
+
+    public IEnumerable<string> Formats { get; } = new[] { "xls" };
 
     public  List<Outcome> GetAllOutcomesTypes(Module module)
     {
@@ -39,7 +47,7 @@ public class ExcelCanvasModuleFileExporter : ICanvasModuleFileExporter
         return 0;
     }
 
-    public void Export(IEnumerable<Module> modules, string path)
+    public void Export(IEnumerable<Module> modules, string format)
     {
         Workbook workbook = new Workbook();
         
@@ -83,6 +91,6 @@ public class ExcelCanvasModuleFileExporter : ICanvasModuleFileExporter
                 
             }
         }
-        workbook.Save(path + ".xls");
+        workbook.Save($"{_options.FormattedOutputName}.{format}");
     }
 }
