@@ -12,6 +12,11 @@ public class ModuleExporterCollection : IModuleExporterCollection
         _exporters = exporters;
     }
 
+    public IEnumerable<string> Formats()
+    {
+        return _exporters.SelectMany(static x => x.Formats);
+    }
+
     public IDictionary<string, ICanvasModuleExporter> DetermineExporters(IEnumerable<string> formats)
     {
         var formatsArray = formats as string[] ?? formats.ToArray(); // To prevent multiple enumeration

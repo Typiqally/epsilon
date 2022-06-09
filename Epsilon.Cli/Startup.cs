@@ -51,9 +51,9 @@ public class Startup : IHostedService
         try
         {
             ValidateOptions();
-            
+
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
-            _logger.LogInformation("Using export formats: {Formats}", string.Join(",", _exportOptions.Formats));
+            _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", _exportOptions.Formats));
 
             var exporters = _exporterCollection.DetermineExporters(_exportOptions.Formats).ToArray();
             var modules = (await _collectionFetcher.Fetch(_canvasSettings.CourseId)).ToArray();
@@ -70,7 +70,7 @@ public class Startup : IHostedService
         }
         catch (NoExportersFoundException e)
         {
-            _logger.LogCritical("An error occured: {Message}", e.Message);
+            _logger.LogCritical("Exporter could not be found, supported formats: {Formats}", string.Join(", ", _exporterCollection.Formats()));
         }
         finally
         {
