@@ -14,7 +14,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         _options = options.Value;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "xls" };
+    public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
     public void Export(IEnumerable<Module> modules, string format)
     {
@@ -66,7 +66,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             workbook.Worksheets.Add(worksheet);
         }
 
-        workbook.Save($"{_options.FormattedOutputName}.{format}");
+        workbook.Save($"{_options.FormattedOutputName}.xls");
     }
 
     private static List<Outcome> GetAllOutcomesTypes(Module module)
