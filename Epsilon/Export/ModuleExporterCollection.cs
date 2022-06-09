@@ -21,7 +21,7 @@ public class ModuleExporterCollection : IModuleExporterCollection
         {
             foreach (var format in formatsArray)
             {
-                if (exporter.Formats.Contains(format))
+                if (exporter.Formats.Contains(format.ToLower()))
                 {
                     foundExporters.Add(format, exporter);
                 }
