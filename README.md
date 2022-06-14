@@ -6,12 +6,12 @@ To aid in these efforts, this application will gather all your mastered/proven [
 
 ![Application demo](https://i.imgur.com/xe9C939.gif)
 
+## Usage
+Read how to use the application in our Wiki located [here](https://github.com/Typiqally/epsilon/wiki/How-to-use).
 
-## How to use the application
-[How to use](https://github.com/Typiqally/epsilon/wiki/How-to-use)
-
-## Contribute to Epsilon
-[Contributing to development](https://github.com/Typiqally/epsilon/wiki/Contributing-to-development)
+## Contributing
+Want to fix bugs, enhance functionality or simply have a look at the source code?
+Have a look at our Wiki page [here](https://github.com/Typiqally/epsilon/wiki/Contributing-to-development) to learn more about contributing.
 
 ## License
 
