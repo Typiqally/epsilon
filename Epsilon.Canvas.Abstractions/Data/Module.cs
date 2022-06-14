@@ -13,6 +13,6 @@ public record Module(
 
     public bool HasAssignments()
     {
-        return this.Assignments.Count > 0;
+        return Assignments.Count > 0;
     }
 }
