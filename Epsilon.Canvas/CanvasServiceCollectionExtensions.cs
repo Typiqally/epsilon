@@ -27,6 +27,7 @@ public static class CanvasServiceCollectionExtensions
         services.AddHttpClient<IModuleService, ModuleService>(CanvasHttpClient);
         services.AddHttpClient<IAssignmentService, AssignmentService>(CanvasHttpClient);
         services.AddHttpClient<IOutcomeService, OutcomeService>(CanvasHttpClient);
+        services.AddHttpClient<ISubmissionService, SubmissionService>(CanvasHttpClient);
         
         services.AddScoped<ICanvasModuleCollectionFetcher, CanvasModuleCollectionFetcher>();
 
