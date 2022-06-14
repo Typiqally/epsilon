@@ -1,85 +1,137 @@
 ﻿using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Data;
 using Epsilon.Canvas.Abstractions.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Canvas;
 
 public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 {
+    private readonly ILogger<CanvasModuleCollectionFetcher> _logger;
     private readonly IModuleService _moduleService;
+    private readonly ISubmissionService _submissionService;
     private readonly IOutcomeService _outcomeService;
-    private readonly IAssignmentService _assignmentService;
 
     public CanvasModuleCollectionFetcher(
+        ILogger<CanvasModuleCollectionFetcher> logger,
         IModuleService moduleService,
-        IOutcomeService outcomeService,
-        IAssignmentService assignmentService)
+        ISubmissionService submissionService,
+        IOutcomeService outcomeService
+    )
     {
+        _logger = logger;
         _moduleService = moduleService;
+        _submissionService = submissionService;
         _outcomeService = outcomeService;
-        _assignmentService = assignmentService;
     }
 
+    //TODO: Deal with KPIs with lower score
     public async Task<IEnumerable<Module>> Fetch(int courseId)
     {
-        var assignments = await FetchAssignmentsAndOutcomes(courseId);
-        var modules = await AddAssignmentsToModules(courseId, assignments);
+        var submissions = await FetchSubmissions(courseId);
+        var submissionsArray = submissions.ToArray();
 
-        return modules;
-    }
+        await Saturate(submissionsArray);
 
-    private async Task<Dictionary<int, Assignment>> FetchAssignmentsAndOutcomes(int courseId)
-    {
-        var outcomeResults = await _outcomeService.AllResults(courseId) ?? throw new InvalidOperationException();
-        var masteredOutcomeResults = outcomeResults.Where(static result => result.Mastery.HasValue && result.Mastery.Value);
+        var submissionAssignmentMap = new Dictionary<int, Submission>();
 
-        var assignments = new Dictionary<int, Assignment>();
-        var outcomes = new Dictionary<int, Outcome>();
-
-        foreach (var outcomeResult in masteredOutcomeResults)
+        foreach (var submission in submissionsArray)
         {
-            var outcomeId = int.Parse(outcomeResult.Links["learning_outcome"]);
-            if (!outcomes.TryGetValue(outcomeId, out var outcome))
+            if (submission.RubricAssessment == null || submission.Assignment == null)
             {
-                outcome = await _outcomeService.Find(outcomeId) ?? throw new InvalidOperationException();
-                outcomes.Add(outcomeId, outcome);
+                continue;
             }
 
-            outcomeResult.Outcome = outcome;
+            var assignmentId = submission.Assignment.Id;
 
-            var assignmentId = int.Parse(outcomeResult.Links["assignment"]["assignment_".Length..]);
-            if (!assignments.TryGetValue(assignmentId, out var assignment))
+            if (submissionAssignmentMap.ContainsKey(assignmentId))
             {
-                assignment = await _assignmentService.Find(courseId, assignmentId) ?? throw new InvalidOperationException();
-                assignments.Add(assignmentId, assignment);
+                throw new InvalidOperationException();
             }
 
-            assignment.OutcomeResults.Add(outcomeResult);
+            submissionAssignmentMap[assignmentId] = submission;
         }
 
-        return assignments;
-    }
-
-    private async Task<List<Module>> AddAssignmentsToModules(int courseId, IReadOnlyDictionary<int, Assignment> assignments)
-    {
-        var modules = (await _moduleService.All(courseId) ?? throw new InvalidOperationException()).ToList();
+        var modules = await FetchModules(courseId);
 
         foreach (var module in modules)
         {
             var items = await _moduleService.AllItems(courseId, module.Id);
-            if (items == null) continue;
 
-            var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
-
-            foreach (var item in assignmentItems)
+            foreach (var item in items.Where(static i => i.Type == ModuleItemType.Assignment && i.ContentId.HasValue))
             {
-                if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
+                if (submissionAssignmentMap.TryGetValue(item.ContentId!.Value, out var submission))
                 {
-                    module.Assignments.Add(assignment);
+                    module.Submissions.Add(submission);
                 }
             }
         }
 
         return modules;
+    }
+
+    private async Task<IEnumerable<Module>> FetchModules(int courseId)
+    {
+        _logger.LogInformation("Downloading modules...");
+        var modules = await _moduleService.All(courseId);
+        if (modules == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var moduleArray = modules.ToArray();
+
+        foreach (var (id, name, count) in moduleArray)
+        {
+            _logger.LogInformation("[{Id}] {Name} with {Count} items", id, name, count);
+        }
+
+        return moduleArray;
+    }
+
+    private async Task<IEnumerable<Submission>> FetchSubmissions(int courseId)
+    {
+        _logger.LogInformation("Downloading submissions...");
+
+        var submissions = await _submissionService.GetAllFromStudent(courseId, new[] { "assignment", "full_rubric_assessment" });
+        if (submissions == null)
+        {
+            throw new InvalidOperationException();
+        }
+
+        var submissionsArray = submissions.ToArray();
+
+        foreach (var (assessment, assignment) in submissionsArray)
+        {
+            _logger.LogInformation("[{Id}] {Assignment}", assignment.Id, assignment.Name);
+        }
+
+        return submissionsArray;
+    }
+
+    //TODO: Move to saturation class
+    private async Task Saturate(IEnumerable<Submission> submissions)
+    {
+        _logger.LogInformation("Saturating submissions...");
+
+        var cache = new Dictionary<int, Outcome>();
+
+        foreach (var submission in submissions.Where(static s => s.RubricAssessment != null))
+        {
+            foreach (var rating in submission.RubricAssessment!.Ratings.Where(static r => r.OutcomeId.HasValue))
+            {
+                var outcomeId = rating.OutcomeId!.Value;
+
+                if (!cache.TryGetValue(outcomeId, out var outcome))
+                {
+                    outcome = await _outcomeService.Find(outcomeId);
+                    cache[outcomeId] = outcome;
+
+                    _logger.LogInformation("[{Id}] {Outcome}", outcome.Id, outcome.Title);
+                }
+
+                rating.Outcome = outcome;
+            }
+        }
     }
 }

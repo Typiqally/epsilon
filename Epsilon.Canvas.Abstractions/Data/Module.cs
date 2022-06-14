@@ -9,13 +9,7 @@ public record Module(
     [property: JsonPropertyName("items_count")] int Count)
 {
     [JsonIgnore]
-    public IList<Assignment> Assignments { get; set; } = new Collection<Assignment>();
-
-    [JsonIgnore]
     public IList<Submission> Submissions { get; set; } = new Collection<Submission>();
 
-    public bool HasAssignments()
-    {
-        return Assignments.Count > 0;
-    }
+    public bool HasSubmissions() => Submissions.Count > 0;
 }

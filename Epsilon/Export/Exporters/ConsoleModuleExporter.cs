@@ -26,25 +26,18 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
         {
             _logger.LogInformation("================ {ModuleName} ================", module.Name);
 
-            LogAssignments(module.Assignments);
-        }
-    }
+            foreach (var submission in module.Submissions)
+            {
+                _logger.LogInformation("Assignment: {Assignment}", submission.Assignment.Name);
 
-    private void LogAssignments(IEnumerable<Assignment> assignments)
-    {
-        foreach (var assignment in assignments)
-        {
-            _logger.LogInformation("{AssignmentName}", assignment.Name);
-
-            LogOutcomeResults(assignment.OutcomeResults);
-        }
-    }
-
-    private void LogOutcomeResults(IEnumerable<OutcomeResult> results)
-    {
-        foreach (var outcomeResult in results)
-        {
-            _logger.LogInformation("\t- {OutcomeTitle}", outcomeResult.Outcome?.Title);
+                foreach (var rating in submission.RubricAssessment.Ratings)
+                {
+                    if (rating.Outcome != null)
+                    {
+                        _logger.LogInformation("- {Outcome}", rating.Outcome?.Title);
+                    }
+                }
+            }
         }
     }
 }

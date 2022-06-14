@@ -1,4 +1,5 @@
-﻿using Epsilon.Abstractions.Export;
+﻿using System.Text;
+using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Data;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
@@ -20,14 +21,8 @@ public class ExcelModuleExporter : ICanvasModuleExporter
     {
         var workbook = new Workbook();
 
-        foreach (var module in modules)
+        foreach (var module in modules.Where(static m => m.HasSubmissions()))
         {
-            if (!module.HasAssignments())
-            {
-                continue;
-            }
-
-            var outcomes = GetAllOutcomesTypes(module);
             var worksheet = new Worksheet(module.Name);
 
             //Because reasons @source https://stackoverflow.com/a/8127642 
@@ -36,63 +31,68 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                 worksheet.Cells[i, 0] = new Cell("");
             }
 
+            var outcomeAssignmentMap = AssociateOutcomes(module.Submissions);
+
             //Adding all the outcomes. 
-            for (var index = 0; index < outcomes.Count; index++)
-            {
-                worksheet.Cells[index, 0] = new Cell(outcomes[index].Title);
-            }
 
-            foreach (var assignment in module.Assignments)
+            var index = 0;
+            foreach (var (outcome, assignments) in outcomeAssignmentMap)
             {
-                foreach (var outcomeResult in assignment.OutcomeResults)
+                worksheet.Cells[index, 0] = new Cell(outcome.Title);
+
+                var cellValueBuilder = new StringBuilder();
+
+                foreach (var assignment in assignments)
                 {
-                    if (outcomeResult.Outcome == null)
-                    {
-                        continue;
-                    }
-
-                    var row = GetOutcomeRow(outcomes, outcomeResult.Outcome);
-
                     //Adding assignments to the outcomes 
-                    var cellValue = worksheet.Cells[row, 1].StringValue;
-                    cellValue += (cellValue != "" ? "\n" : "") + assignment.Name + " " + assignment.Url;
-
-                    worksheet.Cells[row, 1] = new Cell(cellValue);
+                    cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
                 }
+
+                worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
+                index++;
             }
 
             worksheet.Cells.ColumnWidth[0, 0] = 5000;
             worksheet.Cells.ColumnWidth[0, 1] = 8000;
+
             workbook.Worksheets.Add(worksheet);
         }
 
+        // We're forced to xls because of the older format
         workbook.Save($"{_options.FormattedOutputName}.xls");
     }
 
-    private static List<Outcome> GetAllOutcomesTypes(Module module)
+    private static IDictionary<Outcome, ICollection<Assignment>> AssociateOutcomes(IEnumerable<Submission> submissions)
     {
-        var addedOutcomes = new List<Outcome>();
-        if (module.HasAssignments())
+        var map = new Dictionary<Outcome, ICollection<Assignment>>();
+
+        foreach (var (assessment, assignment) in submissions)
         {
-            foreach (var assignment in module.Assignments)
+            if (assessment == null || assignment == null)
             {
-                foreach (var result in assignment.OutcomeResults)
+                continue;
+            }
+
+            foreach (var rating in assessment.Ratings)
+            {
+                if (rating.Outcome == null)
                 {
-                    if (result.Outcome != null && !addedOutcomes.Contains(result.Outcome))
-                    {
-                        addedOutcomes.Add(result.Outcome);
-                    }
+                    continue;
+                }
+
+                if (!map.TryGetValue(rating.Outcome, out var assignments))
+                {
+                    assignments = new List<Assignment>();
+                    map[rating.Outcome] = assignments;
+                }
+
+                if (!assignments.Contains(assignment))
+                {
+                    assignments.Add(assignment);
                 }
             }
         }
 
-        return addedOutcomes.OrderByDescending(static o => o.Title.Length).ToList();
-    }
-
-    private static int GetOutcomeRow(List<Outcome> outcomes, Outcome outcome)
-    {
-        var result = outcomes.Find(o => o.Title == outcome.Title);
-
-        return result != null ? outcomes.IndexOf(result) : 0;
+        return map;
     }
 }
