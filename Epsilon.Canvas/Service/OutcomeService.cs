@@ -27,19 +27,17 @@ public class OutcomeService : HttpService, IOutcomeService
 	      IEnumerable<OutcomeResult>? res = null;
 	      var page = 1;
 	      do {
-            _logger.LogDebug("Fetching outcome results from course #{res} #{len} #{links}", JsonSerializer.Serialize(value?.OutcomeResults), value?.OutcomeResults.Count(), links.NextLink);
-        
             var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results?per_page={count}&offset={res?.Count() ?? 0}&page={page}");
             var (response, value) = await Client.SendAsync<OutcomeResultResponse>(request);
-	          var links = LinkHeader.LinksFromHeader(response);
+	        var links = LinkHeader.LinksFromHeader(response);
 
-	          res = res == null ? value?.OutcomeResults : res.Concat(value.OutcomeResults);
+	        res = res == null ? value?.OutcomeResults : res.Concat(value.OutcomeResults);
             
-	          if (links.NextLink == null) {
+	        if (links.NextLink == null) {
 	            break;
             }
             
-	          page += 1;
+	        page += 1;
 	      } while (res.Count() % 100 == 0);
         
         return res;
