@@ -8,19 +8,14 @@ namespace Epsilon.Canvas.Service;
 
 public class AssignmentService : HttpService, IAssignmentService
 {
-    private readonly ILogger<AssignmentService> _logger;
-
-    public AssignmentService(HttpClient client, ILogger<AssignmentService> logger) : base(client)
+    public AssignmentService(HttpClient client) : base(client)
     {
-        _logger = logger;
     }
 
     public async Task<Assignment?> Find(int courseId, int id)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/assignments/{id}");
-        var (response, value) = await Client.SendAsync<Assignment>(request);
-
-        _logger.LogDebug("Fetching assignment #{AssignmentId} from course #{CourseId}", id, courseId);
+        var (_, value) = await Client.SendAsync<Assignment>(request);
 
         return value;
     }

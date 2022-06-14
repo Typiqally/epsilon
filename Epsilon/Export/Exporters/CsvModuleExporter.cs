@@ -39,11 +39,14 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
         foreach (var module in modules)
         {
-            foreach (var assignment in module.Assignments)
+            foreach (var (assessment, assignment) in module.Submissions)
             {
-                foreach (var outcomeResult in assignment.OutcomeResults)
+                foreach (var rating in assessment.Ratings)
                 {
-                    dt.Rows.Add(outcomeResult.Outcome?.Id, assignment.Id, assignment.Name, outcomeResult?.Outcome?.Title, module.Name);
+                    if (rating.Outcome != null)
+                    {
+                        dt.Rows.Add(rating.Outcome?.Id, assignment.Id, assignment.Name, rating.Outcome?.Title, module.Name);
+                    }
                 }
             }
         }

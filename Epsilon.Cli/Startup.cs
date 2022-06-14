@@ -2,7 +2,6 @@
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
 using Epsilon.Export;
-using Epsilon.Export.Exceptions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -36,6 +35,9 @@ public class Startup : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
+        // TODO: Replace exceptions with validation errors
+        ValidateOptions();
+
         _lifetime.ApplicationStarted.Register(() => Task.Run(ExecuteAsync, cancellationToken));
 
         return Task.CompletedTask;
@@ -48,34 +50,19 @@ public class Startup : IHostedService
 
     private async Task ExecuteAsync()
     {
-        try
-        {
-            ValidateOptions();
-            
-            _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
-            _logger.LogInformation("Using export formats: {Formats}", string.Join(",", _exportOptions.Formats));
+        _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
+        var modules = await _collectionFetcher.Fetch(_canvasSettings.CourseId);
 
-            var exporters = _exporterCollection.DetermineExporters(_exportOptions.Formats).ToArray();
-            var modules = (await _collectionFetcher.Fetch(_canvasSettings.CourseId)).ToArray();
+        _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", _exportOptions.Formats));
+        var exporters = _exporterCollection.DetermineExporters(_exportOptions.Formats).ToArray();
 
-            foreach (var (format, exporter) in exporters)
-            {
-                _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
-                exporter.Export(modules, format);
-            }
-        }
-        catch (ArgumentNullException e)
+        foreach (var (format, exporter) in exporters)
         {
-            _logger.LogCritical("Argument is required: {ParamName}", e.ParamName);
+            _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
+            exporter.Export(modules, format);
         }
-        catch (NoExportersFoundException e)
-        {
-            _logger.LogCritical("An error occured: {Message}", e.Message);
-        }
-        finally
-        {
-            _lifetime.StopApplication();
-        }
+
+        _lifetime.StopApplication();
     }
 
     private void ValidateOptions()

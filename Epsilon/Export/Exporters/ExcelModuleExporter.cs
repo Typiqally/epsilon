@@ -1,4 +1,5 @@
-﻿using Epsilon.Abstractions.Export;
+﻿using System.Text;
+using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Data;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
@@ -14,83 +15,84 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         _options = options.Value;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "xls" };
-
-    public  List<Outcome> GetAllOutcomesTypes(Module module)
-    {
-        List<Outcome> addedOutcomes = new List<Outcome>();
-        if (module.HasAssignments())
-        {
-            foreach (var assignment in module.Assignments)
-            {
-                foreach (var result in assignment.OutcomeResults)
-                {
-                    if (result.Outcome != null && !addedOutcomes.Contains(result.Outcome))
-                    {
-                        addedOutcomes.Add(result.Outcome);
-                    }
-                }
-            }
-        }
-
-        return addedOutcomes.OrderByDescending(o => o.Title.Length).ToList();
-    }
-
-    public int GetOutcomeRow(List<Outcome> outcomes, Outcome outcome)
-    {
-        var result = outcomes.Find(o => o.Title == outcome.Title);
-        if (result != null)
-        {
-            return outcomes.IndexOf(result);
-        }
-
-        return 0;
-    }
+    public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
     public void Export(IEnumerable<Module> modules, string format)
     {
-        Workbook workbook = new Workbook();
-        
-        foreach (var module in modules)
+        var workbook = new Workbook();
+
+        foreach (var module in modules.Where(static m => m.HasSubmissions()))
         {
-            if (module.HasAssignments())
+            var worksheet = new Worksheet(module.Name);
+
+            //Because reasons @source https://stackoverflow.com/a/8127642 
+            for (var i = 0; i < 100; i++)
             {
-                List<Outcome> outcomes = GetAllOutcomesTypes(module);
-                Worksheet worksheet = new Worksheet(module.Name);
-                //Because reasons @source https://stackoverflow.com/a/8127642 
-                for(int i = 0;i < 100; i++)
-                    worksheet.Cells[i,0] = new Cell("");
+                worksheet.Cells[i, 0] = new Cell("");
+            }
 
-                //Adding all the outcomes. 
-                for (int index = 0; index < outcomes.Count; index++)
+            var outcomeAssignmentMap = AssociateOutcomes(module.Submissions);
+
+            //Adding all the outcomes. 
+
+            var index = 0;
+            foreach (var (outcome, assignments) in outcomeAssignmentMap)
+            {
+                worksheet.Cells[index, 0] = new Cell(outcome.Title);
+
+                var cellValueBuilder = new StringBuilder();
+
+                foreach (var assignment in assignments)
                 {
-                    worksheet.Cells[index, 0] = new Cell(outcomes[index].Title);
+                    //Adding assignments to the outcomes 
+                    cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
                 }
 
-                foreach (var assignment in module.Assignments)
-                {
-                    foreach (var outcomeResult in assignment.OutcomeResults)
-                    {
-                        if (outcomeResult.Outcome != null)
-                        {
-                            int row = GetOutcomeRow(outcomes, outcomeResult.Outcome);
-                            
-                            //Adding assignments to the outcomes 
-                            string cellValue = worksheet.Cells[row, 1].StringValue;
-                            cellValue += (cellValue != "" ? "\n": "") +  assignment.Name + " " + assignment.Url  ;
-                            
-                            worksheet.Cells[row, 1] = new Cell(cellValue);
-                        }
+                worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
+                index++;
+            }
 
-                    }
+            worksheet.Cells.ColumnWidth[0, 0] = 5000;
+            worksheet.Cells.ColumnWidth[0, 1] = 8000;
+
+            workbook.Worksheets.Add(worksheet);
+        }
+
+        // We're forced to xls because of the older format
+        workbook.Save($"{_options.FormattedOutputName}.xls");
+    }
+
+    private static IDictionary<Outcome, ICollection<Assignment>> AssociateOutcomes(IEnumerable<Submission> submissions)
+    {
+        var map = new Dictionary<Outcome, ICollection<Assignment>>();
+
+        foreach (var (assessment, assignment) in submissions)
+        {
+            if (assessment == null || assignment == null)
+            {
+                continue;
+            }
+
+            foreach (var rating in assessment.Ratings)
+            {
+                if (rating.Outcome == null)
+                {
+                    continue;
                 }
 
-                worksheet.Cells.ColumnWidth[0, 0] = 5000;
-                worksheet.Cells.ColumnWidth[0, 1] = 8000;
-                workbook.Worksheets.Add(worksheet); 
-                
+                if (!map.TryGetValue(rating.Outcome, out var assignments))
+                {
+                    assignments = new List<Assignment>();
+                    map[rating.Outcome] = assignments;
+                }
+
+                if (!assignments.Contains(assignment))
+                {
+                    assignments.Add(assignment);
+                }
             }
         }
-        workbook.Save($"{_options.FormattedOutputName}.{format}");
+
+        return map;
     }
 }
