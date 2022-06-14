@@ -10,14 +10,7 @@ public static class HttpResponseMessageJsonExtensions
         var reader = new StreamReader(stream);
         var content = reader.ReadToEnd();
 
-        try
-        {
-            return JsonSerializer.Deserialize(content, type, serializerOptions);
-        }
-        catch (JsonException)
-        {
-            return default;
-        }
+        return JsonSerializer.Deserialize(content, type, serializerOptions);
     }
 
     public static T? Deserialize<T>(this HttpResponseMessage response, JsonSerializerOptions? serializerOptions = null)
@@ -29,14 +22,7 @@ public static class HttpResponseMessageJsonExtensions
     {
         await using var contentStream = await response.Content.ReadAsStreamAsync();
 
-        try
-        {
-            return await JsonSerializer.DeserializeAsync(contentStream, type, serializerOptions);
-        }
-        catch (JsonException)
-        {
-            return default;
-        }
+        return await JsonSerializer.DeserializeAsync(contentStream, type, serializerOptions);
     }
 
     public static async Task<T?> DeserializeAsync<T>(this HttpResponseMessage response, JsonSerializerOptions? serializerOptions = null)
