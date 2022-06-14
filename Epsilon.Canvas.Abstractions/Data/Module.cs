@@ -11,6 +11,9 @@ public record Module(
     [JsonIgnore]
     public IList<Assignment> Assignments { get; set; } = new Collection<Assignment>();
 
+    [JsonIgnore]
+    public IList<Submission> Submissions { get; set; } = new Collection<Submission>();
+
     public bool HasAssignments()
     {
         return Assignments.Count > 0;
