@@ -2,29 +2,24 @@
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
 using Epsilon.Http.Abstractions;
-using Epsilon.Http.Abstractions.Json;
 
 namespace Epsilon.Canvas.Service;
 
 public class SubmissionService : HttpService, ISubmissionService
 {
-    public SubmissionService(HttpClient client) : base(client)
+    private readonly IPaginatorService _paginator;
+
+    public SubmissionService(HttpClient client, IPaginatorService paginator) : base(client)
     {
+        _paginator = paginator;
     }
 
     public async Task<IEnumerable<Submission>> GetAllFromStudent(int courseId, IEnumerable<string> include, int limit = 100)
     {
-        var url = new StringBuilder($"v1/courses/{courseId}/students/submissions?per_page={limit}");
+        var url = new StringBuilder($"v1/courses/{courseId}/students/submissions");
+        var query = $"?include[]={string.Join("&include[]=", include)}";
 
-        foreach (var parameter in include)
-        {
-            url.Append($"&include[]={parameter}");
-        }
-
-        var uri = new Uri(url.ToString(), UriKind.Relative);
-        var request = new HttpRequestMessage(HttpMethod.Get, uri);
-        var (_, value) = await Client.SendAsync<IEnumerable<Submission>>(request);
-
-        return value;
+        var responses = await _paginator.FetchAll<IEnumerable<Submission>>(HttpMethod.Get, url + query);
+        return responses.SelectMany(static r => r);
     }
 }

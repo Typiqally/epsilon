@@ -8,8 +8,11 @@ namespace Epsilon.Canvas.Service;
 
 public class OutcomeService : HttpService, IOutcomeService
 {
-    public OutcomeService(HttpClient client) : base(client)
+    private readonly IPaginatorService _paginator;
+
+    public OutcomeService(HttpClient client, IPaginatorService paginator) : base(client)
     {
+        _paginator = paginator;
     }
 
     public async Task<Outcome?> Find(int id)
@@ -20,26 +23,9 @@ public class OutcomeService : HttpService, IOutcomeService
         return value;
     }
 
-    public async Task<IEnumerable<OutcomeResult>?> AllResults(int courseId, int limit = 100)
+    public async Task<IEnumerable<OutcomeResult>?> AllResults(int courseId)
     {
-        IEnumerable<OutcomeResult>? res = null;
-        var page = 1;
-        do
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results?per_page={limit}&offset={res?.Count() ?? 0}&page={page}");
-            var (response, value) = await Client.SendAsync<OutcomeResultResponse>(request);
-            var links = LinkHeader.LinksFromHeader(response);
-
-            res = res == null ? value?.OutcomeResults : res.Concat(value.OutcomeResults);
-
-            if (links.NextLink == null)
-            {
-                break;
-            }
-
-            page += 1;
-        } while (res.Count() % 100 == 0);
-
-        return res;
+        var responses = await _paginator.FetchAll<OutcomeResultResponse>(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results");
+        return responses.SelectMany(static r => r.OutcomeResults);
     }
 }
