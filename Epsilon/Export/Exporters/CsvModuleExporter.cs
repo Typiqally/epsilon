@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 
-namespace Epsilon.Canvas.Abstractions.Data;
+namespace Epsilon.Canvas.Abstractions.Model;
 
 public record Module(
     [property: JsonPropertyName("id")] int Id,

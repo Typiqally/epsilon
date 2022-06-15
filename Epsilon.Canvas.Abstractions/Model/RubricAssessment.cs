@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Epsilon.Canvas.Abstractions.Data;
+namespace Epsilon.Canvas.Abstractions.Model;
 
 public record RubricAssessment(
     [property: JsonPropertyName("score")] double? Score,

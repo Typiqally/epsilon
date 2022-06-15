@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Canvas.Response;
 

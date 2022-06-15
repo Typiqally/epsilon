@@ -1,5 +1,5 @@
 ﻿using Epsilon.Canvas.Abstractions;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Services;
 using Microsoft.Extensions.Logging;
 

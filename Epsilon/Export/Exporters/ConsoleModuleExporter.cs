@@ -1,5 +1,5 @@
 ﻿using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Export.Exporters;

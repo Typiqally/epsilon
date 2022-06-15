@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 

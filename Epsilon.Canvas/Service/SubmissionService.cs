@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Services;
 using Epsilon.Http.Abstractions;
 using Epsilon.Http.Abstractions.Json;
