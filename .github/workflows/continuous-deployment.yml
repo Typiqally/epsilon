@@ -1,9 +1,5 @@
 ﻿name: Continuous deployment
-on:
-  pull_request: 
-  push:
-    branches: [ master ]
-  release:
+on: [ push, pull_request ]
 
 jobs:
   publish:
