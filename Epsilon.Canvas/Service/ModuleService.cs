@@ -27,9 +27,9 @@ public class ModuleService : HttpService, IModuleService
         return value;
     }
 
-    public async Task<IEnumerable<ModuleItem>?> AllItems(int courseId, int moduleId, int count = 1000)
+    public async Task<IEnumerable<ModuleItem>?> AllItems(int courseId, int moduleId, int limit = 100)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{moduleId}/items?per_page={count}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{moduleId}/items?per_page={limit}");
         var (_, value) = await Client.SendAsync<IEnumerable<ModuleItem>>(request);
 
         return value;

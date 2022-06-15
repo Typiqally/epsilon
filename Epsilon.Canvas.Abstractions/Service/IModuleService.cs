@@ -6,5 +6,5 @@ public interface IModuleService
 {
     Task<IEnumerable<Module>?> All(int courseId);
     Task<Module?> Find(int courseId, int id);
-    Task<IEnumerable<ModuleItem>?> AllItems(int courseId, int moduleId, int count = 1000);
+    Task<IEnumerable<ModuleItem>?> AllItems(int courseId, int moduleId, int limit = 100);
 }

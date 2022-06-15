@@ -20,9 +20,9 @@ public class OutcomeService : HttpService, IOutcomeService
         return value;
     }
 
-    public async Task<IEnumerable<OutcomeResult>?> AllResults(int courseId, int count = 1000)
+    public async Task<IEnumerable<OutcomeResult>?> AllResults(int courseId, int limit = 100)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results?per_page={count}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results?per_page={limit}");
         var (_, value) = await Client.SendAsync<OutcomeResultResponse>(request);
 
         return value?.OutcomeResults;
