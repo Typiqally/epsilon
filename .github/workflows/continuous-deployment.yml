@@ -1,5 +1,6 @@
 ﻿name: Continuous deployment
 on:
+  pull_request: 
   release:
   workflow_run:
     workflows: [ "Continuous integration" ]
