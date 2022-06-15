@@ -1,4 +1,4 @@
-﻿using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
 using Epsilon.Canvas.Response;
 using Epsilon.Http.Abstractions;
@@ -22,9 +22,24 @@ public class OutcomeService : HttpService, IOutcomeService
 
     public async Task<IEnumerable<OutcomeResult>?> AllResults(int courseId, int limit = 100)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results?per_page={limit}");
-        var (_, value) = await Client.SendAsync<OutcomeResultResponse>(request);
+        IEnumerable<OutcomeResult>? res = null;
+        var page = 1;
+        do
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/outcome_results?per_page={limit}&offset={res?.Count() ?? 0}&page={page}");
+            var (response, value) = await Client.SendAsync<OutcomeResultResponse>(request);
+            var links = LinkHeader.LinksFromHeader(response);
 
-        return value?.OutcomeResults;
+            res = res == null ? value?.OutcomeResults : res.Concat(value.OutcomeResults);
+
+            if (links.NextLink == null)
+            {
+                break;
+            }
+
+            page += 1;
+        } while (res.Count() % 100 == 0);
+
+        return res;
     }
 }
