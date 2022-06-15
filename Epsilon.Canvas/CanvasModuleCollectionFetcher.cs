@@ -1,6 +1,6 @@
 ﻿using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Services;
+using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Canvas;
