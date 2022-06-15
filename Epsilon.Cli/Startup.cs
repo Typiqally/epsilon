@@ -1,4 +1,5 @@
-﻿using Epsilon.Abstractions.Export;
+﻿using System.ComponentModel.DataAnnotations;
+using Epsilon.Abstractions.Export;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
 using Epsilon.Export;
@@ -35,9 +36,6 @@ public class Startup : IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        // TODO: Replace exceptions with validation errors
-        ValidateOptions();
-
         _lifetime.ApplicationStarted.Register(() => Task.Run(ExecuteAsync, cancellationToken));
 
         return Task.CompletedTask;
@@ -50,6 +48,18 @@ public class Startup : IHostedService
 
     private async Task ExecuteAsync()
     {
+        var results = Validate(_canvasSettings).ToArray();
+        if (results.Any())
+        {
+            foreach (var validationResult in results)
+            {
+                _logger.LogError("Error: {Message}", validationResult.ErrorMessage);
+            }
+
+            _lifetime.StopApplication();
+            return;
+        }
+
         _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
         var modules = await _collectionFetcher.Fetch(_canvasSettings.CourseId);
 
@@ -65,16 +75,13 @@ public class Startup : IHostedService
         _lifetime.StopApplication();
     }
 
-    private void ValidateOptions()
+    private static IEnumerable<ValidationResult> Validate(object model)
     {
-        if (_canvasSettings.CourseId <= 0)
-        {
-            throw new ArgumentNullException(nameof(_canvasSettings.CourseId));
-        }
+        var results = new List<ValidationResult>();
+        var context = new ValidationContext(model);
 
-        if (string.IsNullOrEmpty(_canvasSettings.AccessToken))
-        {
-            throw new ArgumentNullException(nameof(_canvasSettings.AccessToken));
-        }
+        var isValid = Validator.TryValidateObject(model, context, results, true);
+
+        return results;
     }
 }
