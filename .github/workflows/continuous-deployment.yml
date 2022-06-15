@@ -25,6 +25,8 @@ jobs:
         run: dotnet publish Epsilon.Cli --runtime ${{ matrix.RID }} --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
       - name: Copy appsettings.json
         run: cp /home/runner/work/epsilon/epsilon/Epsilon.Cli/appsettings.example.json /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
+      - name: Removing unnecessary files 
+        run: cd /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/ && rm *.pdb
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
