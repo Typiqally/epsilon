@@ -1,20 +1,19 @@
 ﻿name: Continuous deployment
-on:
+on: 
   release:
-  workflow_run:
-    workflows: [ "Continuous integration" ]
+  pull_request:
     branches: [ master ]
-    types:
-      - completed
+    types: [closed]
 
 jobs:
   publish:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Publish
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
+    env: 
+      release-directory: ./Epsilon.Cli/bin/Release/net6.0/
     
     steps:
       - uses: actions/checkout@v2
@@ -24,9 +23,12 @@ jobs:
       - name: Publish
         run: dotnet publish Epsilon.Cli --runtime ${{ matrix.RID }} --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
       - name: Copy appsettings.json
-        run: cp /home/runner/work/epsilon/epsilon/Epsilon.Cli/appsettings.example.json /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
+        run: cp ./appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
+      - name: Removing unnecessary files 
+        run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
+
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
-          path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/
+          path: ${{env.release-directory}}${{ matrix.RID }}/publish
