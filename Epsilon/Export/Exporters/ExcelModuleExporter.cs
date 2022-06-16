@@ -1,9 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
-using ExcelLibrary.BinaryFileFormat;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 
