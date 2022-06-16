@@ -28,7 +28,7 @@ jobs:
       - name: Copy appsettings.json
         run: cp ${{env.working-directory}}/appsettings.example.json ${{env.working-directory}}/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
       - name: Removing unnecessary files 
-        run: cd ${{env.working-directory}}/bin/Release/net6.0/${{ matrix.RID }}/publish/ && rm *.pdb
+        run: rm ${{env.working-directory}}/bin/Release/net6.0/${{ matrix.RID }}/publish/*.pdb
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
