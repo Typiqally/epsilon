@@ -1,18 +1,22 @@
 ﻿name: Continuous deployment
 on: 
   release:
+  push:
+    branches:
+      - 23-optimizing-release-builds
   pull_request:
     branches: [ master ]
     types: [closed]
 
 jobs:
   publish:
-    if: github.event.pull_request.merged == true
     name: Publish
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
+    env: 
+      working-directory: /home/runner/work/epsilon/epsilon/Epsilon.Cli
     
     steps:
       - uses: actions/checkout@v2
@@ -22,11 +26,11 @@ jobs:
       - name: Publish
         run: dotnet publish Epsilon.Cli --runtime ${{ matrix.RID }} --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
       - name: Copy appsettings.json
-        run: cp /home/runner/work/epsilon/epsilon/Epsilon.Cli/appsettings.example.json /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
+        run: cp ${{env.working-directory}}/appsettings.example.json ${{env.working-directory}}/bin/Release/net6.0/${{ matrix.RID }}/publish/appsettings.json
       - name: Removing unnecessary files 
-        run: cd /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/ && rm *.pdb
+        run: cd ${{ matrix.RID }}/bin/Release/net6.0/publish/ && rm *.pdb
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
-          path: /home/runner/work/epsilon/epsilon/Epsilon.Cli/bin/Release/net6.0/${{ matrix.RID }}/publish/
+          path: ${{env.working-directory}}/bin/Release/net6.0/${{ matrix.RID }}/publish/
