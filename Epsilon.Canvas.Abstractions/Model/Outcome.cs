@@ -4,5 +4,6 @@ namespace Epsilon.Canvas.Abstractions.Model;
 
 public record Outcome(
     [property: JsonPropertyName("id")] int Id,
-    [property: JsonPropertyName("title")] string Title
+    [property: JsonPropertyName("title")] string Title,
+    [property: JsonPropertyName("description")] string Description
 );

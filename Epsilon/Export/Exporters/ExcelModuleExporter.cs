@@ -1,6 +1,9 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
+using ExcelLibrary.BinaryFileFormat;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 
@@ -33,13 +36,18 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
             var outcomeAssignmentMap = AssociateOutcomes(module.Submissions);
 
+            //Add headers
+            worksheet.Cells[0, 0] = new Cell("KPI");
+            worksheet.Cells[0, 1] = new Cell("Description");
+            worksheet.Cells[0, 2] = new Cell("Assignment(s)");
+
             //Adding all the outcomes. 
 
-            var index = 0;
+            var index = 1;
             foreach (var (outcome, assignments) in outcomeAssignmentMap)
             {
                 worksheet.Cells[index, 0] = new Cell(outcome.Title);
-
+                worksheet.Cells[index, 1] = new Cell(ConvertHtmlToRaw(outcome.Description));
                 var cellValueBuilder = new StringBuilder();
 
                 foreach (var assignment in assignments)
@@ -48,18 +56,24 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                     cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
                 }
 
-                worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
+                worksheet.Cells[index, 2] = new Cell(cellValueBuilder.ToString());
                 index++;
             }
 
-            worksheet.Cells.ColumnWidth[0, 0] = 5000;
+            worksheet.Cells.ColumnWidth[0, 0] = 2000;
             worksheet.Cells.ColumnWidth[0, 1] = 8000;
+            worksheet.Cells.ColumnWidth[0, 2] = 16000;
 
             workbook.Worksheets.Add(worksheet);
         }
 
         // We're forced to xls because of the older format
         workbook.Save($"{_options.FormattedOutputName}.xls");
+    }
+
+    private static string ConvertHtmlToRaw(string html)
+    {
+        return Regex.Replace(html, "<.*?>", " ");
     }
 
     private static IDictionary<Outcome, ICollection<Assignment>> AssociateOutcomes(IEnumerable<Submission> submissions)
