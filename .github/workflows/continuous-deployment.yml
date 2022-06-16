@@ -23,7 +23,7 @@ jobs:
       - name: Publish
         run: dotnet publish Epsilon.Cli --runtime ${{ matrix.RID }} --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
       - name: Copy appsettings.json
-        run: cp ./appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
+        run: cp ./Epsilon.Cli/appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
       - name: Removing unnecessary files 
         run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
 
