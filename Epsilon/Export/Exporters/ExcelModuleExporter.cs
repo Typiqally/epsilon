@@ -60,9 +60,9 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                 index++;
             }
 
-            worksheet.Cells.ColumnWidth[0, 0] = 2000;
-            worksheet.Cells.ColumnWidth[0, 1] = 8000;
-            worksheet.Cells.ColumnWidth[0, 2] = 16000;
+            worksheet.Cells.ColumnWidth[0, 0] = 500;
+            worksheet.Cells.ColumnWidth[0, 1] = 4000;
+            worksheet.Cells.ColumnWidth[0, 2] = 8000;
 
             workbook.Worksheets.Add(worksheet);
         }
