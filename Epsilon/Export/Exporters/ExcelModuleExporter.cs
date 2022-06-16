@@ -73,7 +73,10 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     private static string ConvertHtmlToRaw(string html)
     {
-        return Regex.Replace(html, "<.*?>", " ");
+        var raw = Regex.Replace(html, "<.*?>", " ");
+        var trimmed = Regex.Replace(raw, @"\s\s+", " ");
+
+        return trimmed;
     }
 
     private static IDictionary<Outcome, ICollection<Assignment>> AssociateOutcomes(IEnumerable<Submission> submissions)
