@@ -45,7 +45,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             foreach (var (outcome, assignments) in outcomeAssignmentMap)
             {
                 worksheet.Cells[index, 0] = new Cell(outcome.Title);
-                worksheet.Cells[index, 1] = new Cell(ConvertHtmlToRaw(outcome.Description));
+                worksheet.Cells[index, 1] = new Cell(ShortDescription(ConvertHtmlToRaw(outcome.Description)));
                 var cellValueBuilder = new StringBuilder();
 
                 foreach (var assignment in assignments)
@@ -69,6 +69,13 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         workbook.Save($"{_options.FormattedOutputName}.xls");
     }
 
+    private static string ShortDescription(string description)
+    {
+        //Function gives only the short English description back of the outcome. 
+        int startPos = description.IndexOf(" EN ", StringComparison.Ordinal)  + " EN ".Length;
+        int endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
+        return description.Substring(startPos,endPos - startPos);
+    }
     private static string ConvertHtmlToRaw(string html)
     {
         var raw = Regex.Replace(html, "<.*?>", " ");
