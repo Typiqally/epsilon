@@ -26,11 +26,11 @@ public static class CanvasServiceCollectionExtensions
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.AccessToken);
             });
 
-        services.AddHttpClient<IPaginatorService, PaginatorService>(CanvasHttpClient);
-        services.AddHttpClient<IModuleService, ModuleService>(CanvasHttpClient);
-        services.AddHttpClient<IAssignmentService, AssignmentService>(CanvasHttpClient);
-        services.AddHttpClient<IOutcomeService, OutcomeService>(CanvasHttpClient);
-        services.AddHttpClient<ISubmissionService, SubmissionService>(CanvasHttpClient);
+        services.AddHttpClient<IPaginatorHttpService, PaginatorHttpService>(CanvasHttpClient);
+        services.AddHttpClient<IModuleHttpService, ModuleHttpService>(CanvasHttpClient);
+        services.AddHttpClient<IAssignmentHttpService, AssignmentHttpService>(CanvasHttpClient);
+        services.AddHttpClient<IOutcomeHttpService, OutcomeHttpService>(CanvasHttpClient);
+        services.AddHttpClient<ISubmissionHttpService, SubmissionHttpService>(CanvasHttpClient);
 
         services.AddScoped<ILinkHeaderConverter, LinkHeaderConverter>();
         

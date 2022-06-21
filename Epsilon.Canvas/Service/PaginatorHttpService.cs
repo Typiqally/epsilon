@@ -6,26 +6,26 @@ using Epsilon.Http.Abstractions.Json;
 
 namespace Epsilon.Canvas.Service;
 
-public class PaginatorService : HttpService, IPaginatorService
+public class PaginatorHttpService : HttpService, IPaginatorHttpService
 {
     private readonly ILinkHeaderConverter _headerConverter;
 
-    public PaginatorService(HttpClient client, ILinkHeaderConverter headerConverter) : base(client)
+    public PaginatorHttpService(HttpClient client, ILinkHeaderConverter headerConverter) : base(client)
     {
         _headerConverter = headerConverter;
     }
 
-    public async Task<IEnumerable<TResult>> FetchAll<TResult>(HttpMethod method, string uri)
+    public async Task<IEnumerable<TResult>> GetAllPages<TResult>(HttpMethod method, string uri)
     {
         var pages = new List<TResult>();
-        var page = "first";
+        var page = "1";
         const int limit = 100;
 
         if (!uri.Contains('?'))
         {
             uri += "?";
         }
-        else if (uri.Contains('&'))
+        else
         {
             uri += "&";
         }

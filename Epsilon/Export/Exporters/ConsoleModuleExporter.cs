@@ -24,18 +24,19 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     {
         foreach (var module in modules)
         {
-            _logger.LogInformation("================ {ModuleName} ================", module.Name);
+            _logger.LogInformation("Module: {Name}", module.Name);
 
-            foreach (var submission in module.Submissions)
+            var links = module.Collection.Links;
+            var alignments = links.AlignmentsDictionary;
+            var outcomes = links.OutcomesDictionary;
+
+            foreach (var alignment in alignments.Values)
             {
-                _logger.LogInformation("Assignment: {Assignment}", submission.Assignment.Name);
+                _logger.LogInformation("Alignment: {Alignment}", alignment.Name);
 
-                foreach (var rating in submission.RubricAssessment.Ratings)
+                foreach (var result in module.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id))
                 {
-                    if (rating.Outcome != null)
-                    {
-                        _logger.LogInformation("- {Outcome}", rating.Outcome?.Title);
-                    }
+                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Score);
                 }
             }
         }

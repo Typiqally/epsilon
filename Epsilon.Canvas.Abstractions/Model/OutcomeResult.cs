@@ -5,5 +5,5 @@ namespace Epsilon.Canvas.Abstractions.Model;
 public record OutcomeResult(
     [property: JsonPropertyName("mastery")] bool? Mastery,
     [property: JsonPropertyName("score")] double? Score,
-    [property: JsonPropertyName("links")] IDictionary<string, string> Links
+    [property: JsonPropertyName("links")] OutcomeResultLink Link
 );

@@ -22,7 +22,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
     {
         var workbook = new Workbook();
 
-        foreach (var module in modules.Where(static m => m.HasSubmissions()))
+        foreach (var module in modules.Where(static m => m.Collection.OutcomeResults.Any()))
         {
             var worksheet = new Worksheet(module.Name);
 
@@ -32,7 +32,9 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                 worksheet.Cells[i, 0] = new Cell("");
             }
 
-            var outcomeAssignmentMap = AssociateOutcomes(module.Submissions);
+            var links = module.Collection.Links;
+            var alignments = links.AlignmentsDictionary;
+            var outcomes = links.OutcomesDictionary;
 
             //Add headers
             worksheet.Cells[0, 0] = new Cell("KPI");
@@ -42,20 +44,28 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             //Adding all the outcomes. 
 
             var index = 1;
-            foreach (var (outcome, assignments) in outcomeAssignmentMap)
+            foreach (var (outcomeId, outcome) in outcomes)
             {
-                worksheet.Cells[index, 0] = new Cell(outcome.Title);
-                worksheet.Cells[index, 1] = new Cell(ShortDescription(ConvertHtmlToRaw(outcome.Description)));
-                var cellValueBuilder = new StringBuilder();
+                var assignmentIds = module.Collection.OutcomeResults
+                    .Where(o => o.Link.Outcome == outcomeId)
+                    .Select(static o => o.Link.Assignment)
+                    .ToArray();
 
-                foreach (var assignment in assignments)
+                if (assignmentIds.Any())
                 {
-                    //Adding assignments to the outcomes 
-                    cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
-                }
+                    worksheet.Cells[index, 0] = new Cell(outcome.Title);
+                    worksheet.Cells[index, 1] = new Cell(ShortDescription(ConvertHtmlToRaw(outcome.Description)));
 
-                worksheet.Cells[index, 2] = new Cell(cellValueBuilder.ToString());
-                index++;
+                    var cellValueBuilder = new StringBuilder();
+
+                    foreach (var (alignmentId, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
+                    {
+                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
+                    }
+
+                    worksheet.Cells[index, 2] = new Cell(cellValueBuilder.ToString());
+                    index++;
+                }
             }
 
             worksheet.Cells.ColumnWidth[0, 0] = 500;
@@ -72,49 +82,17 @@ public class ExcelModuleExporter : ICanvasModuleExporter
     private static string ShortDescription(string description)
     {
         //Function gives only the short English description back of the outcome. 
-        int startPos = description.IndexOf(" EN ", StringComparison.Ordinal)  + " EN ".Length;
-        int endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
-        return description.Substring(startPos,endPos - startPos);
+        var startPos = description.IndexOf(" EN ", StringComparison.Ordinal) + " EN ".Length;
+        var endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
+
+        return description.Substring(startPos, endPos - startPos);
     }
+
     private static string ConvertHtmlToRaw(string html)
     {
         var raw = Regex.Replace(html, "<.*?>", " ");
         var trimmed = Regex.Replace(raw, @"\s\s+", " ");
 
         return trimmed;
-    }
-
-    private static IDictionary<Outcome, ICollection<Assignment>> AssociateOutcomes(IEnumerable<Submission> submissions)
-    {
-        var map = new Dictionary<Outcome, ICollection<Assignment>>();
-
-        foreach (var (assessment, assignment) in submissions)
-        {
-            if (assessment == null || assignment == null)
-            {
-                continue;
-            }
-
-            foreach (var rating in assessment.Ratings)
-            {
-                if (rating.Outcome == null)
-                {
-                    continue;
-                }
-
-                if (!map.TryGetValue(rating.Outcome, out var assignments))
-                {
-                    assignments = new List<Assignment>();
-                    map[rating.Outcome] = assignments;
-                }
-
-                if (!assignments.Contains(assignment))
-                {
-                    assignments.Add(assignment);
-                }
-            }
-        }
-
-        return map;
     }
 }

@@ -1,15 +1,15 @@
-﻿using System.Collections.ObjectModel;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using Epsilon.Canvas.Abstractions.Response;
 
 namespace Epsilon.Canvas.Abstractions.Model;
 
 public record Module(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("name")] string Name,
-    [property: JsonPropertyName("items_count")] int Count)
+    [property: JsonPropertyName("items_count")] int Count,
+    [property: JsonPropertyName("items")] IEnumerable<ModuleItem>? Items
+)
 {
     [JsonIgnore]
-    public IList<Submission> Submissions { get; set; } = new Collection<Submission>();
-
-    public bool HasSubmissions() => Submissions.Count > 0;
+    public OutcomeResultCollection Collection { get; set; }
 }
