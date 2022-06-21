@@ -38,7 +38,6 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
             //Add headers
             worksheet.Cells[0, 0] = new Cell("KPI");
-            // worksheet.Cells[0, 1] = new Cell("Description");
             worksheet.Cells[0, 1] = new Cell("Assignment(s)");
             worksheet.Cells[0, 2] = new Cell("Score");
 
