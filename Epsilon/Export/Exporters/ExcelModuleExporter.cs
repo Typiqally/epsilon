@@ -38,8 +38,9 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
             //Add headers
             worksheet.Cells[0, 0] = new Cell("KPI");
-            worksheet.Cells[0, 1] = new Cell("Description");
-            worksheet.Cells[0, 2] = new Cell("Assignment(s)");
+            // worksheet.Cells[0, 1] = new Cell("Description");
+            worksheet.Cells[0, 1] = new Cell("Assignment(s)");
+            worksheet.Cells[0, 2] = new Cell("Score");
 
             //Adding all the outcomes. 
 
@@ -53,8 +54,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                 if (assignmentIds.Any())
                 {
-                    worksheet.Cells[index, 0] = new Cell(outcome.Title);
-                    worksheet.Cells[index, 1] = new Cell(ShortDescription(ConvertHtmlToRaw(outcome.Description)));
+                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " +  ShortDescription(ConvertHtmlToRaw(outcome.Description)));
 
                     var cellValueBuilder = new StringBuilder();
 
@@ -62,14 +62,21 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                     {
                         cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                     }
+                    worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
+                    
+                    var cellValueOutComeResultsBuilder = new StringBuilder();
+                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
+                    {
+                        cellValueOutComeResultsBuilder.AppendLine(OutcomeToText(outcomeResult.Score));
+                    }
 
-                    worksheet.Cells[index, 2] = new Cell(cellValueBuilder.ToString());
+                    worksheet.Cells[index, 2] = new Cell(cellValueOutComeResultsBuilder.ToString());
                     index++;
                 }
             }
 
             worksheet.Cells.ColumnWidth[0, 0] = 500;
-            worksheet.Cells.ColumnWidth[0, 1] = 4000;
+            worksheet.Cells.ColumnWidth[0, 1] = 8000;
             worksheet.Cells.ColumnWidth[0, 2] = 8000;
 
             workbook.Worksheets.Add(worksheet);
@@ -94,5 +101,25 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         var trimmed = Regex.Replace(raw, @"\s\s+", " ");
 
         return trimmed;
+    }
+
+    private string OutcomeToText(double? result)
+    {
+        switch (result)
+        {
+            default:
+            case 0:
+                return "Unsatisfactory";
+                break;
+            case 3:
+                return "Satisfactory";
+                break;
+            case 4:
+                return "Good";
+                break;
+            case 5:
+                return "Outstanding";
+                break;
+        }
     }
 }
