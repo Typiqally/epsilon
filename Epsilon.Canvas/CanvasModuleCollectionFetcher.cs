@@ -1,83 +1,51 @@
 ﻿using Epsilon.Canvas.Abstractions;
-using Epsilon.Canvas.Abstractions.Data;
-using Epsilon.Canvas.Abstractions.Services;
+using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Response;
+using Epsilon.Canvas.Abstractions.Service;
+using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Canvas;
 
 public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 {
-    private readonly IModuleService _moduleService;
-    private readonly IOutcomeService _outcomeService;
-    private readonly IAssignmentService _assignmentService;
+    private readonly ILogger<CanvasModuleCollectionFetcher> _logger;
+    private readonly IModuleHttpService _moduleService;
+    private readonly IOutcomeHttpService _outcomeService;
 
     public CanvasModuleCollectionFetcher(
-        IModuleService moduleService,
-        IOutcomeService outcomeService,
-        IAssignmentService assignmentService)
+        ILogger<CanvasModuleCollectionFetcher> logger,
+        IModuleHttpService moduleService,
+        IOutcomeHttpService outcomeService
+    )
     {
+        _logger = logger;
         _moduleService = moduleService;
         _outcomeService = outcomeService;
-        _assignmentService = assignmentService;
     }
 
-    public async Task<IEnumerable<Module>> Fetch(int courseId)
+    public async Task<IEnumerable<Module>> GetAll(int courseId)
     {
-        var assignments = await FetchAssignmentsAndOutcomes(courseId);
-        var modules = await AddAssignmentsToModules(courseId, assignments);
+        _logger.LogInformation("Downloading results...");
 
-        return modules;
-    }
+        var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
 
-    private async Task<Dictionary<int, Assignment>> FetchAssignmentsAndOutcomes(int courseId)
-    {
-        var outcomeResults = await _outcomeService.AllResults(courseId) ?? throw new InvalidOperationException();
-        var masteredOutcomeResults = outcomeResults.Where(static result => result.Mastery.HasValue && result.Mastery.Value);
+        var alignments = response.Links.Alignments
+            .DistinctBy(static a => a.Id)
+            .ToDictionary(static a => a.Id, static a => a);
 
-        var assignments = new Dictionary<int, Assignment>();
-        var outcomes = new Dictionary<int, Outcome>();
+        var outcomes = response.Links.Outcomes
+            .DistinctBy(static o => o.Id)
+            .ToDictionary(static o => o.Id.ToString(), static o => o);
 
-        foreach (var outcomeResult in masteredOutcomeResults)
-        {
-            var outcomeId = int.Parse(outcomeResult.Links["learning_outcome"]);
-            if (!outcomes.TryGetValue(outcomeId, out var outcome))
-            {
-                outcome = await _outcomeService.Find(outcomeId) ?? throw new InvalidOperationException();
-                outcomes.Add(outcomeId, outcome);
-            }
-
-            outcomeResult.Outcome = outcome;
-
-            var assignmentId = int.Parse(outcomeResult.Links["assignment"]["assignment_".Length..]);
-            if (!assignments.TryGetValue(assignmentId, out var assignment))
-            {
-                assignment = await _assignmentService.Find(courseId, assignmentId) ?? throw new InvalidOperationException();
-                assignments.Add(assignmentId, assignment);
-            }
-
-            assignment.OutcomeResults.Add(outcomeResult);
-        }
-
-        return assignments;
-    }
-
-    private async Task<List<Module>> AddAssignmentsToModules(int courseId, IReadOnlyDictionary<int, Assignment> assignments)
-    {
-        var modules = (await _moduleService.All(courseId) ?? throw new InvalidOperationException()).ToList();
-
+        var modules = await _moduleService.GetAll(courseId, new[] { "items" });
         foreach (var module in modules)
         {
-            var items = await _moduleService.AllItems(courseId, module.Id);
-            if (items == null) continue;
+            var ids = module.Items.Select(static i => $"assignment_{i.ContentId}");
 
-            var assignmentItems = items.Where(static item => item.Type == ModuleItemType.Assignment);
-
-            foreach (var item in assignmentItems)
-            {
-                if (item.ContentId != null && assignments.TryGetValue(item.ContentId.Value, out var assignment))
-                {
-                    module.Assignments.Add(assignment);
-                }
-            }
+            module.Collection = new OutcomeResultCollection(
+                response.OutcomeResults.Where(r => ids.Contains(r.Link.Alignment)),
+                response.Links with { Alignments = response.Links.Alignments.Where(a => ids.Contains(a.Id)) }
+            );
         }
 
         return modules;

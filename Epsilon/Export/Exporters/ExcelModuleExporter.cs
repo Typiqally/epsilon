@@ -1,5 +1,7 @@
-﻿using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Data;
+﻿using System.Text;
+using System.Text.RegularExpressions;
+using Epsilon.Abstractions.Export;
+using Epsilon.Canvas.Abstractions.Model;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 
@@ -14,83 +16,109 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         _options = options.Value;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "xls" };
-
-    public  List<Outcome> GetAllOutcomesTypes(Module module)
-    {
-        List<Outcome> addedOutcomes = new List<Outcome>();
-        if (module.HasAssignments())
-        {
-            foreach (var assignment in module.Assignments)
-            {
-                foreach (var result in assignment.OutcomeResults)
-                {
-                    if (result.Outcome != null && !addedOutcomes.Contains(result.Outcome))
-                    {
-                        addedOutcomes.Add(result.Outcome);
-                    }
-                }
-            }
-        }
-
-        return addedOutcomes.OrderByDescending(o => o.Title.Length).ToList();
-    }
-
-    public int GetOutcomeRow(List<Outcome> outcomes, Outcome outcome)
-    {
-        var result = outcomes.Find(o => o.Title == outcome.Title);
-        if (result != null)
-        {
-            return outcomes.IndexOf(result);
-        }
-
-        return 0;
-    }
+    public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
     public void Export(IEnumerable<Module> modules, string format)
     {
-        Workbook workbook = new Workbook();
-        
-        foreach (var module in modules)
+        var workbook = new Workbook();
+
+        foreach (var module in modules.Where(static m => m.Collection.OutcomeResults.Any()))
         {
-            if (module.HasAssignments())
+            var worksheet = new Worksheet(module.Name);
+
+            //Because reasons @source https://stackoverflow.com/a/8127642 
+            for (var i = 0; i < 100; i++)
             {
-                List<Outcome> outcomes = GetAllOutcomesTypes(module);
-                Worksheet worksheet = new Worksheet(module.Name);
-                //Because reasons @source https://stackoverflow.com/a/8127642 
-                for(int i = 0;i < 100; i++)
-                    worksheet.Cells[i,0] = new Cell("");
-
-                //Adding all the outcomes. 
-                for (int index = 0; index < outcomes.Count; index++)
-                {
-                    worksheet.Cells[index, 0] = new Cell(outcomes[index].Title);
-                }
-
-                foreach (var assignment in module.Assignments)
-                {
-                    foreach (var outcomeResult in assignment.OutcomeResults)
-                    {
-                        if (outcomeResult.Outcome != null)
-                        {
-                            int row = GetOutcomeRow(outcomes, outcomeResult.Outcome);
-                            
-                            //Adding assignments to the outcomes 
-                            string cellValue = worksheet.Cells[row, 1].StringValue;
-                            cellValue += (cellValue != "" ? "\n": "") +  assignment.Name + " " + assignment.Url  ;
-                            
-                            worksheet.Cells[row, 1] = new Cell(cellValue);
-                        }
-
-                    }
-                }
-
-                worksheet.Cells.ColumnWidth[0, 0] = 5000;
-                worksheet.Cells.ColumnWidth[0, 1] = 8000;
-                workbook.Worksheets.Add(worksheet); 
-                
+                worksheet.Cells[i, 0] = new Cell("");
             }
+
+            var links = module.Collection.Links;
+            var alignments = links.AlignmentsDictionary;
+            var outcomes = links.OutcomesDictionary;
+
+            //Add headers
+            worksheet.Cells[0, 0] = new Cell("KPI");
+            worksheet.Cells[0, 1] = new Cell("Assignment(s)");
+            worksheet.Cells[0, 2] = new Cell("Score");
+
+            //Adding all the outcomes. 
+
+            var index = 1;
+            foreach (var (outcomeId, outcome) in outcomes)
+            {
+                var assignmentIds = module.Collection.OutcomeResults
+                    .Where(o => o.Link.Outcome == outcomeId)
+                    .Select(static o => o.Link.Assignment)
+                    .ToArray();
+
+                if (assignmentIds.Any())
+                {
+                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " +  ShortDescription(ConvertHtmlToRaw(outcome.Description)));
+
+                    var cellValueBuilder = new StringBuilder();
+
+                    foreach (var (alignmentId, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
+                    {
+                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
+                    }
+                    worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
+                    
+                    var cellValueOutComeResultsBuilder = new StringBuilder();
+                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
+                    {
+                        cellValueOutComeResultsBuilder.AppendLine(OutcomeToText(outcomeResult.Score));
+                    }
+
+                    worksheet.Cells[index, 2] = new Cell(cellValueOutComeResultsBuilder.ToString());
+                    index++;
+                }
+            }
+
+            worksheet.Cells.ColumnWidth[0, 0] = 500;
+            worksheet.Cells.ColumnWidth[0, 1] = 8000;
+            worksheet.Cells.ColumnWidth[0, 2] = 8000;
+
+            workbook.Worksheets.Add(worksheet);
         }
-        workbook.Save($"{_options.FormattedOutputName}.{format}");
+
+        // We're forced to xls because of the older format
+        workbook.Save($"{_options.FormattedOutputName}.xls");
+    }
+
+    private static string ShortDescription(string description)
+    {
+        //Function gives only the short English description back of the outcome. 
+        var startPos = description.IndexOf(" EN ", StringComparison.Ordinal) + " EN ".Length;
+        var endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
+
+        return description.Substring(startPos, endPos - startPos);
+    }
+
+    private static string ConvertHtmlToRaw(string html)
+    {
+        var raw = Regex.Replace(html, "<.*?>", " ");
+        var trimmed = Regex.Replace(raw, @"\s\s+", " ");
+
+        return trimmed;
+    }
+
+    private string OutcomeToText(double? result)
+    {
+        switch (result)
+        {
+            default:
+            case 0:
+                return "Unsatisfactory";
+                break;
+            case 3:
+                return "Satisfactory";
+                break;
+            case 4:
+                return "Good";
+                break;
+            case 5:
+                return "Outstanding";
+                break;
+        }
     }
 }

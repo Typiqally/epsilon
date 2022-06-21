@@ -1,8 +1,8 @@
-﻿using Epsilon.Canvas.Abstractions.Data;
+﻿using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Canvas.Abstractions;
 
 public interface ICanvasModuleCollectionFetcher
 {
-    public Task<IEnumerable<Module>> Fetch(int courseId);
+    public Task<IEnumerable<Module>> GetAll(int courseId);
 }

@@ -1,5 +1,5 @@
 ﻿using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Export.Exporters;
@@ -24,27 +24,21 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     {
         foreach (var module in modules)
         {
-            _logger.LogInformation("================ {ModuleName} ================", module.Name);
+            _logger.LogInformation("Module: {Name}", module.Name);
 
-            LogAssignments(module.Assignments);
-        }
-    }
+            var links = module.Collection.Links;
+            var alignments = links.AlignmentsDictionary;
+            var outcomes = links.OutcomesDictionary;
 
-    private void LogAssignments(IEnumerable<Assignment> assignments)
-    {
-        foreach (var assignment in assignments)
-        {
-            _logger.LogInformation("{AssignmentName}", assignment.Name);
+            foreach (var alignment in alignments.Values)
+            {
+                _logger.LogInformation("Alignment: {Alignment}", alignment.Name);
 
-            LogOutcomeResults(assignment.OutcomeResults);
-        }
-    }
-
-    private void LogOutcomeResults(IEnumerable<OutcomeResult> results)
-    {
-        foreach (var outcomeResult in results)
-        {
-            _logger.LogInformation("\t- {OutcomeTitle}", outcomeResult.Outcome?.Title);
+                foreach (var result in module.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id))
+                {
+                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Score);
+                }
+            }
         }
     }
 }

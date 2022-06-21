@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Data;
+using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;
@@ -35,16 +35,26 @@ public class CsvModuleExporter : ICanvasModuleExporter
         dt.Columns.Add("Assignment Id", typeof(string));
         dt.Columns.Add("Assignment", typeof(string));
         dt.Columns.Add("KPI", typeof(string));
+        dt.Columns.Add("Score", typeof(string));
         dt.Columns.Add("Module", typeof(string));
 
         foreach (var module in modules)
         {
-            foreach (var assignment in module.Assignments)
+            var links = module.Collection.Links;
+
+            foreach (var result in module.Collection.OutcomeResults)
             {
-                foreach (var outcomeResult in assignment.OutcomeResults)
-                {
-                    dt.Rows.Add(outcomeResult.Outcome?.Id, assignment.Id, assignment.Name, outcomeResult?.Outcome?.Title, module.Name);
-                }
+                var outcome = links.OutcomesDictionary[result.Link.Outcome];
+                var alignment = links.AlignmentsDictionary[result.Link.Alignment];
+
+                dt.Rows.Add(
+                    outcome.Id,
+                    alignment.Id,
+                    alignment.Name,
+                    outcome.Title,
+                    result.Score.HasValue ? result.Score : "not achieved",
+                    module.Name
+                );
             }
         }
 

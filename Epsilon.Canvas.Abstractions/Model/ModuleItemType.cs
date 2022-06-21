@@ -1,4 +1,4 @@
-﻿namespace Epsilon.Canvas.Abstractions.Data;
+﻿namespace Epsilon.Canvas.Abstractions.Model;
 
 public enum ModuleItemType
 {
