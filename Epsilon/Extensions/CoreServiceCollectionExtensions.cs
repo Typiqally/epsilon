@@ -12,7 +12,7 @@ public static class CoreServiceCollectionExtensions
     public static IServiceCollection AddCore(this IServiceCollection services, IConfiguration config)
     {
         services.AddCanvas(config.GetSection("Canvas"));
-        services.AddExport(config.GetSection("Export"));
+        services.AddExport(config);
 
         return services;
     }
