@@ -65,8 +65,10 @@ public class Startup : IHostedService
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
             var modules = await _collectionFetcher.GetAll(_canvasSettings.CourseId);
 
-            _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", _exportOptions.Formats));
-            var exporters = _exporterCollection.DetermineExporters(_exportOptions.Formats).ToArray();
+            var formats = _exportOptions.Formats.Split(",");
+            var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
+
+            _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
 
             foreach (var (format, exporter) in exporters)
             {
