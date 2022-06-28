@@ -1,10 +1,16 @@
-﻿namespace Epsilon.Canvas.Abstractions.Model;
+﻿using System.Text.Json.Serialization;
 
+namespace Epsilon.Canvas.Abstractions.Model;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ModuleItemType
 {
-    Unknown,
-    Page,
-    Assignment,
-    SubHeader,
     File,
+    Page,
+    Discussion,
+    Assignment,
+    Quiz,
+    SubHeader,
+    ExternalUrl,
+    ExternalTool,
 }
