@@ -48,33 +48,42 @@ public class Startup : IHostedService
 
     private async Task ExecuteAsync()
     {
-        var results = Validate(_canvasSettings).ToArray();
-        if (results.Any())
+        try
         {
-            foreach (var validationResult in results)
+            var results = Validate(_canvasSettings).ToArray();
+            if (results.Any())
             {
-                _logger.LogError("Error: {Message}", validationResult.ErrorMessage);
+                foreach (var validationResult in results)
+                {
+                    _logger.LogError("Error: {Message}", validationResult.ErrorMessage);
+                }
+
+                _lifetime.StopApplication();
+                return;
             }
 
-            _lifetime.StopApplication();
-            return;
+            _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
+            var modules = await _collectionFetcher.GetAll(_canvasSettings.CourseId);
+
+            var formats = _exportOptions.Formats.Split(",");
+            var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
+
+            _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
+
+            foreach (var (format, exporter) in exporters)
+            {
+                _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
+                exporter.Export(modules, format);
+            }
         }
-
-        _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
-        var modules = await _collectionFetcher.GetAll(_canvasSettings.CourseId);
-
-        var formats = _exportOptions.Formats.Split(",");
-        var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
-
-        _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
-        
-        foreach (var (format, exporter) in exporters)
+        catch (Exception ex)
         {
-            _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
-            exporter.Export(modules, format);
+            _logger.LogError(ex, "Error occured:");
         }
-
-        _lifetime.StopApplication();
+        finally
+        {
+            _lifetime.StopApplication();
+        }
     }
 
     private static IEnumerable<ValidationResult> Validate(object model)
