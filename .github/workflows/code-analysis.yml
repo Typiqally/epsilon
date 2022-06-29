@@ -2,7 +2,7 @@ name: "Code analysis"
 
 on:
   pull_request:
-    branches: [ "master", develop ]
+    branches: [ "master", "develop" ]
   schedule:
     - cron: '22 18 * * 5'
 
