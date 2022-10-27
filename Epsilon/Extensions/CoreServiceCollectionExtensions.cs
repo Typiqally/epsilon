@@ -24,6 +24,7 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<ICanvasModuleExporter, ConsoleModuleExporter>();
         services.AddScoped<ICanvasModuleExporter, CsvModuleExporter>();
         services.AddScoped<ICanvasModuleExporter, ExcelModuleExporter>();
+        services.AddScoped<ICanvasModuleExporter, WordModuleExporter>();
 
         services.AddScoped<IModuleExporterCollection, ModuleExporterCollection>();
 
