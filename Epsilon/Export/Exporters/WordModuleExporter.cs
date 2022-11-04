@@ -26,6 +26,13 @@ public class WordModuleExporter : ICanvasModuleExporter
     {
         using (DocX document = DocX.Create(_options.FormattedOutputName+".docx"))
         { 
+            document.AddFooters();
+            var link = document.AddHyperlink("Epsilon", new Uri("https://github.com/Typiqally/epsilon"));
+
+            document.Footers.Odd
+                .InsertParagraph("Created with ")
+                .AppendHyperlink(link).Color( Color.Blue ).UnderlineStyle( UnderlineStyle.singleLine );
+                
             foreach (var module in modules.Where(static m => m.Collection.OutcomeResults.Any())) 
             {
 
