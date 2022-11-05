@@ -1,6 +1,5 @@
 ﻿using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Export.Exporters;
@@ -37,7 +36,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
 
                 foreach (var result in module.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id))
                 {
-                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, OutcomeHelper.OutcomeToText(result));
+                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Grade());
                 }
             }
         }

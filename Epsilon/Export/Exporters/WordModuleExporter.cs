@@ -1,14 +1,10 @@
 ﻿using System.Drawing;
 using System.Text;
-using System.Text.RegularExpressions;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Helpers;
-using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
-using Alignment = Xceed.Document.NET.Alignment;
 
 namespace Epsilon.Export.Exporters;
 
@@ -57,7 +53,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                     if (assignmentIds.Any())
                     {
                         var row = table.InsertRow();
-                        row.Cells[ 0 ].Paragraphs[ 0 ].Append( outcome.Title + " " +  OutcomeHelper.ShortenOutcomeDescription(outcome));
+                        row.Cells[ 0 ].Paragraphs[ 0 ].Append( outcome.Title + " " +  outcome.ShortDescription());
 
                         var cellValueBuilder = new StringBuilder();
 
@@ -70,7 +66,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                         var cellValueOutComeResultsBuilder = new StringBuilder();
                         foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
                         {
-                            cellValueOutComeResultsBuilder.AppendLine(OutcomeHelper.OutcomeToText(outcomeResult));
+                            cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
                         }
                         row.Cells[ 2 ].Paragraphs[ 0 ].Append( cellValueOutComeResultsBuilder.ToString() );
                     }

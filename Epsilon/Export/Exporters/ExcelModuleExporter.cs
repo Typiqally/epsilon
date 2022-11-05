@@ -1,8 +1,6 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Helpers;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 
@@ -54,7 +52,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                 if (assignmentIds.Any())
                 {
-                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " +  OutcomeHelper.ShortenOutcomeDescription(outcome));
+                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " +  outcome.ShortDescription());
 
                     var cellValueBuilder = new StringBuilder();
 
@@ -67,7 +65,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                     var cellValueOutComeResultsBuilder = new StringBuilder();
                     foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
                     {
-                        cellValueOutComeResultsBuilder.AppendLine(OutcomeHelper.OutcomeToText(outcomeResult));
+                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
                     }
 
                     worksheet.Cells[index, 2] = new Cell(cellValueOutComeResultsBuilder.ToString());
