@@ -43,9 +43,9 @@ public class WordModuleExporter : ICanvasModuleExporter
                 
                 var table = document.AddTable( 1, 3);
 
-                table.Rows[0].Cells[0].Paragraphs[0].Append("KPI");
-                table.Rows[0].Cells[1].Paragraphs[0].Append("Assignment(s)");
-                table.Rows[0].Cells[2].Paragraphs[0].Append("Score");
+                table.Rows[ 0 ].Cells[ 0 ].Paragraphs[ 0 ].Append("KPI");
+                table.Rows[ 0 ].Cells[ 1 ].Paragraphs[ 0 ].Append("Assignment(s)");
+                table.Rows[ 0 ].Cells[ 2 ].Paragraphs[ 0 ].Append("Score");
                 
                 foreach (var (outcomeId, outcome) in outcomes)
                 {
