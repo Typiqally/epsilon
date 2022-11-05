@@ -44,17 +44,20 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
             foreach (var result in module.Collection.OutcomeResults)
             {
-                var outcome = links.OutcomesDictionary[result.Link.Outcome];
-                var alignment = links.AlignmentsDictionary[result.Link.Alignment];
+                if (result.Link.Outcome != null && result.Link.Alignment !=null)
+                {
+                    var outcome = links?.OutcomesDictionary[result.Link.Outcome];
+                    var alignment = links?.AlignmentsDictionary[result.Link.Alignment];
 
-                dt.Rows.Add(
-                    outcome.Id,
-                    alignment.Id,
-                    alignment.Name,
-                    outcome.Title,
-                    result.Score.HasValue ? result.Score : "not achieved",
-                    module.Name
-                );
+                    dt.Rows.Add(
+                        outcome?.Id,
+                        alignment?.Id,
+                        alignment?.Name,
+                        outcome?.Title,
+                        result.Score.HasValue ? result.Score : "not achieved",
+                        module.Name
+                    );
+                }
             }
         }
 

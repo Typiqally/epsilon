@@ -33,8 +33,8 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             }
 
             var links = module.Collection.Links;
-            var alignments = links.AlignmentsDictionary;
-            var outcomes = links.OutcomesDictionary;
+            var alignments = links?.AlignmentsDictionary;
+            var outcomes = links?.OutcomesDictionary != null ? links.OutcomesDictionary : new Dictionary<String, Outcome>();
 
             //Add headers
             worksheet.Cells[0, 0] = new Cell("KPI");
@@ -51,7 +51,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                     .Select(static o => o.Link.Assignment)
                     .ToArray();
 
-                if (assignmentIds.Any())
+                if (assignmentIds.Any() && alignments != null)
                 {
                     worksheet.Cells[index, 0] = new Cell(outcome.Title + " " +  ShortDescription(ConvertHtmlToRaw(outcome.Description)));
 
@@ -107,18 +107,13 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         switch (result)
         {
             default:
-            case 0:
                 return "Unsatisfactory";
-                break;
             case 3:
                 return "Satisfactory";
-                break;
             case 4:
                 return "Good";
-                break;
             case 5:
                 return "Outstanding";
-                break;
         }
     }
 }

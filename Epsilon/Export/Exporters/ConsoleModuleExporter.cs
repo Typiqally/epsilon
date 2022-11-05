@@ -27,8 +27,8 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
             _logger.LogInformation("Module: {Name}", module.Name);
 
             var links = module.Collection.Links;
-            var alignments = links.AlignmentsDictionary;
-            var outcomes = links.OutcomesDictionary;
+            var alignments = links?.AlignmentsDictionary != null ? links.AlignmentsDictionary : new Dictionary<string, Alignment>();
+            var outcomes = links?.OutcomesDictionary;
 
             foreach (var alignment in alignments.Values)
             {
@@ -36,7 +36,10 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
 
                 foreach (var result in module.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id))
                 {
-                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Score);
+                    if (result?.Link?.Outcome != null && outcomes != null)
+                    {
+                        _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Score);
+                    }
                 }
             }
         }
