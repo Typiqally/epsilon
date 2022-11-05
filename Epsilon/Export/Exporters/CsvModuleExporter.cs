@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Helpers;
 using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;
@@ -52,7 +53,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
                     alignment.Id,
                     alignment.Name,
                     outcome.Title,
-                    result.Score.HasValue ? result.Score : "not achieved",
+                    OutcomeHelper.OutcomeToText(result),
                     module.Name
                 );
             }

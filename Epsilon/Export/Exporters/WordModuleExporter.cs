@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Helpers;
 using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 using Xceed.Document.NET;
@@ -56,7 +57,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                     if (assignmentIds.Any())
                     {
                         var row = table.InsertRow();
-                        row.Cells[ 0 ].Paragraphs[ 0 ].Append( outcome.Title + " " +  ShortDescription(ConvertHtmlToRaw(outcome.Description)) );
+                        row.Cells[ 0 ].Paragraphs[ 0 ].Append( outcome.Title + " " +  OutcomeHelper.ShortenOutcomeDescription(outcome));
 
                         var cellValueBuilder = new StringBuilder();
 
@@ -69,7 +70,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                         var cellValueOutComeResultsBuilder = new StringBuilder();
                         foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
                         {
-                            cellValueOutComeResultsBuilder.AppendLine(OutcomeToText(outcomeResult.Score));
+                            cellValueOutComeResultsBuilder.AppendLine(OutcomeHelper.OutcomeToText(outcomeResult));
                         }
                         row.Cells[ 2 ].Paragraphs[ 0 ].Append( cellValueOutComeResultsBuilder.ToString() );
                     }
@@ -79,43 +80,6 @@ public class WordModuleExporter : ICanvasModuleExporter
                 par.InsertTableAfterSelf(table).InsertPageBreakAfterSelf();
             }
             document.Save();
-        }
-    }
-    
-    private static string ShortDescription(string description)
-    {
-        //Function gives only the short English description back of the outcome. 
-        var startPos = description.IndexOf(" EN ", StringComparison.Ordinal) + " EN ".Length;
-        var endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
-
-        return description.Substring(startPos, endPos - startPos);
-    }
-
-    private static string ConvertHtmlToRaw(string html)
-    {
-        var raw = Regex.Replace(html, "<.*?>", " ");
-        var trimmed = Regex.Replace(raw, @"\s\s+", " ");
-
-        return trimmed;
-    }
-
-    private string OutcomeToText(double? result)
-    {
-        switch (result)
-        {
-            default:
-            case 0:
-                return "Unsatisfactory";
-                break;
-            case 3:
-                return "Satisfactory";
-                break;
-            case 4:
-                return "Good";
-                break;
-            case 5:
-                return "Outstanding";
-                break;
         }
     }
 }
