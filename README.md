@@ -5,7 +5,7 @@ These students usually have a personal course within Canvas (from Instructure), 
 During each semester, it is requested to take note of all KPI's which have been proven.
 To aid in these efforts, this application will gather all your mastered/proven [KPI's](https://hbo-i.nl/domeinbeschrijving/) and export your KPI's to a file format (e.g., JSON, Exel, CSV).
 
-![Application demo](https://user-images.githubusercontent.com/12190745/176268592-e863e4c3-47b4-4af5-aeca-298d53a37c33.gif)
+![Application demo](https://user-images.githubusercontent.com/12190745/200400486-a7c6a166-cb42-4da4-a6be-855bedf1bfc6.gif)
 
 ## Usage
 Read how to use the application in our Wiki located [here](https://github.com/Typiqally/epsilon/wiki/How-to-use).
