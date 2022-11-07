@@ -52,7 +52,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
                     alignment.Id,
                     alignment.Name,
                     outcome.Title,
-                    result.Score.HasValue ? result.Score : "not achieved",
+                    result.Grade(),
                     module.Name
                 );
             }

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
 using ExcelLibrary.SpreadSheet;
@@ -53,7 +52,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                 if (assignmentIds.Any())
                 {
-                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " +  ShortDescription(ConvertHtmlToRaw(outcome.Description)));
+                    worksheet.Cells[index, 0] = new Cell($"{outcome.Title} {outcome.ShortDescription()}");
 
                     var cellValueBuilder = new StringBuilder();
 
@@ -61,12 +60,14 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                     {
                         cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                     }
+
                     worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
-                    
+
                     var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
+                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>
+                                 result.Link.Outcome == outcomeId))
                     {
-                        cellValueOutComeResultsBuilder.AppendLine(OutcomeToText(outcomeResult.Score));
+                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
                     }
 
                     worksheet.Cells[index, 2] = new Cell(cellValueOutComeResultsBuilder.ToString());
@@ -83,42 +84,5 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
         // We're forced to xls because of the older format
         workbook.Save($"{_options.FormattedOutputName}.xls");
-    }
-
-    private static string ShortDescription(string description)
-    {
-        //Function gives only the short English description back of the outcome. 
-        var startPos = description.IndexOf(" EN ", StringComparison.Ordinal) + " EN ".Length;
-        var endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
-
-        return description.Substring(startPos, endPos - startPos);
-    }
-
-    private static string ConvertHtmlToRaw(string html)
-    {
-        var raw = Regex.Replace(html, "<.*?>", " ");
-        var trimmed = Regex.Replace(raw, @"\s\s+", " ");
-
-        return trimmed;
-    }
-
-    private string OutcomeToText(double? result)
-    {
-        switch (result)
-        {
-            default:
-            case 0:
-                return "Unsatisfactory";
-                break;
-            case 3:
-                return "Satisfactory";
-                break;
-            case 4:
-                return "Good";
-                break;
-            case 5:
-                return "Outstanding";
-                break;
-        }
     }
 }

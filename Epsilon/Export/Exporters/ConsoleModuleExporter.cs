@@ -36,7 +36,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
 
                 foreach (var result in module.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id))
                 {
-                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Score);
+                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Grade());
                 }
             }
         }
