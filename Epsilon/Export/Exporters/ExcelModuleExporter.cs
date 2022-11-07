@@ -52,7 +52,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                 if (assignmentIds.Any())
                 {
-                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " + outcome.ShortDescription());
+                    worksheet.Cells[index, 0] = new Cell($"{outcome.Title} {outcome.ShortDescription()}");
 
                     var cellValueBuilder = new StringBuilder();
 
