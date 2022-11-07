@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Options;
@@ -16,9 +17,9 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "csv" };
 
-    public void Export(IEnumerable<Module> data, string format)
+    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        var dt = CreateDataTable(data);
+        var dt = await CreateDataTable(data);
 
         var stream = new StreamWriter($"{_options.FormattedOutputName}.{format}", false);
         WriteHeader(stream, dt);
@@ -27,7 +28,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
         stream.Close();
     }
 
-    private static DataTable CreateDataTable(IEnumerable<Module> modules)
+    private static async Task<DataTable> CreateDataTable(IAsyncEnumerable<ModuleOutcomeResultCollection> items)
     {
         var dt = new DataTable();
 
@@ -38,14 +39,18 @@ public class CsvModuleExporter : ICanvasModuleExporter
         dt.Columns.Add("Score", typeof(string));
         dt.Columns.Add("Module", typeof(string));
 
-        foreach (var module in modules)
+        await foreach (var item in items)
         {
-            var links = module.Collection.Links;
+            var links = item.Collection.Links;
 
-            foreach (var result in module.Collection.OutcomeResults)
+            Debug.Assert(links?.OutcomesDictionary != null, "links?.OutcomesDictionary != null");
+            Debug.Assert(links.AlignmentsDictionary != null, "links.AlignmentsDictionary != null");
+            
+            foreach (var result in item.Collection.OutcomeResults)
             {
-                var outcome = links.OutcomesDictionary[result.Link.Outcome];
-                var alignment = links.AlignmentsDictionary[result.Link.Alignment];
+                Debug.Assert(result.Link != null, "result.Link != null");
+                var outcome = links.OutcomesDictionary[result.Link.Outcome!];
+                var alignment = links.AlignmentsDictionary[result.Link.Alignment!];
                 var grade = result.Grade();
 
                 if (grade != null)
@@ -56,7 +61,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
                         alignment.Name,
                         outcome.Title,
                         result.Grade(),
-                        module.Name
+                        item.Module.Name
                     );
                 }
             }

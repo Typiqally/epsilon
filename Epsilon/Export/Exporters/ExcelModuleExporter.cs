@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
 using ExcelLibrary.SpreadSheet;
@@ -17,13 +18,13 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
-    public void Export(IEnumerable<Module> modules, string format)
+    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
         var workbook = new Workbook();
 
-        foreach (var module in modules.Where(static m => m.Collection.OutcomeResults.Any()))
+        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
         {
-            var worksheet = new Worksheet(module.Name);
+            var worksheet = new Worksheet(item.Module.Name);
 
             //Because reasons @source https://stackoverflow.com/a/8127642 
             for (var i = 0; i < 100; i++)
@@ -31,7 +32,10 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                 worksheet.Cells[i, 0] = new Cell("");
             }
 
-            var links = module.Collection.Links;
+            var links = item.Collection.Links;
+            
+            Debug.Assert(links != null, nameof(links) + " != null");
+            
             var alignments = links.AlignmentsDictionary;
             var outcomes = links.OutcomesDictionary;
 
@@ -45,7 +49,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             var index = 1;
             foreach (var (outcomeId, outcome) in outcomes)
             {
-                var assignmentIds = module.Collection.OutcomeResults
+                var assignmentIds = item.Collection.OutcomeResults
                     .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
                     .Select(static o => o.Link.Assignment)
                     .ToArray();
@@ -56,7 +60,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                     var cellValueBuilder = new StringBuilder();
 
-                    foreach (var (alignmentId, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
+                    foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
                     {
                         cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                     }
@@ -64,7 +68,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                     worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
 
                     var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>
+                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
                                  result.Link.Outcome == outcomeId))
                     {
                         cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());

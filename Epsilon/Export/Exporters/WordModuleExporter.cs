@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
@@ -19,7 +20,7 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "word" };
 
-    public void Export(IEnumerable<Module> modules, string format)
+    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
         using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
         
@@ -30,9 +31,12 @@ public class WordModuleExporter : ICanvasModuleExporter
             .InsertParagraph("Created with ")
             .AppendHyperlink(link).Color(Color.Blue).UnderlineStyle(UnderlineStyle.singleLine);
 
-        foreach (var module in modules.Where(static m => m.Collection.OutcomeResults.Any()))
+        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
         {
-            var links = module.Collection.Links;
+            var links = item.Collection.Links;
+            
+            Debug.Assert(links != null, nameof(links) + " != null");
+            
             var alignments = links.AlignmentsDictionary;
             var outcomes = links.OutcomesDictionary;
 
@@ -44,7 +48,7 @@ public class WordModuleExporter : ICanvasModuleExporter
 
             foreach (var (outcomeId, outcome) in outcomes)
             {
-                var assignmentIds = module.Collection.OutcomeResults
+                var assignmentIds = item.Collection.OutcomeResults
                     .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
                     .Select(static o => o.Link.Assignment)
                     .ToArray();
@@ -64,7 +68,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                     row.Cells[1].Paragraphs[0].Append(cellValueBuilder.ToString());
 
                     var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>
+                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
                                  result.Link.Outcome == outcomeId))
                     {
                         cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
@@ -74,7 +78,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                 }
             }
 
-            var par = document.InsertParagraph(module.Name);
+            var par = document.InsertParagraph(item.Module.Name);
             par.FontSize(24);
             par.InsertTableAfterSelf(table).InsertPageBreakAfterSelf();
         }

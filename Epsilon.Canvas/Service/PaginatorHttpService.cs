@@ -37,7 +37,10 @@ public class PaginatorHttpService : HttpService, IPaginatorHttpService
             var (response, value) = await Client.SendAsync<TResult>(request);
             var links = _headerConverter.ConvertFrom(response);
 
-            pages.Add(value);
+            if (value != null)
+            {
+                pages.Add(value);
+            }
 
             if (links.NextLink == null)
             {

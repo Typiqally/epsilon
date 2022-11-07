@@ -7,8 +7,4 @@ public record Module(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("items_count")] int Count,
     [property: JsonPropertyName("items")] IEnumerable<ModuleItem>? Items
-)
-{
-    [JsonIgnore]
-    public OutcomeResultCollection Collection { get; set; }
-}
+);
