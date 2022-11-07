@@ -46,15 +46,19 @@ public class CsvModuleExporter : ICanvasModuleExporter
             {
                 var outcome = links.OutcomesDictionary[result.Link.Outcome];
                 var alignment = links.AlignmentsDictionary[result.Link.Alignment];
+                var grade = result.Grade();
 
-                dt.Rows.Add(
-                    outcome.Id,
-                    alignment.Id,
-                    alignment.Name,
-                    outcome.Title,
-                    result.Grade(),
-                    module.Name
-                );
+                if (grade != null)
+                {
+                    dt.Rows.Add(
+                        outcome.Id,
+                        alignment.Id,
+                        alignment.Name,
+                        outcome.Title,
+                        result.Grade(),
+                        module.Name
+                    );
+                }
             }
         }
 

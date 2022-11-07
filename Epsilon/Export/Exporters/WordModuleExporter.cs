@@ -45,7 +45,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                 foreach (var (outcomeId, outcome) in outcomes)
                 {
                     var assignmentIds = module.Collection.OutcomeResults
-                        .Where(o => o.Link.Outcome == outcomeId)
+                        .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
                         .Select(static o => o.Link.Assignment)
                         .ToArray();
 
