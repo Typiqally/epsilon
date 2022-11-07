@@ -63,6 +63,7 @@ public class Startup : IHostedService
             }
 
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
+            _logger.LogInformation("Downloading results, this may take a few seconds...");
             var modules = await _collectionFetcher.GetAll(_canvasSettings.CourseId);
 
             var formats = _exportOptions.Formats.Split(",");

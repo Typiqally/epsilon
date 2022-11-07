@@ -24,8 +24,6 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 
     public async Task<IEnumerable<Module>> GetAll(int courseId)
     {
-        _logger.LogInformation("Downloading results...");
-
         var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
 
         var alignments = response.Links.Alignments
