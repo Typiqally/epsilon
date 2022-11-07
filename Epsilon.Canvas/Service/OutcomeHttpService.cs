@@ -1,9 +1,8 @@
 using System.Text;
+using Epsilon.Abstractions.Http;
+using Epsilon.Abstractions.Http.Json;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Response;
 using Epsilon.Canvas.Abstractions.Service;
-using Epsilon.Http.Abstractions;
-using Epsilon.Http.Abstractions.Json;
 
 namespace Epsilon.Canvas.Service;
 
