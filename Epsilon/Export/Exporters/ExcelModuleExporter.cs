@@ -52,7 +52,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                 if (assignmentIds.Any())
                 {
-                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " +  outcome.ShortDescription());
+                    worksheet.Cells[index, 0] = new Cell(outcome.Title + " " + outcome.ShortDescription());
 
                     var cellValueBuilder = new StringBuilder();
 
@@ -60,10 +60,12 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                     {
                         cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                     }
+
                     worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
-                    
+
                     var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
+                    foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>
+                                 result.Link.Outcome == outcomeId))
                     {
                         cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
                     }

@@ -21,28 +21,27 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public void Export(IEnumerable<Module> modules, string format)
     {
-        using (DocX document = DocX.Create(_options.FormattedOutputName+".docx"))
-        { 
+        using (DocX document = DocX.Create(_options.FormattedOutputName + ".docx"))
+        {
             document.AddFooters();
             var link = document.AddHyperlink("Epsilon", new Uri("https://github.com/Typiqally/epsilon"));
 
             document.Footers.Odd
                 .InsertParagraph("Created with ")
-                .AppendHyperlink(link).Color( Color.Blue ).UnderlineStyle( UnderlineStyle.singleLine );
-                
-            foreach (var module in modules.Where(static m => m.Collection.OutcomeResults.Any())) 
-            {
+                .AppendHyperlink(link).Color(Color.Blue).UnderlineStyle(UnderlineStyle.singleLine);
 
+            foreach (var module in modules.Where(static m => m.Collection.OutcomeResults.Any()))
+            {
                 var links = module.Collection.Links;
                 var alignments = links.AlignmentsDictionary;
                 var outcomes = links.OutcomesDictionary;
-                
-                var table = document.AddTable( 1, 3);
 
-                table.Rows[ 0 ].Cells[ 0 ].Paragraphs[ 0 ].Append("KPI");
-                table.Rows[ 0 ].Cells[ 1 ].Paragraphs[ 0 ].Append("Assignment(s)");
-                table.Rows[ 0 ].Cells[ 2 ].Paragraphs[ 0 ].Append("Score");
-                
+                var table = document.AddTable(1, 3);
+
+                table.Rows[0].Cells[0].Paragraphs[0].Append("KPI");
+                table.Rows[0].Cells[1].Paragraphs[0].Append("Assignment(s)");
+                table.Rows[0].Cells[2].Paragraphs[0].Append("Score");
+
                 foreach (var (outcomeId, outcome) in outcomes)
                 {
                     var assignmentIds = module.Collection.OutcomeResults
@@ -53,7 +52,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                     if (assignmentIds.Any())
                     {
                         var row = table.InsertRow();
-                        row.Cells[ 0 ].Paragraphs[ 0 ].Append( outcome.Title + " " +  outcome.ShortDescription());
+                        row.Cells[0].Paragraphs[0].Append(outcome.Title + " " + outcome.ShortDescription());
 
                         var cellValueBuilder = new StringBuilder();
 
@@ -61,20 +60,25 @@ public class WordModuleExporter : ICanvasModuleExporter
                         {
                             cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                         }
-                        row.Cells[ 1 ].Paragraphs[ 0 ].Append( cellValueBuilder.ToString() );
+
+                        row.Cells[1].Paragraphs[0].Append(cellValueBuilder.ToString());
 
                         var cellValueOutComeResultsBuilder = new StringBuilder();
-                        foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>  result.Link.Outcome == outcomeId))
+                        foreach (var outcomeResult in module.Collection.OutcomeResults.Where(result =>
+                                     result.Link.Outcome == outcomeId))
                         {
                             cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
                         }
-                        row.Cells[ 2 ].Paragraphs[ 0 ].Append( cellValueOutComeResultsBuilder.ToString() );
+
+                        row.Cells[2].Paragraphs[0].Append(cellValueOutComeResultsBuilder.ToString());
                     }
-                } 
-                var par = document.InsertParagraph( module.Name );
+                }
+
+                var par = document.InsertParagraph(module.Name);
                 par.FontSize(24);
                 par.InsertTableAfterSelf(table).InsertPageBreakAfterSelf();
             }
+
             document.Save();
         }
     }
