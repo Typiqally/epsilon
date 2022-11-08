@@ -9,18 +9,15 @@ public record OutcomeResult(
     [property: JsonPropertyName("links")] OutcomeResultLink Link
 )
 {
-    public string Grade()
+    public string? Grade()
     {
-        switch (Score)
+        return Score switch
         {
-            default:
-                return "Unsatisfactory";
-            case 3:
-                return "Satisfactory";
-            case 4:
-                return "Good";
-            case 5:
-                return "Outstanding";
-        }
+            <= 2 => "Unsatisfactory",
+            3 => "Satisfactory",
+            4 => "Good",
+            5 => "Outstanding",
+            _ => null,
+        };
     }
 }

@@ -19,17 +19,14 @@ public class ModuleExporterCollection : IModuleExporterCollection
 
     public IDictionary<string, ICanvasModuleExporter> DetermineExporters(IEnumerable<string> formats)
     {
-        var formatsArray = formats as string[] ?? formats.ToArray(); // To prevent multiple enumeration
+        var formatsArray = formats.ToArray(); // To prevent multiple enumeration
         var foundExporters = new Dictionary<string, ICanvasModuleExporter>();
 
         foreach (var exporter in _exporters)
         {
-            foreach (var format in formatsArray)
+            foreach (var format in formatsArray.Where(f => exporter.Formats.Contains(f.ToLower())))
             {
-                if (exporter.Formats.Contains(format.ToLower()))
-                {
-                    foundExporters.Add(format, exporter);
-                }
+                foundExporters.Add(format, exporter);
             }
         }
 

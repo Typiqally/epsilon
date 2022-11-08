@@ -1,13 +1,14 @@
 ﻿using System.Web;
+using Epsilon.Abstractions.Http;
+using Epsilon.Abstractions.Http.Json;
 using Epsilon.Canvas.Abstractions.Converter;
 using Epsilon.Canvas.Abstractions.Service;
-using Epsilon.Http.Abstractions;
-using Epsilon.Http.Abstractions.Json;
 
 namespace Epsilon.Canvas.Service;
 
 public class PaginatorHttpService : HttpService, IPaginatorHttpService
 {
+    private const int Limit = 100;
     private readonly ILinkHeaderConverter _headerConverter;
 
     public PaginatorHttpService(HttpClient client, ILinkHeaderConverter headerConverter) : base(client)
@@ -19,25 +20,20 @@ public class PaginatorHttpService : HttpService, IPaginatorHttpService
     {
         var pages = new List<TResult>();
         var page = "1";
-        const int limit = 100;
 
-        if (!uri.Contains('?'))
-        {
-            uri += "?";
-        }
-        else
-        {
-            uri += "&";
-        }
+        uri += !uri.Contains('?') ? "?" : "&";
 
         do
         {
-            var offset = pages.Count * limit;
-            var request = new HttpRequestMessage(method, $"{uri}per_page={limit}&offset={offset}&page={page}");
+            var offset = pages.Count * Limit;
+            var request = new HttpRequestMessage(method, $"{uri}per_page={Limit}&offset={offset}&page={page}");
             var (response, value) = await Client.SendAsync<TResult>(request);
             var links = _headerConverter.ConvertFrom(response);
 
-            pages.Add(value);
+            if (value != null)
+            {
+                pages.Add(value);
+            }
 
             if (links.NextLink == null)
             {
@@ -46,7 +42,7 @@ public class PaginatorHttpService : HttpService, IPaginatorHttpService
 
             var query = HttpUtility.ParseQueryString(new Uri(links.NextLink).Query);
             page = query["page"];
-        } while (pages.Count * limit % limit == 0);
+        } while (pages.Count * Limit % Limit == 0);
 
         return pages;
     }

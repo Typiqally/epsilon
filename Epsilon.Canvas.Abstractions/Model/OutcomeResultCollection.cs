@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using Epsilon.Canvas.Abstractions.Model;
 
-namespace Epsilon.Canvas.Abstractions.Response;
+namespace Epsilon.Canvas.Abstractions.Model;
 
 public record OutcomeResultCollection(
     [property: JsonPropertyName("outcome_results")] IEnumerable<OutcomeResult> OutcomeResults,

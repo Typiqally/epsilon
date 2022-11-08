@@ -13,7 +13,7 @@ public class LinkHeaderConverter : ILinkHeaderConverter
     {
         if (!response.Headers.Contains("Link"))
         {
-            throw new ArgumentNullException(nameof(response.Headers), "Header does not contain link key");
+            throw new KeyNotFoundException("Header does not contain link key");
         }
 
         return ConvertFrom(response.Headers.GetValues("Link").First());

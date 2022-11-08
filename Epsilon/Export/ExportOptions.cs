@@ -2,7 +2,7 @@
 
 public class ExportOptions
 {
-    public string OutputName { get; set; } = "Epsilon-Export-{DateTime}";
+    public string OutputName { get; set; } = $"{Constants.ProjectName}-Export-{{DateTime}}";
 
     public string Formats { get; set; } = "console";
 

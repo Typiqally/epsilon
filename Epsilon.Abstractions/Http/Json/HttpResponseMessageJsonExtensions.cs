@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Epsilon.Http.Abstractions.Json;
+namespace Epsilon.Abstractions.Http.Json;
 
 public static class HttpResponseMessageJsonExtensions
 {
