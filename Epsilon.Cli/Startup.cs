@@ -70,7 +70,7 @@ public class Startup : IHostedService
             var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
 
             _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
-
+            
             foreach (var (format, exporter) in exporters)
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
