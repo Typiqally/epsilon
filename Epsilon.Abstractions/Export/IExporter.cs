@@ -4,5 +4,5 @@ public interface IExporter<in T>
 {
     public IEnumerable<string> Formats { get; }
 
-    void Export(T data, string format);
+    Task Export(T data, string format);
 }

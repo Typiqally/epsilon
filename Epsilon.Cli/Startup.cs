@@ -63,17 +63,19 @@ public class Startup : IHostedService
             }
 
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
-            var modules = await _collectionFetcher.GetAll(_canvasSettings.CourseId);
+            _logger.LogInformation("Downloading results, this may take a few seconds...");
+            var items = _collectionFetcher.GetAll(_canvasSettings.CourseId);
 
             var formats = _exportOptions.Formats.Split(",");
             var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
 
             _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
-
+            
             foreach (var (format, exporter) in exporters)
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
-                exporter.Export(modules, format);
+                // ReSharper disable once PossibleMultipleEnumeration
+                await exporter.Export(items, format);
             }
         }
         catch (Exception ex)
@@ -91,7 +93,7 @@ public class Startup : IHostedService
         var results = new List<ValidationResult>();
         var context = new ValidationContext(model);
 
-        var isValid = Validator.TryValidateObject(model, context, results, true);
+        Validator.TryValidateObject(model, context, results, true);
 
         return results;
     }

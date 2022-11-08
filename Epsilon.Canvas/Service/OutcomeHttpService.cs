@@ -1,9 +1,8 @@
 using System.Text;
+using Epsilon.Abstractions.Http;
+using Epsilon.Abstractions.Http.Json;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Response;
 using Epsilon.Canvas.Abstractions.Service;
-using Epsilon.Http.Abstractions;
-using Epsilon.Http.Abstractions.Json;
 
 namespace Epsilon.Canvas.Service;
 
@@ -30,11 +29,13 @@ public class OutcomeHttpService : HttpService, IOutcomeHttpService
         var query = $"?include[]={string.Join("&include[]=", include)}";
 
         var responses = await _paginator.GetAllPages<OutcomeResultCollection>(HttpMethod.Get, url + query);
+        var responsesArray = responses.ToArray();
+        
         return new OutcomeResultCollection(
-            responses.SelectMany(static r => r.OutcomeResults),
+            responsesArray.SelectMany(static r => r.OutcomeResults),
             new OutcomeResultCollectionLink(
-                responses.SelectMany(static r => r.Links.Outcomes),
-                responses.SelectMany(static r => r.Links.Alignments)
+                responsesArray.SelectMany(static r => r.Links?.Outcomes ?? Array.Empty<Outcome>()),
+                responsesArray.SelectMany(static r => r.Links?.Alignments ?? Array.Empty<Alignment>())
             )
         );
     }

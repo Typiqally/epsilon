@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Options;
@@ -16,9 +17,9 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "csv" };
 
-    public void Export(IEnumerable<Module> data, string format)
+    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        var dt = CreateDataTable(data);
+        var dt = await CreateDataTable(data);
 
         var stream = new StreamWriter($"{_options.FormattedOutputName}.{format}", false);
         WriteHeader(stream, dt);
@@ -27,7 +28,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
         stream.Close();
     }
 
-    private static DataTable CreateDataTable(IEnumerable<Module> modules)
+    private static async Task<DataTable> CreateDataTable(IAsyncEnumerable<ModuleOutcomeResultCollection> items)
     {
         var dt = new DataTable();
 
@@ -38,23 +39,31 @@ public class CsvModuleExporter : ICanvasModuleExporter
         dt.Columns.Add("Score", typeof(string));
         dt.Columns.Add("Module", typeof(string));
 
-        foreach (var module in modules)
+        await foreach (var item in items)
         {
-            var links = module.Collection.Links;
+            var links = item.Collection.Links;
 
-            foreach (var result in module.Collection.OutcomeResults)
+            Debug.Assert(links?.OutcomesDictionary != null, "links?.OutcomesDictionary != null");
+            Debug.Assert(links.AlignmentsDictionary != null, "links.AlignmentsDictionary != null");
+            
+            foreach (var result in item.Collection.OutcomeResults)
             {
-                var outcome = links.OutcomesDictionary[result.Link.Outcome];
-                var alignment = links.AlignmentsDictionary[result.Link.Alignment];
+                Debug.Assert(result.Link != null, "result.Link != null");
+                var outcome = links.OutcomesDictionary[result.Link.Outcome!];
+                var alignment = links.AlignmentsDictionary[result.Link.Alignment!];
+                var grade = result.Grade();
 
-                dt.Rows.Add(
-                    outcome.Id,
-                    alignment.Id,
-                    alignment.Name,
-                    outcome.Title,
-                    result.Score.HasValue ? result.Score : "not achieved",
-                    module.Name
-                );
+                if (grade != null)
+                {
+                    dt.Rows.Add(
+                        outcome.Id,
+                        alignment.Id,
+                        alignment.Name,
+                        outcome.Title,
+                        result.Grade(),
+                        item.Module.Name
+                    );
+                }
             }
         }
 
@@ -75,31 +84,27 @@ public class CsvModuleExporter : ICanvasModuleExporter
         writer.Write(writer.NewLine);
     }
 
-    // TODO: Fix code smell, cognitive complexity in if statement nesting
     private static void WriteRows(TextWriter writer, DataTable dt)
     {
         foreach (DataRow dr in dt.Rows)
         {
-            for (var i = 0; i < dt.Columns.Count; i++)
+            foreach (DataColumn dtColumn in dt.Columns)
             {
-                if (!Convert.IsDBNull(dr[i]))
+                var value = dr[dtColumn.Ordinal].ToString();
+                if (value != null)
                 {
-                    var value = dr[i].ToString();
-                    if (value != null)
+                    if (value.Contains(';'))
                     {
-                        if (value.Contains(';'))
-                        {
-                            value = $"\"{value}\"";
-                            writer.Write(value);
-                        }
-                        else
-                        {
-                            writer.Write(dr[i].ToString());
-                        }
+                        value = $"\"{value}\"";
+                        writer.Write(value);
+                    }
+                    else
+                    {
+                        writer.Write(value);
                     }
                 }
 
-                if (i < dt.Columns.Count - 1)
+                if (dtColumn.Ordinal < dt.Columns.Count - 1)
                 {
                     writer.Write(";");
                 }

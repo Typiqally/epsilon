@@ -1,37 +1,38 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
-using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
+using Xceed.Document.NET;
+using Xceed.Words.NET;
 
 namespace Epsilon.Export.Exporters;
 
-public class ExcelModuleExporter : ICanvasModuleExporter
+public class WordModuleExporter : ICanvasModuleExporter
 {
     private readonly ExportOptions _options;
 
-    public ExcelModuleExporter(IOptions<ExportOptions> options)
+    public WordModuleExporter(IOptions<ExportOptions> options)
     {
         _options = options.Value;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
+    public IEnumerable<string> Formats { get; } = new[] { "word" };
 
     public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        var workbook = new Workbook();
+        using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
+        
+        document.AddFooters();
+        var link = document.AddHyperlink(Constants.ProjectName, Constants.RepositoryUri);
+
+        document.Footers.Odd
+            .InsertParagraph("Created with ")
+            .AppendHyperlink(link).Color(Color.Blue).UnderlineStyle(UnderlineStyle.singleLine);
 
         await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
         {
-            var worksheet = new Worksheet(item.Module.Name);
-
-            //Because reasons @source https://stackoverflow.com/a/8127642 
-            for (var i = 0; i < 100; i++)
-            {
-                worksheet.Cells[i, 0] = new Cell("");
-            }
-
             var links = item.Collection.Links;
             
             Debug.Assert(links != null, nameof(links) + " != null");
@@ -39,14 +40,12 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             var alignments = links.AlignmentsDictionary;
             var outcomes = links.OutcomesDictionary;
 
-            //Add headers
-            worksheet.Cells[0, 0] = new Cell("KPI");
-            worksheet.Cells[0, 1] = new Cell("Assignment(s)");
-            worksheet.Cells[0, 2] = new Cell("Score");
+            var table = document.AddTable(1, 3);
 
-            //Adding all the outcomes. 
+            table.Rows[0].Cells[0].Paragraphs[0].Append("KPI");
+            table.Rows[0].Cells[1].Paragraphs[0].Append("Assignment(s)");
+            table.Rows[0].Cells[2].Paragraphs[0].Append("Score");
 
-            var index = 1;
             foreach (var (outcomeId, outcome) in outcomes)
             {
                 var assignmentIds = item.Collection.OutcomeResults
@@ -56,7 +55,8 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                 if (assignmentIds.Any())
                 {
-                    worksheet.Cells[index, 0] = new Cell($"{outcome.Title} {outcome.ShortDescription()}");
+                    var row = table.InsertRow();
+                    row.Cells[0].Paragraphs[0].Append(outcome.Title + " " + outcome.ShortDescription());
 
                     var cellValueBuilder = new StringBuilder();
 
@@ -65,7 +65,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                         cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                     }
 
-                    worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
+                    row.Cells[1].Paragraphs[0].Append(cellValueBuilder.ToString());
 
                     var cellValueOutComeResultsBuilder = new StringBuilder();
                     foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
@@ -74,19 +74,15 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                         cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
                     }
 
-                    worksheet.Cells[index, 2] = new Cell(cellValueOutComeResultsBuilder.ToString());
-                    index++;
+                    row.Cells[2].Paragraphs[0].Append(cellValueOutComeResultsBuilder.ToString());
                 }
             }
 
-            worksheet.Cells.ColumnWidth[0, 0] = 500;
-            worksheet.Cells.ColumnWidth[0, 1] = 8000;
-            worksheet.Cells.ColumnWidth[0, 2] = 8000;
-
-            workbook.Worksheets.Add(worksheet);
+            var par = document.InsertParagraph(item.Module.Name);
+            par.FontSize(24);
+            par.InsertTableAfterSelf(table).InsertPageBreakAfterSelf();
         }
 
-        // We're forced to xls because of the older format
-        workbook.Save($"{_options.FormattedOutputName}.xls");
+        document.Save();
     }
 }

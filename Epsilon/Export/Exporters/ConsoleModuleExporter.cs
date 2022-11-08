@@ -1,4 +1,5 @@
-﻿using Epsilon.Abstractions.Export;
+﻿using System.Diagnostics;
+using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Logging;
 
@@ -15,28 +16,26 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "console", "logs" };
 
-    public void Export(IEnumerable<Module> data, string format)
+    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        LogModule(data);
-    }
-
-    private void LogModule(IEnumerable<Module> modules)
-    {
-        foreach (var module in modules)
+        await foreach (var item in data)
         {
-            _logger.LogInformation("Module: {Name}", module.Name);
+            _logger.LogInformation("Module: {Name}", item.Module.Name);
 
-            var links = module.Collection.Links;
-            var alignments = links.AlignmentsDictionary;
-            var outcomes = links.OutcomesDictionary;
+            var links = item.Collection.Links;
+            var alignments = links?.AlignmentsDictionary;
+            var outcomes = links?.OutcomesDictionary;
 
+            Debug.Assert(alignments != null, nameof(alignments) + " != null");
+            Debug.Assert(outcomes != null, nameof(outcomes) + " != null");
+            
             foreach (var alignment in alignments.Values)
             {
                 _logger.LogInformation("Alignment: {Alignment}", alignment.Name);
 
-                foreach (var result in module.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id))
+                foreach (var result in item.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id && o.Link.Outcome != null))
                 {
-                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome].Title, result.Score);
+                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome!].Title, result.Grade());
                 }
             }
         }

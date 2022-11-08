@@ -14,6 +14,7 @@ public static class CanvasServiceCollectionExtensions
 {
     private const string CanvasHttpClient = "CanvasHttpClient";
 
+    // ReSharper disable once UnusedMethodReturnValue.Global
     public static IServiceCollection AddCanvas(this IServiceCollection services, IConfiguration config)
     {
         services.Configure<CanvasSettings>(config);
