@@ -7,6 +7,15 @@ To aid in these efforts, this application will gather all your mastered/proven [
 
 ![Application demo](https://user-images.githubusercontent.com/12190745/200400486-a7c6a166-cb42-4da4-a6be-855bedf1bfc6.gif)
 
+## Supported formats
+
+Currently we support exporting assignment outcomes to the following formats:
+
+- Word
+- Excel
+- CSV
+- Console
+
 ## Usage
 Read how to use the application in our Wiki located [here](https://github.com/Typiqally/epsilon/wiki/How-to-use).
 
