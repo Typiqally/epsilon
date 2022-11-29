@@ -12,10 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="ExcelLibrary" Version="1.2011.7.31" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
         <PackageReference Include="ExcelLibrary" Version="1.2011.7.31" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="DocumentFormat.OpenXml" Version="2.18.0" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     </ItemGroup>
