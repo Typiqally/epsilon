@@ -1,4 +1,3 @@
-using System.Text;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
@@ -28,89 +27,20 @@ public class WordModuleExporter : ICanvasModuleExporter
         {
             document.AddMainDocumentPart();
             document.MainDocumentPart!.Document = new Document(new Body());
-            var doc = document.MainDocumentPart.Document;
-            // Add a main document part. 
-            // MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
-
-            // Create the document structure and add some text.
-            // mainPart.Document = new Document();
-            // Body body = mainPart.Document.AppendChild(new Body());
-            // Paragraph para = body.AppendChild(new Paragraph());
-            // Run run = para.AppendChild(new Run());
-            // run.AppendChild(new Text("Create text in body - CreateWordprocessingDocument"));
-
-
-            await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
-            {
-                var links = item.Collection.Links;
-                var alignments = links.AlignmentsDictionary;
-                var outcomes = links.OutcomesDictionary;
-
-                Table table = new Table();
-                TableRow headerRow = new TableRow();
-                var kpiCell = new TableCell();
-                kpiCell.Append(new Paragraph(new Run(new Text("KPI"))));
-                var assignmentCell = new TableCell();
-                assignmentCell.Append(new Paragraph(new Run(new Text("Assignment(s)"))));
-                var scoreCell = new TableCell();
-                scoreCell.Append(new Paragraph(new Run(new Text("Scores"))));
-                headerRow.Append(kpiCell);
-                headerRow.Append(assignmentCell);
-                headerRow.Append(scoreCell);
-                
-                table.Append(headerRow);
-
-                // foreach (var (outcomeId, outcome) in outcomes)
-                // {
-                //     var assignmentIds = item.Collection.OutcomeResults
-                //         .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                //         .Select(static o => o.Link.Assignment)
-                //         .ToArray();
-
-                // if (assignmentIds.Any())
-                // {
-                //     TableRow row = new TableRow();
-                //     
-                //     var outcomeCell = new TableCell();
-                //     outcomeCell.Append(new Text($"{outcome.Title} {outcome.ShortDescription()}"));
-                //     
-                //     row.Append(new TableCell(outcomeCell));
-                //
-                //     var cellValueBuilder = new StringBuilder();
-                //
-                //     foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
-                //     {
-                //         cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
-                //     }
-                //
-                //     var assignmentXCell = new TableCell();
-                //     assignmentXCell.Append(new Text(cellValueBuilder.ToString()));
-                //     
-                //     row.Append(new TableCell(assignmentXCell));
-                //
-                //     var cellValueOutComeResultsBuilder = new StringBuilder();
-                //     foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
-                //                  result.Link.Outcome == outcomeId))
-                //     {
-                //         cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
-                //     }
-                //     
-                //     var scoresCell = new TableCell();
-                //     scoresCell.Append(new Text(cellValueBuilder.ToString()));
-                //     
-                //     row.Append(scoresCell);
-                // }
-                // }
-
-                doc?.Body?.Append(table);
-            }
 
             document?.Save();
             document?.Close();
+            
+            AddTable(fileName, new String[,]{
+                {"Texas", "TX"},
+                {"California", "CA"},
+                {"New York", "NY"},
+                {"Massachusetts", "MA"}});
+            
         }
 
         ValidateWordDocument(fileName);
-        ValidateCorruptedWordDocument(fileName);
+        // ValidateCorruptedWordDocument(fileName);
     }
 
     public static void ValidateWordDocument(string filepath)
@@ -127,6 +57,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                 {
                     count++;
                     Console.WriteLine("Error " + count);
+                    Console.WriteLine("Id: " + error.Id);
                     Console.WriteLine("Description: " + error.Description);
                     Console.WriteLine("ErrorType: " + error.ErrorType);
                     Console.WriteLine("Node: " + error.Node);
@@ -182,6 +113,71 @@ public class WordModuleExporter : ICanvasModuleExporter
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+    }
+    
+    public static void AddTable(string fileName, string[,] data)
+    {
+        using (var document = WordprocessingDocument.Open(fileName, true))
+        {
+
+            var doc = document.MainDocumentPart.Document;
+
+            Table table = new Table();
+
+            TableProperties props = new TableProperties(
+                new TableBorders(
+                new TopBorder
+                {
+                    Val = new EnumValue<BorderValues>(BorderValues.Single),
+                    Size = 12
+                },
+                new BottomBorder
+                {
+                  Val = new EnumValue<BorderValues>(BorderValues.Single),
+                  Size = 12
+                },
+                new LeftBorder
+                {
+                  Val = new EnumValue<BorderValues>(BorderValues.Single),
+                  Size = 12
+                },
+                new RightBorder
+                {
+                  Val = new EnumValue<BorderValues>(BorderValues.Single),
+                  Size = 12
+                },
+                new InsideHorizontalBorder
+                {
+                  Val = new EnumValue<BorderValues>(BorderValues.Single),
+                  Size = 12
+                },
+                new InsideVerticalBorder
+                {
+                  Val = new EnumValue<BorderValues>(BorderValues.Single),
+                  Size = 12
+            }));
+
+            table.AppendChild<TableProperties>(props);
+
+            for (var i = 0; i <= data.GetUpperBound(0); i++)
+            {
+                var tr = new TableRow();
+                for (var j = 0; j <= data.GetUpperBound(1); j++)
+                {
+                    var tc = new TableCell();
+                    tc.Append(new Paragraph(new Run(new Text(data[i, j]))));
+                    
+                    // Assume you want columns that are automatically sized.
+                    tc.Append(new TableCellProperties(
+                        new TableCellWidth { Type = TableWidthUnitValues.Auto }));
+                    
+                    tr.Append(tc);
+                }
+                table.Append(tr);
+            }
+            doc.Body.Append(table);
+            doc.Save();
         }
     }
 }
