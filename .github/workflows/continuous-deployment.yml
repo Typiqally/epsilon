@@ -1,7 +1,8 @@
 ﻿name: Continuous deployment
 on:
   push:
-    branches: *
+    branches: 
+      - '*'
   pull_request:
     branches: [ master ]
     types: [ closed ]
