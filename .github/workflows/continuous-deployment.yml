@@ -22,9 +22,9 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     steps:
+      - uses: release-drafter/release-drafter@v5
       - name: Create release draft
         id: create_release
-      - uses: release-drafter/release-drafter@v5
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1.7.2
         with:
