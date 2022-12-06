@@ -1,21 +1,30 @@
 ﻿name: Continuous deployment
-on: 
-  release:
+on:
+  push:
+    #Testing only
+    branches: [ master ]
   pull_request:
     branches: [ master ]
-    types: [closed]
+    types: [ closed ]
 
 jobs:
   publish:
+    permissions:
+      contents: write
+      pull-requests: write
     name: Publish
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
-    env: 
+    env:
       release-directory: ./Epsilon.Cli/bin/Release/net6.0/
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
     steps:
+      - name: Create release draft
+        id: create_release
+      - uses: release-drafter/release-drafter@v5
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1.7.2
         with:
@@ -24,11 +33,11 @@ jobs:
         run: dotnet publish Epsilon.Cli --runtime ${{ matrix.RID }} --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
       - name: Copy appsettings.json
         run: cp ./Epsilon.Cli/appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
-      - name: Removing unnecessary files 
+      - name: Removing unnecessary files
         run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
-
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
           path: ${{env.release-directory}}${{ matrix.RID }}/publish
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
