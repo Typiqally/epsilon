@@ -34,9 +34,9 @@ jobs:
         run: cp ./Epsilon.Cli/appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
       - name: Removing unnecessary files
         run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
-#      - name: Create artifact ${{ matrix.RID }}
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: Epsilon.Cli - ${{ matrix.RID }}
-#          path: ${{env.release-directory}}${{ matrix.RID }}/publish
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+      - name: Create artifact ${{ matrix.RID }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Epsilon.Cli - ${{ matrix.RID }}
+          path: ${{env.release-directory}}${{ matrix.RID }}/publish
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
