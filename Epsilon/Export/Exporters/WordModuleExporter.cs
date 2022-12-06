@@ -1,3 +1,4 @@
+using System.Text;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
@@ -28,135 +29,113 @@ public class WordModuleExporter : ICanvasModuleExporter
             document.AddMainDocumentPart();
             document.MainDocumentPart!.Document = new Document(new Body());
 
+
+            await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
+            {
+                var links = item.Collection.Links;
+
+                var alignments = links.AlignmentsDictionary;
+                var outcomes = links.OutcomesDictionary;
+                
+                Table table = new Table();
+
+                table.Append(AddHeader());
+
+                //Adding all the outcomes. 
+                foreach (var (outcomeId, outcome) in outcomes)
+                {
+                    var assignmentIds = item.Collection.OutcomeResults
+                        .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
+                        .Select(static o => o.Link.Assignment)
+                        .ToArray();
+
+                    if (assignmentIds.Any())
+                    {
+                        TableRow row = new TableRow();
+                        row.Append(CreateCell($"{outcome.Title} {outcome.ShortDescription()}"));
+
+                        var cellValueBuilder = new StringBuilder();
+
+                        foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
+                        {
+                            cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
+                        }
+                        row.Append(CreateCell(cellValueBuilder.ToString()));
+
+                        var cellValueOutComeResultsBuilder = new StringBuilder();
+                        foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
+                                     result.Link.Outcome == outcomeId))
+                        {
+                            cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
+                        }
+                        row.Append(CreateCell(cellValueOutComeResultsBuilder.ToString()));
+                        table.Append(row);
+                    }
+                }
+                document.MainDocumentPart.Document.Body?.Append(table);
+            }
+
             document?.Save();
             document?.Close();
-            
-            AddTable(fileName, new String[,]{
-                {"Texas", "TX"},
-                {"California", "CA"},
-                {"New York", "NY"},
-                {"Massachusetts", "MA"}});
-            
         }
-
-        ValidateWordDocument(fileName);
-        // ValidateCorruptedWordDocument(fileName);
     }
 
-    public static void ValidateWordDocument(string filepath)
+    public static TableRow AddHeader()
     {
-        using (WordprocessingDocument wordprocessingDocument =
-               WordprocessingDocument.Open(filepath, true))
-        {
-            try
-            {
-                OpenXmlValidator validator = new OpenXmlValidator();
-                int count = 0;
-                foreach (ValidationErrorInfo error in
-                         validator.Validate(wordprocessingDocument))
-                {
-                    count++;
-                    Console.WriteLine("Error " + count);
-                    Console.WriteLine("Id: " + error.Id);
-                    Console.WriteLine("Description: " + error.Description);
-                    Console.WriteLine("ErrorType: " + error.ErrorType);
-                    Console.WriteLine("Node: " + error.Node);
-                    Console.WriteLine("Path: " + error.Path.XPath);
-                    Console.WriteLine("Part: " + error.Part.Uri);
-                    Console.WriteLine("-------------------------------------------");
-                }
-
-                Console.WriteLine("count={0}", count);
-            }
-
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            wordprocessingDocument.Close();
-        }
+        var tr = new TableRow();
+        tr.Append(CreateCell("KPI's"));
+        tr.Append(CreateCell("Assignments"));
+        tr.Append(CreateCell("Score"));
+        return tr;
     }
 
-    public static void ValidateCorruptedWordDocument(string filepath)
+    public static TableCell CreateCell(string text)
     {
-        // Insert some text into the body, this would cause Schema Error
-        using (WordprocessingDocument wordprocessingDocument =
-               WordprocessingDocument.Open(filepath, true))
-        {
-            // Insert some text into the body, this would cause Schema Error
-            // Body body = wordprocessingDocument.MainDocumentPart.Document.Body;
-            // Run run = new Run(new Text("some text"));
-            // body.Append(run);
-
-            try
-            {
-                OpenXmlValidator validator = new OpenXmlValidator();
-                int count = 0;
-                foreach (ValidationErrorInfo error in
-                         validator.Validate(wordprocessingDocument))
-                {
-                    count++;
-                    Console.WriteLine("Error " + count);
-                    Console.WriteLine("Description: " + error.Description);
-                    Console.WriteLine("ErrorType: " + error.ErrorType);
-                    Console.WriteLine("Node: " + error.Node);
-                    Console.WriteLine("Path: " + error.Path.XPath);
-                    Console.WriteLine("Part: " + error.Part.Uri);
-                    Console.WriteLine("-------------------------------------------");
-                }
-
-                Console.WriteLine("count={0}", count);
-            }
-
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
+        var tc = new TableCell();
+        tc.Append(new Paragraph(new Run(new Text(text))));
+        return tc;
     }
-    
+
     public static void AddTable(string fileName, string[,] data)
     {
         using (var document = WordprocessingDocument.Open(fileName, true))
         {
-
             var doc = document.MainDocumentPart.Document;
 
             Table table = new Table();
 
             TableProperties props = new TableProperties(
                 new TableBorders(
-                new TopBorder
-                {
-                    Val = new EnumValue<BorderValues>(BorderValues.Single),
-                    Size = 12
-                },
-                new BottomBorder
-                {
-                  Val = new EnumValue<BorderValues>(BorderValues.Single),
-                  Size = 12
-                },
-                new LeftBorder
-                {
-                  Val = new EnumValue<BorderValues>(BorderValues.Single),
-                  Size = 12
-                },
-                new RightBorder
-                {
-                  Val = new EnumValue<BorderValues>(BorderValues.Single),
-                  Size = 12
-                },
-                new InsideHorizontalBorder
-                {
-                  Val = new EnumValue<BorderValues>(BorderValues.Single),
-                  Size = 12
-                },
-                new InsideVerticalBorder
-                {
-                  Val = new EnumValue<BorderValues>(BorderValues.Single),
-                  Size = 12
-            }));
+                    new TopBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 12
+                    },
+                    new BottomBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 12
+                    },
+                    new LeftBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 12
+                    },
+                    new RightBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 12
+                    },
+                    new InsideHorizontalBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 12
+                    },
+                    new InsideVerticalBorder
+                    {
+                        Val = new EnumValue<BorderValues>(BorderValues.Single),
+                        Size = 12
+                    }));
 
             table.AppendChild<TableProperties>(props);
 
@@ -167,15 +146,17 @@ public class WordModuleExporter : ICanvasModuleExporter
                 {
                     var tc = new TableCell();
                     tc.Append(new Paragraph(new Run(new Text(data[i, j]))));
-                    
+
                     // Assume you want columns that are automatically sized.
                     tc.Append(new TableCellProperties(
                         new TableCellWidth { Type = TableWidthUnitValues.Auto }));
-                    
+
                     tr.Append(tc);
                 }
+
                 table.Append(tr);
             }
+
             doc.Body.Append(table);
             doc.Save();
         }
