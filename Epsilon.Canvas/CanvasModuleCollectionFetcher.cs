@@ -21,29 +21,26 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
         _outcomeService = outcomeService;
     }
 
-    public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, string[] allowedModules)
+    public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId)
     {
         var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
         var modules = await _moduleService.GetAll(courseId, new[] { "items" });
 
         Debug.Assert(response != null, nameof(response) + " != null");
         Debug.Assert(modules != null, nameof(modules) + " != null");
-
+        
         foreach (var module in modules.ToArray())
         {
-            if (allowedModules.Contains(module.Name) || allowedModules.Length == 0)
-            {
-                Debug.Assert(module.Items != null, "module.Items != null");
+            Debug.Assert(module.Items != null, "module.Items != null");
 
-                var ids = module.Items.Select(static i => $"assignment_{i.ContentId}");
+            var ids = module.Items.Select(static i => $"assignment_{i.ContentId}");
 
-                Debug.Assert(response.Links?.Alignments != null, "response.Links?.Alignments != null");
+            Debug.Assert(response.Links?.Alignments != null, "response.Links?.Alignments != null");
 
-                yield return new ModuleOutcomeResultCollection(module, new OutcomeResultCollection(
-                    response.OutcomeResults.Where(r => ids.Contains(r.Link.Alignment)),
-                    response.Links with { Alignments = response.Links.Alignments.Where(a => ids.Contains(a.Id)) }
-                ));
-            }
+            yield return new ModuleOutcomeResultCollection(module, new OutcomeResultCollection(
+                response.OutcomeResults.Where(r => ids.Contains(r.Link.Alignment)),
+                response.Links with { Alignments = response.Links.Alignments.Where(a => ids.Contains(a.Id)) }
+            ));
         }
     }
 }

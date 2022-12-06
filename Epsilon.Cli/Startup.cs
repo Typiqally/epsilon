@@ -62,17 +62,15 @@ public class Startup : IHostedService
                 return;
             }
 
-            var modules = _exportOptions.Modules.Split(",");
-            _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId,
-                _canvasSettings.ApiUrl);
+            _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
             _logger.LogInformation("Downloading results, this may take a few seconds...");
-            var items = _collectionFetcher.GetAll(_canvasSettings.CourseId, modules);
+            var items = _collectionFetcher.GetAll(_canvasSettings.CourseId);
 
             var formats = _exportOptions.Formats.Split(",");
             var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
 
             _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
-
+            
             foreach (var (format, exporter) in exporters)
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
