@@ -45,7 +45,5 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
                 ));
             }
         }
-
-        return modules;
     }
 }
