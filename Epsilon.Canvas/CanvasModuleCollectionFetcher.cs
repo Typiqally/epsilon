@@ -31,7 +31,7 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 
         foreach (var module in modules.ToArray())
         {
-            if (allowedModules.Contains(module.Name) || allowedModules.Length == 0)
+            if (allowedModules.Length == 0 || allowedModules.Contains(module.Name))
             {
                 Debug.Assert(module.Items != null, "module.Items != null");
 
