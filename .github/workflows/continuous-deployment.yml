@@ -1,6 +1,6 @@
 name: Continuous deployment
 on:
-  pull_request:
+  push:
     branches: [ develop ]
 
 jobs:
