@@ -35,4 +35,3 @@ jobs:
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
           path: ${{env.release-directory}}${{ matrix.RID }}/publish
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
