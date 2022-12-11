@@ -1,26 +1,31 @@
-﻿name: Continuous deployment
+name: Continuous deployment
 on:
   pull_request:
-    branches: [ master ]
-    types: [ closed ]
-
+    branches:
+      - master
+      - develop
+    types: [closed]
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        description: 'The version of the new release (v*.*.*)'
+        required: true
+        default: false
+      DRAFT_RELEASE:
+        description: 'The release will be created as a draft'
+        required: false
+        default: true
+        type: boolean
 jobs:
-  publish:
-    permissions:
-      contents: write
-      pull-requests: write
-    name: Publish
+  building:
+    name: Building artifacts
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
     env:
       release-directory: ./Epsilon.Cli/bin/Release/net6.0/
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Create release draft
-        id: create_release
-        uses: release-drafter/release-drafter@v5
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1.7.2
         with:
@@ -31,9 +36,40 @@ jobs:
         run: cp ./Epsilon.Cli/appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
       - name: Removing unnecessary files
         run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
+      - name: Zip files
+        run: zip -r Epsilon.Cli-${{ matrix.RID }}.zip *
+        working-directory: ${{env.release-directory}}${{ matrix.RID }}/publish
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
-          name: Epsilon.Cli - ${{ matrix.RID }}
-          path: ${{env.release-directory}}${{ matrix.RID }}/publish
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          name: Epsilon.Cli-${{ matrix.RID }}
+          path: ${{env.release-directory}}${{ matrix.RID }}/publish/Epsilon.Cli-${{ matrix.RID }}.zip
+  release:
+    needs: building
+    if: ${{ inputs.VERSION }}
+    name: Creating release
+    runs-on: ubuntu-20.04
+    env:
+      release-directory: ./Epsilon.Cli/bin/Release/net6.0/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Getting release files
+        uses: actions/download-artifact@v2
+        with:
+          path: download/releases
+      - name: Display structure of downloaded files
+        run: ls download/releases -R
+      - name: Release
+        uses: meeDamian/github-release@2.0
+        with:
+          draft: ${{ inputs.DRAFT_RELEASE }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ inputs.VERSION }}
+          name: ${{ inputs.VERSION }}
+          gzip: false
+          files: >
+            download/releases/Epsilon.Cli-linux-x64/Epsilon.Cli-linux-x64.zip
+            download/releases/Epsilon.Cli-win-x64/Epsilon.Cli-win-x64.zip
+            download/releases/Epsilon.Cli-osx-x64/Epsilon.Cli-osx-x64.zip
+    
