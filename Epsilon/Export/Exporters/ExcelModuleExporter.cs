@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
 using System.Text;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
-using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;
@@ -20,73 +21,95 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        var workbook = new Workbook();
-
-        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
+        string fileName = $"{_options.FormattedOutputName}.xlsx";
+        using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create(fileName, SpreadsheetDocumentType.Workbook))
         {
-            var worksheet = new Worksheet(item.Module.Name);
+            // Add a WorkbookPart to the document.
+            WorkbookPart workbookpart = spreadsheetDocument.AddWorkbookPart();
+            workbookpart.Workbook = new Workbook();
 
-            //Because reasons @source https://stackoverflow.com/a/8127642 
-            for (var i = 0; i < 100; i++)
+            // Add Sheets to the Workbook.
+            Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.
+                AppendChild<Sheets>(new Sheets());
+
+            await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
             {
-                worksheet.Cells[i, 0] = new Cell("");
-            }
-
-            var links = item.Collection.Links;
-            
-            Debug.Assert(links != null, nameof(links) + " != null");
-            
-            var alignments = links.AlignmentsDictionary;
-            var outcomes = links.OutcomesDictionary;
-
-            //Add headers
-            worksheet.Cells[0, 0] = new Cell("KPI");
-            worksheet.Cells[0, 1] = new Cell("Assignment(s)");
-            worksheet.Cells[0, 2] = new Cell("Score");
-
-            //Adding all the outcomes. 
-
-            var index = 1;
-            foreach (var (outcomeId, outcome) in outcomes)
-            {
-                var assignmentIds = item.Collection.OutcomeResults
-                    .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                    .Select(static o => o.Link.Assignment)
-                    .ToArray();
-
-                if (assignmentIds.Any())
+                WorksheetPart worksheetPart = workbookpart.AddNewPart<WorksheetPart>();
+                SheetData sheetData = new SheetData();
+                worksheetPart.Worksheet = new Worksheet(sheetData);
+                
+                // Append a new worksheet and associate it with the workbook.
+                Sheet sheet = new Sheet()
                 {
-                    worksheet.Cells[index, 0] = new Cell($"{outcome.Title} {outcome.ShortDescription()}");
+                    Id = spreadsheetDocument.WorkbookPart.
+                        GetIdOfPart(worksheetPart),
+                    SheetId = 1,
+                    Name = item.Module.Name
+                };
+                var links = item.Collection.Links;
+            
+                var alignments = links.AlignmentsDictionary;
+                var outcomes = links.OutcomesDictionary;
+                
+                sheetData.Append(AddHeader());
 
-                    var cellValueBuilder = new StringBuilder();
-
-                    foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
+                int count = 2;
+                foreach (var (outcomeId, outcome) in outcomes)
+                {
+                    var assignmentIds = item.Collection.OutcomeResults
+                        .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
+                        .Select(static o => o.Link.Assignment)
+                        .ToArray();
+                    
+                    if (assignmentIds.Any())
                     {
-                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
+                        Row row = new Row();
+                        row.Append(CreateCell($"{outcome.Title} {outcome.ShortDescription()}", $"A{count}"));
+                
+                        var cellValueBuilder = new StringBuilder();
+                
+                        foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
+                        {
+                            cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
+                        }
+                
+                        row.Append(CreateCell(cellValueBuilder.ToString(), $"B{count}"));
+                
+                        var cellValueOutComeResultsBuilder = new StringBuilder();
+                        foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
+                                     result.Link.Outcome == outcomeId))
+                        {
+                            cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
+                        }
+                
+                        row.Append(CreateCell(cellValueOutComeResultsBuilder.ToString(), $"C{count}"));
+                        sheetData.AppendChild(row);
+                        count++;
                     }
-
-                    worksheet.Cells[index, 1] = new Cell(cellValueBuilder.ToString());
-
-                    var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
-                                 result.Link.Outcome == outcomeId))
-                    {
-                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
-                    }
-
-                    worksheet.Cells[index, 2] = new Cell(cellValueOutComeResultsBuilder.ToString());
-                    index++;
                 }
+                sheets.Append(sheet);
+                // sheets.Append(sheetData);
             }
-
-            worksheet.Cells.ColumnWidth[0, 0] = 500;
-            worksheet.Cells.ColumnWidth[0, 1] = 8000;
-            worksheet.Cells.ColumnWidth[0, 2] = 8000;
-
-            workbook.Worksheets.Add(worksheet);
+            workbookpart.Workbook.Save();
+            spreadsheetDocument.Close();
         }
+    }
 
-        // We're forced to xls because of the older format
-        workbook.Save($"{_options.FormattedOutputName}.xls");
+    public static Row AddHeader()
+    {
+        var tr = new Row();
+        tr.Append(CreateCell("KPI's", "A1"));
+        tr.Append(CreateCell("Assignments", "B1"));
+        tr.Append(CreateCell("Score", "C1"));
+        return tr;
+    }
+
+    public static Cell CreateCell(string text, string cellReference)
+    {
+        var tc = new Cell();
+        tc.CellValue = new CellValue(text);
+        tc.CellReference = cellReference;
+        tc.DataType = CellValues.String;
+        return tc;
     }
 }
