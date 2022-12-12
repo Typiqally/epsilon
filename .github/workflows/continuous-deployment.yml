@@ -63,7 +63,6 @@ jobs:
             This release actually changes the fabric of the reality, so be careful 
             while applying, as error in database migration, can irrecoverably wipe 
             some laws of physics.  
-          gzip: folders
           files: >
             Epsilon.Cli-linux-x64:download/releases/linux-x64
             Epsilon.Cli-win-x64:download/releases/win-x64
