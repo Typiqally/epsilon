@@ -1,8 +1,6 @@
 name: Continuous deployment
 on:
   push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
 jobs:
   building:
     name: Building artifacts
@@ -38,10 +36,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Release
-        uses: anton-yurchenko/git-release@v5.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRAFT_RELEASE: true
+      - uses: meeDamian/github-release@2.0
         with:
-          args: build/*.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.MY_CUSTOM_TAG }}
+          name: My Creative Name
+          body: >
+            This release actually changes the fabric of the reality, so be careful 
+            while applying, as error in database migration, can irrecoverably wipe 
+            some laws of physics.  
+          gzip: folders
+          files: >
+            Dockerfile
+            action.yml
+            .github/
+            license:LICENSE
+            work-flows:.github/
     
