@@ -65,7 +65,7 @@ jobs:
             some laws of physics.  
           gzip: folders
           files: >
-            Epsilon.Cli - linux-x64:download/releases/linux-x64
-            Epsilon.Cli - win-x64:download/releases/win-x64
-            Epsilon.Cli - osx-x64:download/releases/osx-x64
+            Epsilon.Cli-linux-x64:download/releases/linux-x64
+            Epsilon.Cli-win-x64:download/releases/win-x64
+            Epsilon.Cli-osx-x64:download/releases/osx-x64
     
