@@ -35,6 +35,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Getting osx-x64 release file
+        uses: actions/download-artifact@v2
+        with:
+          name: Epsilon.Cli - osx-x64
+          path: ~/download/releases
+      - name: Getting win-x64 release file
+        uses: actions/download-artifact@v2
+        with:
+          name: Epsilon.Cli - win-x64
+          path: ~/download/releases
+      - name: Getting linux-x64 release file
+        uses: actions/download-artifact@v2
+        with:
+          name: Epsilon.Cli - linux-x64
+          path: ~/download/releases
       - name: Release
         uses: meeDamian/github-release@2.0
         with:
@@ -46,8 +61,5 @@ jobs:
             while applying, as error in database migration, can irrecoverably wipe 
             some laws of physics.  
           gzip: folders
-          files: >
-            ${{env.release-directory}}osx-x64/publish
-            ${{env.release-directory}}win-x64/publish
-            ${{env.release-directory}}linux-x64/publish
+          files: ~/download/releases
     
