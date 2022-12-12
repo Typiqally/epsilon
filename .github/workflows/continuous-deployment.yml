@@ -47,5 +47,7 @@ jobs:
             some laws of physics.  
           gzip: folders
           files: >
-            build/
+            ${{env.release-directory}}osx-x64/publish
+            ${{env.release-directory}}win-x64/publish
+            ${{env.release-directory}}linux-x64/publish
     
