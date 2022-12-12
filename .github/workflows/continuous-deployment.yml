@@ -39,7 +39,7 @@ jobs:
         uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.MY_CUSTOM_TAG }}
+          tag: 'v0.1.0'
           name: My Creative Name
           body: >
             This release actually changes the fabric of the reality, so be careful 
