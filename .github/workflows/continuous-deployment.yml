@@ -1,20 +1,15 @@
 name: Continuous deployment
 on:
   push:
-    branches: [ develop ]
 jobs:
   building:
-    permissions:
-      contents: write
-      pull-requests: write
-    name: Publish
+    name: Building artifacts
     runs-on: ubuntu-20.04
     strategy:
       matrix:
         RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
     env:
       release-directory: ./Epsilon.Cli/bin/Release/net6.0/
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1.7.2
@@ -31,3 +26,14 @@ jobs:
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
           path: ${{env.release-directory}}${{ matrix.RID }}/publish
+  release:
+    name: Creating release
+    runs-on: ubuntu-20.04
+    env:
+      release-directory: ./Epsilon.Cli/bin/Release/net6.0/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Release
+        uses: softprops/action-gh-release@v1
+    
