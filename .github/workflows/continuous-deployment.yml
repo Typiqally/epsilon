@@ -40,16 +40,19 @@ jobs:
         with:
           name: Epsilon.Cli - osx-x64
           path: download/releases/osx-x64
+        run: zip -r Epsilon.Cli-osx-x64.zip download/releases/osx-x64
       - name: Getting win-x64 release file
         uses: actions/download-artifact@v2
         with:
           name: Epsilon.Cli - win-x64
           path: download/releases/win-x64
+        run: zip -r Epsilon.Cli-win-x64.zip download/releases/win-x64
       - name: Getting linux-x64 release file
         uses: actions/download-artifact@v2
         with:
           name: Epsilon.Cli - linux-x64
           path: download/releases/linux-x64
+        run: zip -r Epsilon.Cli-linux-x64.zip download/releases/linux-x64
       - name: Display structure of downloaded files
         run: ls download/releases -R
       - name: Release
