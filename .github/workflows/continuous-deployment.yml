@@ -1,9 +1,7 @@
-﻿name: Continuous deployment
+name: Continuous deployment
 on:
-  pull_request:
-    branches: [ master ]
-    types: [ closed ]
-
+  push:
+    branches: [ develop ]
 jobs:
   publish:
     permissions:
