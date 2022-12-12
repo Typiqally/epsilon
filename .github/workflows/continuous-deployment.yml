@@ -27,6 +27,7 @@ jobs:
           name: Epsilon.Cli - ${{ matrix.RID }}
           path: ${{env.release-directory}}${{ matrix.RID }}/publish
   release:
+    needs: building
     name: Creating release
     runs-on: ubuntu-20.04
     env:
@@ -35,5 +36,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: anton-yurchenko/git-release@v5.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRAFT_RELEASE: true
+        with:
+          args: build/*.zip
     
