@@ -47,9 +47,5 @@ jobs:
             some laws of physics.  
           gzip: folders
           files: >
-            Dockerfile
-            action.yml
-            .github/
-            license:LICENSE
-            work-flows:.github/
+            build/
     
