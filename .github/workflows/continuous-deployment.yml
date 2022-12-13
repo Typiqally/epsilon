@@ -21,11 +21,13 @@ jobs:
         run: cp ./Epsilon.Cli/appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
       - name: Removing unnecessary files
         run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
+      - name: Zip files
+        run: zip -r releases/Epsilon.Cli-${{ matrix.RID }}.zip ${{env.release-directory}}${{ matrix.RID }}/publish
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
-          path: ${{env.release-directory}}${{ matrix.RID }}/publish
+          path: releases/Epsilon.Cli-${{ matrix.RID }}.zip
   release:
     needs: building
     name: Creating release
@@ -35,24 +37,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Getting osx-x64 release file
+      - name: Getting release files
         uses: actions/download-artifact@v2
         with:
-          name: Epsilon.Cli - osx-x64
-          path: download/releases/osx-x64
-      - run: zip -r download/releases/Epsilon.Cli-osx-x64.zip download/releases/osx-x64
-      - name: Getting win-x64 release file
-        uses: actions/download-artifact@v2
-        with:
-          name: Epsilon.Cli - win-x64
-          path: download/releases/win-x64
-      - run: zip -r download/releases/Epsilon.Cli-win-x64.zip download/releases/win-x64
-      - name: Getting linux-x64 release file
-        uses: actions/download-artifact@v2
-        with:
-          name: Epsilon.Cli - linux-x64
-          path: download/releases/linux-x64
-      - run: zip -r download/releases/Epsilon.Cli-linux-x64.zip download/releases/linux-x64
+          path: download/releases
       - name: Display structure of downloaded files
         run: ls download/releases -R
       - name: Release
@@ -62,10 +50,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: 'v0.1.0'
           name: My Creative Name
-          body: >
-            This release actually changes the fabric of the reality, so be careful 
-            while applying, as error in database migration, can irrecoverably wipe 
-            some laws of physics.  
           gzip: false
           files: >
             download/releases/Epsilon.Cli-linux-x64.zip
