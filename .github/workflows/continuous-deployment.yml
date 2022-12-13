@@ -22,12 +22,12 @@ jobs:
       - name: Removing unnecessary files
         run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
       - name: Zip files
-        run: zip -r releases/Epsilon.Cli-${{ matrix.RID }}.zip ${{env.release-directory}}${{ matrix.RID }}/publish
+        run: zip -r Epsilon.Cli-${{ matrix.RID }}.zip ${{env.release-directory}}${{ matrix.RID }}/publish
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
           name: Epsilon.Cli - ${{ matrix.RID }}
-          path: releases/Epsilon.Cli-${{ matrix.RID }}.zip
+          path: Epsilon.Cli-${{ matrix.RID }}.zip
   release:
     needs: building
     name: Creating release
