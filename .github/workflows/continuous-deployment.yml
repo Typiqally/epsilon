@@ -1,6 +1,16 @@
 name: Continuous deployment
 on:
-  push:
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        description: 'The version of the new release (v*.*.*)'
+        required: true
+        default: false
+      DRAFT_RELEASE:
+        description: 'The release will be created as a draft'
+        required: false
+        default: true
+        type: boolean
 jobs:
   building:
     name: Building artifacts
@@ -31,6 +41,7 @@ jobs:
           path: ${{env.release-directory}}${{ matrix.RID }}/publish/Epsilon.Cli-${{ matrix.RID }}.zip
   release:
     needs: building
+    if:  ${{ inputs.VERSION }}
     name: Creating release
     runs-on: ubuntu-20.04
     env:
@@ -47,10 +58,10 @@ jobs:
       - name: Release
         uses: meeDamian/github-release@2.0
         with:
-          draft: true
+          draft: ${{ inputs.DRAFT_RELEASE }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: 'v0.1.0'
-          name: My Creative Name
+          tag: ${{ inputs.VERSION }}
+          name: ${{ inputs.VERSION }}
           gzip: false
           files: >
             download/releases/Epsilon.Cli-linux-x64/Epsilon.Cli-linux-x64.zip
