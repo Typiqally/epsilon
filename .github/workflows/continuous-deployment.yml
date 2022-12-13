@@ -1,6 +1,6 @@
 name: Continuous deployment
 on:
-  push:
+  pull_request: [ master, develop ]
   workflow_dispatch:
     inputs:
       VERSION:
@@ -42,7 +42,7 @@ jobs:
           path: ${{env.release-directory}}${{ matrix.RID }}/publish/Epsilon.Cli-${{ matrix.RID }}.zip
   release:
     needs: building
-    if:  ${{ inputs.VERSION }}
+    if: ${{ inputs.VERSION }}
     name: Creating release
     runs-on: ubuntu-20.04
     env:
