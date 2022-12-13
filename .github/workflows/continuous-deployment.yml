@@ -26,7 +26,7 @@ jobs:
       - name: Create artifact ${{ matrix.RID }}
         uses: actions/upload-artifact@v2
         with:
-          name: Epsilon.Cli - ${{ matrix.RID }}
+          name: Epsilon.Cli-${{ matrix.RID }}
           path: Epsilon.Cli-${{ matrix.RID }}.zip
   release:
     needs: building
@@ -52,7 +52,7 @@ jobs:
           name: My Creative Name
           gzip: false
           files: >
-            download/releases/Epsilon.Cli-linux-x64.zip
-            download/releases/Epsilon.Cli-win-x64.zip
-            download/releases/Epsilon.Cli-osx-x64.zip
+            download/releases/Epsilon.Cli-linux-x64/Epsilon.Cli-linux-x64.zip
+            download/releases/Epsilon.Cli-win-x64/Epsilon.Cli-win-x64.zip
+            download/releases/Epsilon.Cli-osx-x64/Epsilon.Cli-osx-x64.zip
     
