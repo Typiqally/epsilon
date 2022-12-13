@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - develop
+    types: [closed]
   workflow_dispatch:
     inputs:
       VERSION:
