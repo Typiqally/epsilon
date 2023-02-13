@@ -1,6 +1,6 @@
+using System.Net.Http.Json;
 using System.Text;
 using Epsilon.Abstractions.Http;
-using Epsilon.Abstractions.Http.Json;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
 
@@ -18,9 +18,9 @@ public class OutcomeHttpService : HttpService, IOutcomeHttpService
     public async Task<Outcome?> Find(int id)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/outcomes/{id}");
-        var (_, value) = await Client.SendAsync<Outcome>(request);
+        var response = await Client.SendAsync(request);
 
-        return value;
+        return await response.Content.ReadFromJsonAsync<Outcome>();
     }
 
     public async Task<OutcomeResultCollection?> GetResults(int courseId, IEnumerable<string> include)
@@ -30,7 +30,7 @@ public class OutcomeHttpService : HttpService, IOutcomeHttpService
 
         var responses = await _paginator.GetAllPages<OutcomeResultCollection>(HttpMethod.Get, url + query);
         var responsesArray = responses.ToArray();
-        
+
         return new OutcomeResultCollection(
             responsesArray.SelectMany(static r => r.OutcomeResults),
             new OutcomeResultCollectionLink(
