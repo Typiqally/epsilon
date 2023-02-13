@@ -62,7 +62,7 @@ public class Startup : IHostedService
                 return;
             }
 
-            var modules = _exportOptions.Modules.Split(",");
+            var modules = _exportOptions.Modules?.Split(",");
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId,
                 _canvasSettings.ApiUrl);
             _logger.LogInformation("Downloading results, this may take a few seconds...");
