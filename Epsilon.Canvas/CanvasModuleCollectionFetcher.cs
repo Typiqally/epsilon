@@ -21,7 +21,7 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
         _outcomeService = outcomeService;
     }
 
-    public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, string[] allowedModules)
+    public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, IEnumerable<string>? allowedModules)
     {
         var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
         var modules = await _moduleService.GetAll(courseId, new[] { "items" });
@@ -31,7 +31,7 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 
         foreach (var module in modules.ToArray())
         {
-            if (allowedModules.Length == 0 || allowedModules.Contains(module.Name))
+            if (allowedModules == null || !allowedModules.Any() || allowedModules.Contains(module.Name))
             {
                 Debug.Assert(module.Items != null, "module.Items != null");
 
