@@ -1,6 +1,6 @@
-﻿using System.Web;
+﻿using System.Net.Http.Json;
+using System.Web;
 using Epsilon.Abstractions.Http;
-using Epsilon.Abstractions.Http.Json;
 using Epsilon.Canvas.Abstractions.Converter;
 using Epsilon.Canvas.Abstractions.Service;
 
@@ -27,7 +27,9 @@ public class PaginatorHttpService : HttpService, IPaginatorHttpService
         {
             var offset = pages.Count * Limit;
             var request = new HttpRequestMessage(method, $"{uri}per_page={Limit}&offset={offset}&page={page}");
-            var (response, value) = await Client.SendAsync<TResult>(request);
+            var response = await Client.SendAsync(request);
+            var value = await response.Content.ReadFromJsonAsync<TResult>();
+
             var links = _headerConverter.ConvertFrom(response);
 
             if (value != null)
