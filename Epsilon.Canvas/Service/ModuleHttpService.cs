@@ -1,6 +1,6 @@
-﻿using System.Text;
+﻿using System.Net.Http.Json;
+using System.Text;
 using Epsilon.Abstractions.Http;
-using Epsilon.Abstractions.Http.Json;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
 
@@ -16,26 +16,26 @@ public class ModuleHttpService : HttpService, IModuleHttpService
     {
         var url = new StringBuilder($"v1/courses/{courseId}/modules");
         var query = $"?include[]={string.Join("&include[]=", include)}";
-        
-        var request = new HttpRequestMessage(HttpMethod.Get, url + query);
-        var (_, value) = await Client.SendAsync<IEnumerable<Module>>(request);
 
-        return value;
+        var request = new HttpRequestMessage(HttpMethod.Get, url + query);
+        var response = await Client.SendAsync(request);
+
+        return await response.Content.ReadFromJsonAsync<IEnumerable<Module>>();
     }
 
     public async Task<Module?> GetById(int courseId, int id)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{id}");
-        var (_, value) = await Client.SendAsync<Module>(request);
+        var response = await Client.SendAsync(request);
 
-        return value;
+        return await response.Content.ReadFromJsonAsync<Module>();
     }
 
     public async Task<IEnumerable<ModuleItem>?> GetAllItems(int courseId, int moduleId, int limit = 100)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{moduleId}/items?per_page={limit}");
-        var (_, value) = await Client.SendAsync<IEnumerable<ModuleItem>>(request);
+        var response = await Client.SendAsync(request);
 
-        return value;
+        return await response.Content.ReadFromJsonAsync<IEnumerable<ModuleItem>>();
     }
 }

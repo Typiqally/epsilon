@@ -1,5 +1,5 @@
-﻿using Epsilon.Abstractions.Http;
-using Epsilon.Abstractions.Http.Json;
+﻿using System.Net.Http.Json;
+using Epsilon.Abstractions.Http;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
 
@@ -18,7 +18,7 @@ public class AssignmentHttpService : HttpService, IAssignmentHttpService
     {
         var uri = $"v1/courses/{courseId}/assignments";
         var query = $"?include[]={string.Join("&include[]=", include)}";
-        
+
         var pages = await _paginator.GetAllPages<IEnumerable<Assignment>>(HttpMethod.Get, uri + query);
         return pages.SelectMany(static p => p);
     }
@@ -26,8 +26,8 @@ public class AssignmentHttpService : HttpService, IAssignmentHttpService
     public async Task<Assignment?> GetById(int courseId, int id)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/assignments/{id}");
-        var (_, value) = await Client.SendAsync<Assignment>(request);
+        var response = await Client.SendAsync(request);
 
-        return value;
+        return await response.Content.ReadFromJsonAsync<Assignment>();
     }
 }

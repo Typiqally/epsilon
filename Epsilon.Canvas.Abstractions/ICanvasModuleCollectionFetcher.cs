@@ -4,5 +4,5 @@ namespace Epsilon.Canvas.Abstractions;
 
 public interface ICanvasModuleCollectionFetcher
 {
-    public IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, String[] allowedModules);
+    public IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, IEnumerable<string>? allowedModules);
 }
