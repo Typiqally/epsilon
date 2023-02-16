@@ -33,12 +33,11 @@ public class WordModuleExporter : ICanvasModuleExporter
         _options = options.Value;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "word" };
+    public IEnumerable<string> Formats { get; } = new[] { "word", "docx" };
 
     public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        string fileName = $"{_options.FormattedOutputName}.docx";
-        using (var document = WordprocessingDocument.Create(fileName,
+        using (var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx",
                    WordprocessingDocumentType.Document))
         {
             document.AddMainDocumentPart();
@@ -153,8 +152,6 @@ public class WordModuleExporter : ICanvasModuleExporter
                 Val = new EnumValue<BorderValues>(BorderValues.Single),
                 Size = 6
             }));
-
-        // properties.Append(new TableBackground());
         return properties;
     }
 }
