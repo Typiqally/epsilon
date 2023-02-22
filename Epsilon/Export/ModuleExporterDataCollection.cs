@@ -44,10 +44,6 @@ public class ModuleExporterDataCollection : IModuleExporterDataCollection
                                 .Grade() ?? "N/A"
                         })
                         .ToList();
-                    
-                    var outcomeResults = assignments
-                        .Select(a => a.Score)
-                        .ToList();
 
                     moduleKpis.Add(new Kpi
                     {
