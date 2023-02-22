@@ -1,8 +1,8 @@
-﻿using Epsilon.Canvas.Abstractions.Model;
+﻿using Epsilon.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Export;
 
-public interface ICanvasModuleExporter : IExporter<IAsyncEnumerable<ModuleOutcomeResultCollection>>
+public interface ICanvasModuleExporter : IExporter<IEnumerable<Module>>
 {
     
 }

@@ -17,6 +17,7 @@ public class Startup : IHostedService
     private readonly CanvasSettings _canvasSettings;
     private readonly ICanvasModuleCollectionFetcher _collectionFetcher;
     private readonly IModuleExporterCollection _exporterCollection;
+    private readonly IModuleExporterDataCollection _exporterDataCollection;
 
     public Startup(
         ILogger<Startup> logger,
@@ -24,7 +25,8 @@ public class Startup : IHostedService
         IOptions<CanvasSettings> canvasSettings,
         IOptions<ExportOptions> exportSettings,
         ICanvasModuleCollectionFetcher collectionFetcher,
-        IModuleExporterCollection exporterCollection)
+        IModuleExporterCollection exporterCollection,
+        IModuleExporterDataCollection exporterDataCollection)
     {
         _logger = logger;
         _canvasSettings = canvasSettings.Value;
@@ -32,6 +34,7 @@ public class Startup : IHostedService
         _lifetime = lifetime;
         _collectionFetcher = collectionFetcher;
         _exporterCollection = exporterCollection;
+        _exporterDataCollection = exporterDataCollection;
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -67,6 +70,7 @@ public class Startup : IHostedService
                 _canvasSettings.ApiUrl);
             _logger.LogInformation("Downloading results, this may take a few seconds...");
             var items = _collectionFetcher.GetAll(_canvasSettings.CourseId, modules);
+            var formattedItems = await _exporterDataCollection.GetExportData(items);
 
             var formats = _exportOptions.Formats.Split(",");
             var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
@@ -77,7 +81,7 @@ public class Startup : IHostedService
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
                 // ReSharper disable once PossibleMultipleEnumeration
-                await exporter.Export(items, format);
+                await exporter.Export(formattedItems, format);
             }
         }
         catch (Exception ex)

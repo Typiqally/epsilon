@@ -1,8 +1,6 @@
-﻿using System.Diagnostics;
-using System.Drawing;
-using System.Text;
+﻿using System.Drawing;
 using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Abstractions.Model;
 using Microsoft.Extensions.Options;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
@@ -20,65 +18,39 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "word" };
 
-    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
+    public async Task Export(IEnumerable<Module> data, string format)
     {
         using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
-        
+
         document.AddFooters();
         var link = document.AddHyperlink(Constants.ProjectName, Constants.RepositoryUri);
 
         document.Footers.Odd
             .InsertParagraph("Created with ")
             .AppendHyperlink(link).Color(Color.Blue).UnderlineStyle(UnderlineStyle.singleLine);
-
-        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
+        
+        foreach (var module in data)
         {
-            var links = item.Collection.Links;
-            
-            Debug.Assert(links != null, nameof(links) + " != null");
-            
-            var alignments = links.AlignmentsDictionary;
-            var outcomes = links.OutcomesDictionary;
-
             var table = document.AddTable(1, 3);
 
             table.Rows[0].Cells[0].Paragraphs[0].Append("KPI");
             table.Rows[0].Cells[1].Paragraphs[0].Append("Assignment(s)");
             table.Rows[0].Cells[2].Paragraphs[0].Append("Score");
 
-            foreach (var (outcomeId, outcome) in outcomes)
+            foreach (var kpi in module.Kpis)
             {
-                var assignmentIds = item.Collection.OutcomeResults
-                    .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                    .Select(static o => o.Link.Assignment)
-                    .ToArray();
+                var row = table.InsertRow();
+                row.Cells[0].Paragraphs[0].Append(kpi.Name);
 
-                if (assignmentIds.Any())
+                foreach (var assignment in kpi.Assignments)
                 {
-                    var row = table.InsertRow();
-                    row.Cells[0].Paragraphs[0].Append(outcome.Title + " " + outcome.ShortDescription());
-
-                    var cellValueBuilder = new StringBuilder();
-
-                    foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
-                    {
-                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
-                    }
-
-                    row.Cells[1].Paragraphs[0].Append(cellValueBuilder.ToString());
-
-                    var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
-                                 result.Link.Outcome == outcomeId))
-                    {
-                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
-                    }
-
-                    row.Cells[2].Paragraphs[0].Append(cellValueOutComeResultsBuilder.ToString());
-                }
+                    row.Cells[1].Paragraphs[0].Append(assignment.Name);
+                    row.Cells[2].Paragraphs[0].Append(assignment.Score);
+                    //row.Cells[2].Paragraphs[0].Append(assignment.Score).AppendLine();
+                } 
             }
 
-            var par = document.InsertParagraph(item.Module.Name);
+            var par = document.InsertParagraph(module.Name);
             par.FontSize(24);
             par.InsertTableAfterSelf(table).InsertPageBreakAfterSelf();
         }

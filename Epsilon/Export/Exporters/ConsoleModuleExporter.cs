@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Model;
+﻿using Epsilon.Abstractions.Export;
+using Epsilon.Abstractions.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Export.Exporters;
@@ -13,29 +12,25 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     {
         _logger = logger;
     }
-
+    
     public IEnumerable<string> Formats { get; } = new[] { "console", "logs" };
 
-    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
+    public async Task Export(IEnumerable<Module> data, string format)
     {
-        await foreach (var item in data)
+        foreach (var module in data)
         {
-            _logger.LogInformation("Module: {Name}", item.Module.Name);
+            _logger.LogInformation("--------------------------------");
+            _logger.LogInformation("Module: {Module}", module.Name);
 
-            var links = item.Collection.Links;
-            var alignments = links?.AlignmentsDictionary;
-            var outcomes = links?.OutcomesDictionary;
-
-            Debug.Assert(alignments != null, nameof(alignments) + " != null");
-            Debug.Assert(outcomes != null, nameof(outcomes) + " != null");
-            
-            foreach (var alignment in alignments.Values)
+            foreach (var kpi in module.Kpis)
             {
-                _logger.LogInformation("Alignment: {Alignment}", alignment.Name);
+                _logger.LogInformation("");
+                _logger.LogInformation("KPI: {Kpi}", kpi.Name);
 
-                foreach (var result in item.Collection.OutcomeResults.Where(o => o.Link.Alignment == alignment.Id && o.Link.Outcome != null))
+                foreach (var assignment in kpi.Assignments)
                 {
-                    _logger.LogInformation("- {OutcomeName} {Score}", outcomes[result.Link.Outcome!].Title, result.Grade());
+                    _logger.LogInformation("- Assignment: {Assignment}", assignment.Name);
+                    _logger.LogInformation("  Score: {Score}", assignment.Score);
                 }
             }
         }
