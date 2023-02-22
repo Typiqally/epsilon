@@ -46,7 +46,6 @@ public class WordModuleExporter : ICanvasModuleExporter
                 {
                     row.Cells[1].Paragraphs[0].Append(assignment.Name);
                     row.Cells[2].Paragraphs[0].Append(assignment.Score);
-                    //row.Cells[2].Paragraphs[0].Append(assignment.Score).AppendLine();
                 } 
             }
 
