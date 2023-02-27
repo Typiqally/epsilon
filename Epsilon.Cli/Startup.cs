@@ -17,7 +17,7 @@ public class Startup : IHostedService
     private readonly CanvasSettings _canvasSettings;
     private readonly ICanvasModuleCollectionFetcher _collectionFetcher;
     private readonly IModuleExporterCollection _exporterCollection;
-    private readonly IModuleExporterDataCollection _exporterDataCollection;
+    private readonly IModuleDataPackager _exporterDataCollection;
 
     public Startup(
         ILogger<Startup> logger,
@@ -26,7 +26,7 @@ public class Startup : IHostedService
         IOptions<ExportOptions> exportSettings,
         ICanvasModuleCollectionFetcher collectionFetcher,
         IModuleExporterCollection exporterCollection,
-        IModuleExporterDataCollection exporterDataCollection)
+        IModuleDataPackager exporterDataCollection)
     {
         _logger = logger;
         _canvasSettings = canvasSettings.Value;

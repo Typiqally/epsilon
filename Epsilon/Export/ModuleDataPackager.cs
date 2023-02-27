@@ -5,7 +5,7 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Export;
 
-public class ModuleExporterDataCollection : IModuleExporterDataCollection
+public class ModuleDataPackager : IModuleDataPackager
 { 
     public async Task<IAsyncEnumerable<CourseModule>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
     {
