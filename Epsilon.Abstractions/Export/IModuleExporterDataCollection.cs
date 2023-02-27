@@ -1,9 +1,9 @@
-﻿using Epsilon.Canvas.Abstractions.Model;
-using Module = Epsilon.Abstractions.Model.Module;
+﻿using Epsilon.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Export;
 
 public interface IModuleExporterDataCollection
 {
-    public Task<IEnumerable<Module>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data);
+    public Task<IAsyncEnumerable<CourseModule>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data);
 }

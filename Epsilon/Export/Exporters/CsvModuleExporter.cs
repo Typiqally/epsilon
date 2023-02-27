@@ -16,7 +16,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "csv" };
 
-    public async Task Export(IEnumerable<Module> data, string format)
+    public async Task Export(IEnumerable<CourseModule> data, string format)
     {
         var dt = CreateDataTable(data);
 
@@ -27,7 +27,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
         stream.Close();
     }
 
-    private static DataTable CreateDataTable(IEnumerable<Module> data)
+    private static DataTable CreateDataTable(IEnumerable<CourseModule> data)
     {
         var dataTable = new DataTable();
         

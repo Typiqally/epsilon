@@ -1,8 +1,8 @@
 ﻿namespace Epsilon.Abstractions.Model
 {
-    public class Assignment
+    public class CourseModule
     {
         public string Name { get; set; }
-        public string Score { get; set; }
+        public IEnumerable<CourseOutcome> Kpis { get; set; }
     }
 }

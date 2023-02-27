@@ -64,7 +64,7 @@ public class Startup : IHostedService
                 _lifetime.StopApplication();
                 return;
             }
-
+            
             var modules = _exportOptions.Modules?.Split(",");
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId,
                 _canvasSettings.ApiUrl);

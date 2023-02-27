@@ -1,23 +1,19 @@
-﻿using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Model;
-using Module = Epsilon.Abstractions.Model.Module;
-using Assignment = Epsilon.Abstractions.Model.Assignment;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Export;
 
 public class ModuleExporterDataCollection : IModuleExporterDataCollection
-{
-    public ModuleExporterDataCollection() { }
-
-    public async Task<IEnumerable<Module>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
+{ 
+    public async Task<IAsyncEnumerable<CourseModule>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
     {
-        var output = new List<Module>();
+        var output = new List<CourseModule>();
 
         await foreach (var item in data.Where(m => m.Collection.OutcomeResults.Any()))
         {
-            var module = new Module { Name = item.Module.Name };
+            var module = new CourseModule { Name = item.Module.Name };
             var links = item.Collection.Links;
 
             Debug.Assert(links != null, nameof(links) + " != null");
@@ -25,7 +21,7 @@ public class ModuleExporterDataCollection : IModuleExporterDataCollection
             var alignments = links.AlignmentsDictionary;
             var outcomes = links.OutcomesDictionary;
 
-            var moduleKpis = new List<Kpi>();
+            var moduleKpis = new List<CourseOutcome>();
 
             foreach (var (outcomeId, outcome) in outcomes)
             {
@@ -36,7 +32,7 @@ public class ModuleExporterDataCollection : IModuleExporterDataCollection
                 if (assignmentIds.Any())
                 {
                     var assignments = assignmentIds
-                        .Select(assignmentId => new Assignment
+                        .Select(assignmentId => new CourseAssignment
                         {
                             Name = alignments[assignmentId].Name + " | " + alignments[assignmentId].Url,
                             Score = item.Collection.OutcomeResults
@@ -45,7 +41,7 @@ public class ModuleExporterDataCollection : IModuleExporterDataCollection
                         })
                         .ToList();
 
-                    moduleKpis.Add(new Kpi
+                    moduleKpis.Add(new CourseOutcome
                     {
                         Name = outcome.Title + " " + outcome.ShortDescription(),
                         Assignments = assignments,
