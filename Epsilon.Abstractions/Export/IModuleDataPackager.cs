@@ -5,5 +5,5 @@ namespace Epsilon.Abstractions.Export;
 
 public interface IModuleDataPackager
 {
-    public Task<IAsyncEnumerable<CourseModule>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data);
+    public Task<IEnumerable<CourseModule>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data);
 }
