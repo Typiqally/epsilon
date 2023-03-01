@@ -38,6 +38,10 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
                 var alignments = links!.AlignmentsDictionary;
                 var outcomes = links.OutcomesDictionary;
+                
+                CreateTextCell("KPI", "A", 1, worksheetPart);
+                CreateTextCell("Assignment", "B", 1, worksheetPart);
+                CreateTextCell("Grade", "C", 1, worksheetPart);
 
                 uint count = 2;
                 foreach (var (outcomeId, outcome) in outcomes)
