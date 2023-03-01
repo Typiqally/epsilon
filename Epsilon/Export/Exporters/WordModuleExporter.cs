@@ -1,26 +1,10 @@
 using System.Text;
 using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Validation;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Options;
-using BottomBorder = DocumentFormat.OpenXml.Wordprocessing.BottomBorder;
-using InsideHorizontalBorder = DocumentFormat.OpenXml.Wordprocessing.InsideHorizontalBorder;
-using InsideVerticalBorder = DocumentFormat.OpenXml.Wordprocessing.InsideVerticalBorder;
-using LeftBorder = DocumentFormat.OpenXml.Wordprocessing.LeftBorder;
-using Paragraph = DocumentFormat.OpenXml.Wordprocessing.Paragraph;
-using RightBorder = DocumentFormat.OpenXml.Wordprocessing.RightBorder;
-using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
-using Table = DocumentFormat.OpenXml.Wordprocessing.Table;
-using TableCell = DocumentFormat.OpenXml.Wordprocessing.TableCell;
-using TableCellProperties = DocumentFormat.OpenXml.Wordprocessing.TableCellProperties;
-using TableProperties = DocumentFormat.OpenXml.Wordprocessing.TableProperties;
-using TableRow = DocumentFormat.OpenXml.Wordprocessing.TableRow;
-using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
-using TopBorder = DocumentFormat.OpenXml.Wordprocessing.TopBorder;
 
 namespace Epsilon.Export.Exporters;
 
@@ -37,69 +21,66 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        using (var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx",
-                   WordprocessingDocumentType.Document))
+        using var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx",
+            WordprocessingDocumentType.Document);
+        document.AddMainDocumentPart();
+        document.MainDocumentPart!.Document = new Document(new Body());
+        var body = document.MainDocumentPart.Document.Body;
+
+        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
         {
-            document.AddMainDocumentPart();
-            document.MainDocumentPart!.Document = new Document(new Body());
+            var links = item.Collection.Links;
 
+            var alignments = links?.AlignmentsDictionary;
+            var outcomes = links?.OutcomesDictionary;
 
-            await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
+            Table table = new Table();
+
+            table.AppendChild<TableProperties>(GetTableProperties());
+            table.Append(AddHeader());
+
+            foreach (var (outcomeId, outcome) in outcomes!)
             {
-                var links = item.Collection.Links;
+                var assignmentIds = item.Collection.OutcomeResults
+                    .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
+                    .Select(static o => o.Link.Assignment)
+                    .ToArray();
 
-                var alignments = links.AlignmentsDictionary;
-                var outcomes = links.OutcomesDictionary;
-
-                Table table = new Table();
-
-
-                table.AppendChild<TableProperties>(GetTableProperties());
-                table.Append(AddHeader());
-
-                foreach (var (outcomeId, outcome) in outcomes)
+                if (assignmentIds.Any())
                 {
-                    var assignmentIds = item.Collection.OutcomeResults
-                        .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                        .Select(static o => o.Link.Assignment)
-                        .ToArray();
+                    TableRow row = new TableRow();
+                    row.Append(CreateCell($"{outcome.Title} {outcome.ShortDescription()}"));
 
-                    if (assignmentIds.Any())
+                    var cellValueBuilder = new StringBuilder();
+
+                    foreach (var (_, alignment) in alignments?.Where(a => assignmentIds.Contains(a.Key))!)
                     {
-                        TableRow row = new TableRow();
-                        row.Append(CreateCell($"{outcome.Title} {outcome.ShortDescription()}"));
-
-                        var cellValueBuilder = new StringBuilder();
-
-                        foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
-                        {
-                            cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
-                        }
-
-                        row.Append(CreateCell(cellValueBuilder.ToString()));
-
-                        var cellValueOutComeResultsBuilder = new StringBuilder();
-                        foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
-                                     result.Link.Outcome == outcomeId))
-                        {
-                            cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
-                        }
-
-                        row.Append(CreateCell(cellValueOutComeResultsBuilder.ToString()));
-                        table.Append(row);
+                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                     }
-                }
 
-                document.MainDocumentPart.Document.Body?.Append(new Paragraph(new Run(new Text(item.Module.Name))));
-                document.MainDocumentPart.Document.Body?.Append(table);
+                    row.Append(CreateCell(cellValueBuilder.ToString()));
+
+                    var cellValueOutComeResultsBuilder = new StringBuilder();
+                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
+                                 result.Link.Outcome == outcomeId))
+                    {
+                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
+                    }
+
+                    row.Append(CreateCell(cellValueOutComeResultsBuilder.ToString()));
+                    table.Append(row);
+                }
             }
 
-            document?.Save();
-            document?.Close();
+            body?.Append(CreateText(item.Module.Name));
+            body?.Append(table);
         }
+
+        document?.Save();
+        document?.Close();
     }
 
-    public static TableRow AddHeader()
+    private static TableRow AddHeader()
     {
         var tr = new TableRow();
         tr.Append(CreateCell("KPI's"));
@@ -108,17 +89,22 @@ public class WordModuleExporter : ICanvasModuleExporter
         return tr;
     }
 
-    public static TableCell CreateCell(string text)
+    private static Paragraph CreateText(string text)
+    {
+        return new Paragraph(new Run(new Text(text)));
+    }
+
+    private static TableCell CreateCell(string text)
     {
         var tc = new TableCell();
-        tc.Append(new Paragraph(new Run(new Text(text))));
+        tc.Append(CreateText(text));
         tc.Append(new TableCellProperties(
             new TableCellWidth { Type = TableWidthUnitValues.Auto }));
         return tc;
     }
 
 
-    public static TableProperties GetTableProperties()
+    private static TableProperties GetTableProperties()
     {
         var properties = new TableProperties();
         properties.Append(new TableBorders(

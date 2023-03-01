@@ -21,68 +21,66 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
     {
-        using (SpreadsheetDocument spreadsheetDocument =
-               SpreadsheetDocument.Create($"{_options.FormattedOutputName}.xlsx", SpreadsheetDocumentType.Workbook))
+        using SpreadsheetDocument spreadsheetDocument =
+            SpreadsheetDocument.Create($"{_options.FormattedOutputName}.xlsx", SpreadsheetDocumentType.Workbook);
+        WorkbookPart workbookpart = spreadsheetDocument.AddWorkbookPart();
+        workbookpart.Workbook = new Workbook();
+
+        // Add Sheets to the Workbook.
+        spreadsheetDocument.WorkbookPart!.Workbook.AppendChild<Sheets>(new Sheets());
+
+        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
         {
-            WorkbookPart workbookpart = spreadsheetDocument.AddWorkbookPart();
-            workbookpart.Workbook = new Workbook();
+            WorksheetPart worksheetPart = InsertWorksheet(item.Module, workbookpart);
 
-            // Add Sheets to the Workbook.
-            spreadsheetDocument.WorkbookPart!.Workbook.AppendChild<Sheets>(new Sheets());
+            var links = item.Collection.Links;
 
-            await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
+            var alignments = links!.AlignmentsDictionary;
+            var outcomes = links.OutcomesDictionary;
+
+            CreateTextCell("KPI", "A", 1, worksheetPart);
+            CreateTextCell("Assignment", "B", 1, worksheetPart);
+            CreateTextCell("Grade", "C", 1, worksheetPart);
+
+            uint count = 2;
+            foreach (var (outcomeId, outcome) in outcomes)
             {
-                WorksheetPart worksheetPart = InsertWorksheet(item.Module, workbookpart);
+                var assignmentIds = item.Collection.OutcomeResults
+                    .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
+                    .Select(static o => o.Link.Assignment)
+                    .ToArray();
 
-                var links = item.Collection.Links;
-
-                var alignments = links!.AlignmentsDictionary;
-                var outcomes = links.OutcomesDictionary;
-                
-                CreateTextCell("KPI", "A", 1, worksheetPart);
-                CreateTextCell("Assignment", "B", 1, worksheetPart);
-                CreateTextCell("Grade", "C", 1, worksheetPart);
-
-                uint count = 2;
-                foreach (var (outcomeId, outcome) in outcomes)
+                if (assignmentIds.Any())
                 {
-                    var assignmentIds = item.Collection.OutcomeResults
-                        .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                        .Select(static o => o.Link.Assignment)
-                        .ToArray();
+                    CreateTextCell($"{outcome.Title} {outcome.ShortDescription()}", "A", count, worksheetPart);
 
-                    if (assignmentIds.Any())
+                    var cellValueBuilder = new StringBuilder();
+                    foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
                     {
-                        CreateTextCell($"{outcome.Title} {outcome.ShortDescription()}", "A", count, worksheetPart);
-
-                        var cellValueBuilder = new StringBuilder();
-                        foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
-                        {
-                            cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
-                        }
-
-                        CreateTextCell(cellValueBuilder.ToString(), "B", count, worksheetPart);
-
-                        var cellValueOutComeResultsBuilder = new StringBuilder();
-                        foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
-                                     result.Link.Outcome == outcomeId))
-                        {
-                            cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
-                        }
-
-                        CreateTextCell(cellValueOutComeResultsBuilder.ToString(), "C", count,
-                            worksheetPart);
-                        count++;
+                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
                     }
+
+                    CreateTextCell(cellValueBuilder.ToString(), "B", count, worksheetPart);
+
+                    var cellValueOutComeResultsBuilder = new StringBuilder();
+                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
+                                 result.Link.Outcome == outcomeId))
+                    {
+                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
+                    }
+
+                    CreateTextCell(cellValueOutComeResultsBuilder.ToString(), "C", count,
+                        worksheetPart);
+                    count++;
                 }
             }
-
-            workbookpart.Workbook.Save();
-            spreadsheetDocument.Close();
         }
+
+        workbookpart.Workbook.Save();
+        spreadsheetDocument.Close();
     }
 
-    public static Cell CreateTextCell(string content, string columnName, uint rowIndex, WorksheetPart worksheetPart)
+    private static Cell CreateTextCell(string content, string columnName, uint rowIndex, WorksheetPart worksheetPart)
     {
         Cell cell = InsertCellInWorksheet(columnName, rowIndex, worksheetPart);
         cell.CellValue = new CellValue(content);
