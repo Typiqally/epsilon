@@ -5,9 +5,9 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Export;
 
-public class ModuleDataPackager : IModuleDataPackager
+public class ExportDataPackager : IExportDataPackager
 { 
-    public async Task<ModuleData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
+    public async Task<ExportData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
     {
         var output = new List<CourseModule>();
 
@@ -54,6 +54,6 @@ public class ModuleDataPackager : IModuleDataPackager
             output.Add(module);
         }
 
-        return new ModuleData { CourseModules = output };
+        return new ExportData { CourseModules = output };
     }
 }

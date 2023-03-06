@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Epsilon.Abstractions.Model
 {
-    public class ModuleData
+    public class ExportData
     {
         public IEnumerable<CourseModule> CourseModules { get; set; }
     }

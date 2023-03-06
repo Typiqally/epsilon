@@ -18,7 +18,7 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "word" };
 
-    public async Task Export(ModuleData data, string format)
+    public async Task Export(ExportData data, string format)
     {
         using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
 

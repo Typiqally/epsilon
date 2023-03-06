@@ -16,7 +16,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
-    public async Task Export(ModuleData data, string format)
+    public async Task Export(ExportData data, string format)
     {
         var workbook = new Workbook();
 

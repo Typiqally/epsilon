@@ -2,7 +2,7 @@
 
 namespace Epsilon.Abstractions.Export;
 
-public interface ICanvasModuleExporter : IExporter<ModuleData>
+public interface ICanvasModuleExporter : IExporter<ExportData>
 {
     
 }
