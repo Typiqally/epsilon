@@ -1,8 +1,7 @@
 ﻿using System.Data;
-using System.Diagnostics;
 using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Model;
 using Microsoft.Extensions.Options;
+using Epsilon.Abstractions.Model;
 
 namespace Epsilon.Export.Exporters;
 
@@ -17,9 +16,9 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "csv" };
 
-    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
+    public async Task Export(ExportData data, string format)
     {
-        var dt = await CreateDataTable(data);
+        var dt = CreateDataTable(data.CourseModules);
 
         var stream = new StreamWriter($"{_options.FormattedOutputName}.{format}", false);
         WriteHeader(stream, dt);
@@ -28,46 +27,27 @@ public class CsvModuleExporter : ICanvasModuleExporter
         stream.Close();
     }
 
-    private static async Task<DataTable> CreateDataTable(IAsyncEnumerable<ModuleOutcomeResultCollection> items)
+    private static DataTable CreateDataTable(IEnumerable<CourseModule> data)
     {
-        var dt = new DataTable();
+        var dataTable = new DataTable();
+        
+        dataTable.Columns.Add("Module", typeof(string));
+        dataTable.Columns.Add("KPI", typeof(string));
+        dataTable.Columns.Add("Assignment", typeof(string));
+        dataTable.Columns.Add("Score", typeof(string));
 
-        dt.Columns.Add("Result Id", typeof(int));
-        dt.Columns.Add("Assignment Id", typeof(string));
-        dt.Columns.Add("Assignment", typeof(string));
-        dt.Columns.Add("KPI", typeof(string));
-        dt.Columns.Add("Score", typeof(string));
-        dt.Columns.Add("Module", typeof(string));
-
-        await foreach (var item in items)
+        foreach (var module in data)
         {
-            var links = item.Collection.Links;
-
-            Debug.Assert(links?.OutcomesDictionary != null, "links?.OutcomesDictionary != null");
-            Debug.Assert(links.AlignmentsDictionary != null, "links.AlignmentsDictionary != null");
-            
-            foreach (var result in item.Collection.OutcomeResults)
+            foreach (var kpi in module.Kpis)
             {
-                Debug.Assert(result.Link != null, "result.Link != null");
-                var outcome = links.OutcomesDictionary[result.Link.Outcome!];
-                var alignment = links.AlignmentsDictionary[result.Link.Alignment!];
-                var grade = result.Grade();
-
-                if (grade != null)
+                foreach (var assignment in kpi.Assignments)
                 {
-                    dt.Rows.Add(
-                        outcome.Id,
-                        alignment.Id,
-                        alignment.Name,
-                        outcome.Title,
-                        result.Grade(),
-                        item.Module.Name
-                    );
+                    dataTable.Rows.Add(module.Name, kpi.Name, assignment.Name, assignment.Score);
                 }
             }
         }
 
-        return dt;
+        return dataTable;
     }
 
     private static void WriteHeader(TextWriter writer, DataTable dt)
