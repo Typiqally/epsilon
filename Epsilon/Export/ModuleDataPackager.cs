@@ -7,7 +7,7 @@ namespace Epsilon.Export;
 
 public class ModuleDataPackager : IModuleDataPackager
 { 
-    public async Task<IEnumerable<CourseModule>> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
+    public async Task<ModuleData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
     {
         var output = new List<CourseModule>();
 
@@ -54,6 +54,6 @@ public class ModuleDataPackager : IModuleDataPackager
             output.Add(module);
         }
 
-        return output;
+        return new ModuleData { CourseModules = output };
     }
 }

@@ -18,7 +18,7 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "word" };
 
-    public async Task Export(IEnumerable<CourseModule> data, string format)
+    public async Task Export(ModuleData data, string format)
     {
         using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
 
@@ -29,7 +29,7 @@ public class WordModuleExporter : ICanvasModuleExporter
             .InsertParagraph("Created with ")
             .AppendHyperlink(link).Color(Color.Blue).UnderlineStyle(UnderlineStyle.singleLine);
         
-        foreach (var module in data)
+        foreach (var module in data.CourseModules)
         {
             var table = document.AddTable(1, 3);
 

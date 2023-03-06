@@ -15,9 +15,9 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     
     public IEnumerable<string> Formats { get; } = new[] { "console", "logs" };
 
-    public async Task Export(IEnumerable<CourseModule> data, string format)
+    public async Task Export(ModuleData data, string format)
     {
-        foreach (var module in data)
+        foreach (var module in data.CourseModules)
         {
             _logger.LogInformation("--------------------------------");
             _logger.LogInformation("Module: {Module}", module.Name);
