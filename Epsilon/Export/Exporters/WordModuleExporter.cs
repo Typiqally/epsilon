@@ -19,7 +19,7 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "word", "docx" };
 
-    public async Task Export(ExportData data, string format)
+    public void Export(ExportData data, string format)
     {
         using var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx",
             WordprocessingDocumentType.Document);

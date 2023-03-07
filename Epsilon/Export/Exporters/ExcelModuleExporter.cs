@@ -19,7 +19,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
-    public async Task Export(ExportData data, string format)
+    public void Export(ExportData data, string format)
     {
         using SpreadsheetDocument spreadsheetDocument =
             SpreadsheetDocument.Create($"{_options.FormattedOutputName}.xlsx", SpreadsheetDocumentType.Workbook);
