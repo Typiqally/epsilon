@@ -27,15 +27,15 @@ public class ExportDataPackager : IExportDataPackager
             {
                 var assignmentIds = item.Collection.OutcomeResults
                     .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                    .Select(o => o.Link.Assignment);
+                    .Select(o => o.Link.Assignment).ToArray();
 
                 if (assignmentIds.Any())
                 {
                     var assignments = assignmentIds
                         .Select(assignmentId => new CourseAssignment
                         {
-                            Name = alignments[assignmentId].Name,
-                            Url = alignments[assignmentId].Url.ToString(),
+                            Name = alignments[assignmentId!].Name,
+                            Url = alignments[assignmentId!].Url.ToString(),
                             Score = item.Collection.OutcomeResults
                                 .First(o => o.Link.Outcome == outcomeId && o.Link.Assignment == assignmentId)
                                 .Grade() ?? "N/A"
@@ -46,7 +46,7 @@ public class ExportDataPackager : IExportDataPackager
                     {
                         Name = outcome.Title,
                         Description = outcome.ShortDescription(),
-                        Assignments = assignments,
+                        Assignments = assignments!,
                     });
                 }
             }
