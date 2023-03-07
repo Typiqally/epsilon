@@ -6,7 +6,7 @@ using Epsilon.Canvas.Abstractions.Model;
 namespace Epsilon.Export;
 
 public class ExportDataPackager : IExportDataPackager
-{ 
+{
     public async Task<ExportData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
     {
         var output = new List<CourseModule>();
@@ -34,7 +34,8 @@ public class ExportDataPackager : IExportDataPackager
                     var assignments = assignmentIds
                         .Select(assignmentId => new CourseAssignment
                         {
-                            Name = alignments[assignmentId].Name + " | " + alignments[assignmentId].Url,
+                            Name = alignments[assignmentId].Name,
+                            Url = alignments[assignmentId].Url.ToString(),
                             Score = item.Collection.OutcomeResults
                                 .First(o => o.Link.Outcome == outcomeId && o.Link.Assignment == assignmentId)
                                 .Grade() ?? "N/A"
@@ -43,14 +44,15 @@ public class ExportDataPackager : IExportDataPackager
 
                     moduleKpis.Add(new CourseOutcome
                     {
-                        Name = outcome.Title + " " + outcome.ShortDescription(),
+                        Name = outcome.Title,
+                        Description = outcome.ShortDescription(),
                         Assignments = assignments,
                     });
                 }
             }
 
             module.Kpis = moduleKpis;
-            
+
             output.Add(module);
         }
 
