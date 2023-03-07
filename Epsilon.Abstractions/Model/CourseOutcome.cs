@@ -2,8 +2,8 @@
 {
     public class CourseOutcome
     {
-        public string Name { get; set; }
-        public IEnumerable<CourseAssignment> Assignments { get; set; }
-        public string Description { get; set; }
+        public string Name { get; set; } = String.Empty;
+        public IEnumerable<CourseAssignment> Assignments { get; set; } = Enumerable.Empty<CourseAssignment>();
+        public string Description { get; set; } = String.Empty;
     }
 }
