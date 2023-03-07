@@ -1,9 +1,6 @@
-using System.Text;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Model;
+﻿using Epsilon.Abstractions.Export;
+using Epsilon.Abstractions.Model;
+using ExcelLibrary.SpreadSheet;
 using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;
@@ -19,142 +16,36 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
-    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
+    public async Task Export(ExportData data, string format)
     {
-        using SpreadsheetDocument spreadsheetDocument =
-            SpreadsheetDocument.Create($"{_options.FormattedOutputName}.xlsx", SpreadsheetDocumentType.Workbook);
-        WorkbookPart workbookpart = spreadsheetDocument.AddWorkbookPart();
-        workbookpart.Workbook = new Workbook();
+        var workbook = new Workbook();
 
-        // Add Sheets to the Workbook.
-        spreadsheetDocument.WorkbookPart!.Workbook.AppendChild<Sheets>(new Sheets());
-
-        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
+        foreach (var module in data.CourseModules)
         {
-            WorksheetPart worksheetPart = InsertWorksheet(item.Module, workbookpart);
+            var worksheet = new Worksheet(module.Name);
+            var kpis = module.Kpis;
 
-            var links = item.Collection.Links;
+            worksheet.Cells[0, 0] = new Cell("KPI");
+            worksheet.Cells[0, 1] = new Cell("Assignment(s)");
+            worksheet.Cells[0, 2] = new Cell("Score");
 
-            var alignments = links!.AlignmentsDictionary;
-            var outcomes = links.OutcomesDictionary;
-
-            CreateTextCell("KPI", "A", 1, worksheetPart);
-            CreateTextCell("Assignment", "B", 1, worksheetPart);
-            CreateTextCell("Grade", "C", 1, worksheetPart);
-
-            uint count = 2;
-            foreach (var (outcomeId, outcome) in outcomes)
+            for (var i = 0; i < kpis.Count(); i++)
             {
-                var assignmentIds = item.Collection.OutcomeResults
-                    .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                    .Select(static o => o.Link.Assignment)
-                    .ToArray();
+                var kpi = kpis.ElementAt(i);
 
-                if (assignmentIds.Any())
-                {
-                    CreateTextCell($"{outcome.Title} {outcome.ShortDescription()}", "A", count, worksheetPart);
-
-                    var cellValueBuilder = new StringBuilder();
-                    foreach (var (_, alignment) in alignments.Where(a => assignmentIds.Contains(a.Key)))
-                    {
-                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
-                    }
-
-                    CreateTextCell(cellValueBuilder.ToString(), "B", count, worksheetPart);
-
-                    var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
-                                 result.Link.Outcome == outcomeId))
-                    {
-                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
-                    }
-
-                    CreateTextCell(cellValueOutComeResultsBuilder.ToString(), "C", count,
-                        worksheetPart);
-                    count++;
-                }
-            }
-        }
-
-        workbookpart.Workbook.Save();
-        spreadsheetDocument.Close();
-    }
-
-    private static Cell CreateTextCell(string content, string columnName, uint rowIndex, WorksheetPart worksheetPart)
-    {
-        Cell cell = InsertCellInWorksheet(columnName, rowIndex, worksheetPart);
-        cell.CellValue = new CellValue(content);
-        cell.DataType = CellValues.String;
-        return cell;
-    }
-
-    // Given a WorkbookPart, inserts a new worksheet.
-    private static WorksheetPart InsertWorksheet(Module module, WorkbookPart workbookPart)
-    {
-        WorksheetPart newWorksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-        newWorksheetPart.Worksheet = new Worksheet(new SheetData());
-        newWorksheetPart.Worksheet.Save();
-
-        Sheets sheets = workbookPart.Workbook.GetFirstChild<Sheets>()!;
-        string relationshipId = workbookPart.GetIdOfPart(newWorksheetPart);
-
-        uint sheetId = 1;
-        if (sheets.Elements<Sheet>().Any())
-        {
-            sheetId = sheets.Elements<Sheet>().Select(s => s.SheetId!.Value).Max() + 1;
-        }
-
-        Sheet sheet = new Sheet() { Id = relationshipId, SheetId = sheetId, Name = module.Name };
-        sheets.Append(sheet);
-        workbookPart.Workbook.Save();
-
-        return newWorksheetPart;
-    }
-
-    private static Cell InsertCellInWorksheet(string columnName, uint rowIndex, WorksheetPart worksheetPart)
-    {
-        Worksheet worksheet = worksheetPart.Worksheet;
-        SheetData sheetData = worksheet.GetFirstChild<SheetData>()!;
-        string cellReference = columnName + rowIndex;
-
-        // If the worksheet does not contain a row with the specified row index, insert one.
-        Row row;
-        if (sheetData.Elements<Row>().Count(r => r.RowIndex! == rowIndex) != 0)
-        {
-            row = sheetData.Elements<Row>().First(r => r.RowIndex! == rowIndex);
-        }
-        else
-        {
-            row = new Row() { RowIndex = rowIndex };
-            sheetData.Append(row);
-        }
-
-        // If there is not a cell with the specified column name, insert one.  
-        if (row.Elements<Cell>().Any(c => c.CellReference!.Value == columnName + rowIndex))
-        {
-            return row.Elements<Cell>().First(c => c.CellReference!.Value == cellReference);
-        }
-        else
-        {
-            // Cells must be in sequential order according to CellReference. Determine where to insert the new cell.
-            Cell refCell = null!;
-            foreach (Cell cell in row.Elements<Cell>())
-            {
-                if (cell.CellReference?.Value?.Length == cellReference.Length)
-                {
-                    if (String.Compare(cell.CellReference.Value, cellReference, StringComparison.OrdinalIgnoreCase) > 0)
-                    {
-                        refCell = cell;
-                        break;
-                    }
-                }
+                worksheet.Cells[i + 1, 0] = new Cell(kpi.Name);
+                worksheet.Cells[i + 1, 1] = new Cell(string.Join('\n', kpi.Assignments.Select(a => a.Name)));
+                worksheet.Cells[i + 1, 2] = new Cell(string.Join('\n', kpi.Assignments.Select(a => a.Score)));
             }
 
-            Cell newCell = new Cell() { CellReference = cellReference };
-            row.InsertBefore(newCell, refCell);
+            worksheet.Cells.ColumnWidth[0, 0] = 500;
+            worksheet.Cells.ColumnWidth[0, 1] = 8000;
+            worksheet.Cells.ColumnWidth[0, 2] = 8000;
 
-            worksheet.Save();
-            return newCell;
+            workbook.Worksheets.Add(worksheet);
         }
+
+        // We're forced to xls because of the older format
+        workbook.Save($"{_options.FormattedOutputName}.xls");
     }
 }

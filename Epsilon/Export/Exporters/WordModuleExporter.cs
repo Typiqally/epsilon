@@ -1,10 +1,9 @@
-using System.Text;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using System.Drawing;
 using Epsilon.Abstractions.Export;
-using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Abstractions.Model;
 using Microsoft.Extensions.Options;
+using Xceed.Document.NET;
+using Xceed.Words.NET;
 
 namespace Epsilon.Export.Exporters;
 
@@ -17,127 +16,44 @@ public class WordModuleExporter : ICanvasModuleExporter
         _options = options.Value;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "word", "docx" };
+    public IEnumerable<string> Formats { get; } = new[] { "word" };
 
-    public async Task Export(IAsyncEnumerable<ModuleOutcomeResultCollection> data, string format)
+    public async Task Export(ExportData data, string format)
     {
-        using var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx",
-            WordprocessingDocumentType.Document);
-        document.AddMainDocumentPart();
-        document.MainDocumentPart!.Document = new Document(new Body());
-        var body = document.MainDocumentPart.Document.Body;
+        using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
 
-        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
+        document.AddFooters();
+        var link = document.AddHyperlink(Constants.ProjectName, Constants.RepositoryUri);
+
+        document.Footers.Odd
+            .InsertParagraph("Created with ")
+            .AppendHyperlink(link).Color(Color.Blue).UnderlineStyle(UnderlineStyle.singleLine);
+        
+        foreach (var module in data.CourseModules)
         {
-            var links = item.Collection.Links;
+            var table = document.AddTable(1, 3);
 
-            var alignments = links?.AlignmentsDictionary;
-            var outcomes = links?.OutcomesDictionary;
+            table.Rows[0].Cells[0].Paragraphs[0].Append("KPI");
+            table.Rows[0].Cells[1].Paragraphs[0].Append("Assignment(s)");
+            table.Rows[0].Cells[2].Paragraphs[0].Append("Score");
 
-            Table table = new Table();
-
-            table.AppendChild<TableProperties>(GetTableProperties());
-            table.Append(AddHeader());
-
-            foreach (var (outcomeId, outcome) in outcomes!)
+            foreach (var kpi in module.Kpis)
             {
-                var assignmentIds = item.Collection.OutcomeResults
-                    .Where(o => o.Link.Outcome == outcomeId && o.Grade() != null)
-                    .Select(static o => o.Link.Assignment)
-                    .ToArray();
+                var row = table.InsertRow();
+                row.Cells[0].Paragraphs[0].Append(kpi.Name);
 
-                if (assignmentIds.Any())
+                foreach (var assignment in kpi.Assignments)
                 {
-                    TableRow row = new TableRow();
-                    row.Append(CreateCell($"{outcome.Title} {outcome.ShortDescription()}"));
-
-                    var cellValueBuilder = new StringBuilder();
-
-                    foreach (var (_, alignment) in alignments?.Where(a => assignmentIds.Contains(a.Key))!)
-                    {
-                        cellValueBuilder.AppendLine($"{alignment.Name} {alignment.Url}");
-                    }
-
-                    row.Append(CreateCell(cellValueBuilder.ToString()));
-
-                    var cellValueOutComeResultsBuilder = new StringBuilder();
-                    foreach (var outcomeResult in item.Collection.OutcomeResults.Where(result =>
-                                 result.Link.Outcome == outcomeId))
-                    {
-                        cellValueOutComeResultsBuilder.AppendLine(outcomeResult.Grade());
-                    }
-
-                    row.Append(CreateCell(cellValueOutComeResultsBuilder.ToString()));
-                    table.Append(row);
-                }
+                    row.Cells[1].Paragraphs[0].Append(assignment.Name);
+                    row.Cells[2].Paragraphs[0].Append(assignment.Score);
+                } 
             }
 
-            body?.Append(CreateText(item.Module.Name));
-            body?.Append(table);
+            var par = document.InsertParagraph(module.Name);
+            par.FontSize(24);
+            par.InsertTableAfterSelf(table).InsertPageBreakAfterSelf();
         }
 
-        document?.Save();
-        document?.Close();
-    }
-
-    private static TableRow AddHeader()
-    {
-        var tr = new TableRow();
-        tr.Append(CreateCell("KPI's"));
-        tr.Append(CreateCell("Assignments"));
-        tr.Append(CreateCell("Score"));
-        return tr;
-    }
-
-    private static Paragraph CreateText(string text)
-    {
-        return new Paragraph(new Run(new Text(text)));
-    }
-
-    private static TableCell CreateCell(string text)
-    {
-        var tc = new TableCell();
-        tc.Append(CreateText(text));
-        tc.Append(new TableCellProperties(
-            new TableCellWidth { Type = TableWidthUnitValues.Auto }));
-        return tc;
-    }
-
-
-    private static TableProperties GetTableProperties()
-    {
-        var properties = new TableProperties();
-        properties.Append(new TableBorders(
-            new TopBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new BottomBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new LeftBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new RightBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new InsideHorizontalBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 6
-            },
-            new InsideVerticalBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 6
-            }));
-        return properties;
+        document.Save();
     }
 }
