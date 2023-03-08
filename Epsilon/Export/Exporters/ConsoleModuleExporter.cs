@@ -15,7 +15,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     
     public IEnumerable<string> Formats { get; } = new[] { "console", "logs" };
 
-    public async Task Export(IEnumerable<Module> data, string format)
+    public async Task<Stream> Export(IEnumerable<Module> data, string format)
     {
         foreach (var module in data)
         {
@@ -34,5 +34,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
                 }
             }
         }
+
+        return null;
     }
 }

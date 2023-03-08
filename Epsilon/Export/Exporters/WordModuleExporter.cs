@@ -18,9 +18,10 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "word" };
 
-    public async Task Export(IEnumerable<Module> data, string format)
+    public async Task<Stream> Export(IEnumerable<Module> data, string format)
     {
-        using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
+        var filePath = $"{_options.FormattedOutputName}.docx";
+        using var document = DocX.Create(filePath);
 
         document.AddFooters();
         var link = document.AddHyperlink(Constants.ProjectName, Constants.RepositoryUri);
@@ -55,5 +56,7 @@ public class WordModuleExporter : ICanvasModuleExporter
         }
 
         document.Save();
+
+        return new FileStream(filePath, FileMode.Open);        
     }
 }

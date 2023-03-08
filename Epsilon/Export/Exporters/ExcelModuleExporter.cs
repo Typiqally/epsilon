@@ -16,7 +16,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
 
-    public async Task Export(IEnumerable<Module> data, string format)
+    public async Task<Stream> Export(IEnumerable<Module> data, string format)
     {
         var workbook = new Workbook();
 
@@ -46,6 +46,9 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         }
 
         // We're forced to xls because of the older format
-        workbook.Save($"{_options.FormattedOutputName}.xls");
+        var filePath = $"{_options.FormattedOutputName}.xls";
+        workbook.Save(filePath);
+
+        return new FileStream(filePath, FileMode.Open);
     }
 }

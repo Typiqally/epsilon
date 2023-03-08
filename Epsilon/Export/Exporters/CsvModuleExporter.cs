@@ -16,15 +16,18 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[] { "csv" };
 
-    public async Task Export(IEnumerable<Module> data, string format)
+    public async Task<Stream> Export(IEnumerable<Module> data, string format)
     {
+        var filePath = $"{_options.FormattedOutputName}.{format}";
         var dt = CreateDataTable(data);
 
-        var stream = new StreamWriter($"{_options.FormattedOutputName}.{format}", false);
+        var stream = new StreamWriter(filePath, false);
         WriteHeader(stream, dt);
         WriteRows(stream, dt);
 
         stream.Close();
+
+        return new FileStream(filePath, FileMode.Open);
     }
 
     private static DataTable CreateDataTable(IEnumerable<Module> data)
