@@ -17,7 +17,7 @@ public class Startup : IHostedService
     private readonly CanvasSettings _canvasSettings;
     private readonly ICanvasModuleCollectionFetcher _collectionFetcher;
     private readonly IModuleExporterCollection _exporterCollection;
-    private readonly IModuleExporterDataCollection _exporterDataCollection;
+    private readonly IExportDataPackager _exporterDataCollection;
 
     public Startup(
         ILogger<Startup> logger,
@@ -26,7 +26,7 @@ public class Startup : IHostedService
         IOptions<ExportOptions> exportSettings,
         ICanvasModuleCollectionFetcher collectionFetcher,
         IModuleExporterCollection exporterCollection,
-        IModuleExporterDataCollection exporterDataCollection)
+        IExportDataPackager exporterDataCollection)
     {
         _logger = logger;
         _canvasSettings = canvasSettings.Value;
@@ -64,7 +64,7 @@ public class Startup : IHostedService
                 _lifetime.StopApplication();
                 return;
             }
-
+            
             var modules = _exportOptions.Modules?.Split(",");
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId,
                 _canvasSettings.ApiUrl);
