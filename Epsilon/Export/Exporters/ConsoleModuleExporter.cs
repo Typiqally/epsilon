@@ -9,22 +9,20 @@ namespace Epsilon.Export.Exporters;
 public class ConsoleModuleExporter : ICanvasModuleExporter
 {
     private readonly ILogger<ConsoleModuleExporter> _logger;
-    private readonly ExportOptions _options;
 
-    public ConsoleModuleExporter(ILogger<ConsoleModuleExporter> logger, IOptions<ExportOptions> options)
+    public ConsoleModuleExporter(ILogger<ConsoleModuleExporter> logger)
     {
         _logger = logger;
-        _options = options.Value;
     }
     
     public IEnumerable<string> Formats { get; } = new[] { "console", "logs" };
 
-    public async Task<Stream> Export(IEnumerable<Module> data, string format)
+    public async Task<Stream> Export(ExportData data, string format)
     {
         using var stream = new MemoryStream();
         using var writer = new StreamWriter(stream);
         
-        foreach (var module in data)
+        foreach (var module in data.CourseModules)
         {
             await writer.WriteLineAsync("--------------------------------");
             await writer.WriteLineAsync($"Module: {module.Name}");
