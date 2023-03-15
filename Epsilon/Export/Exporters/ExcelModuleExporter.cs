@@ -23,7 +23,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
     {
         using SpreadsheetDocument spreadsheetDocument =
             SpreadsheetDocument.Create($"{_options.FormattedOutputName}.xlsx", SpreadsheetDocumentType.Workbook);
-        WorkbookPart workbookpart = spreadsheetDocument.AddWorkbookPart();
+        var workbookpart = spreadsheetDocument.AddWorkbookPart();
         workbookpart.Workbook = new Workbook();
 
         // Add Sheets to the Workbook.
@@ -31,7 +31,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
         foreach (var module in data.CourseModules)
         {
-            WorksheetPart worksheetPart = InsertWorksheet(module, workbookpart);
+            var worksheetPart = InsertWorksheet(module, workbookpart);
 
             CreateTextCell("KPI", "A", 1, worksheetPart);
             CreateTextCell("Assignment", "B", 1, worksheetPart);
@@ -64,7 +64,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     private static Cell CreateTextCell(string content, string columnName, uint rowIndex, WorksheetPart worksheetPart)
     {
-        Cell cell = InsertCellInWorksheet(columnName, rowIndex, worksheetPart);
+        var cell = InsertCellInWorksheet(columnName, rowIndex, worksheetPart);
         cell.CellValue = new CellValue(content);
         cell.DataType = CellValues.String;
         return cell;
@@ -73,12 +73,12 @@ public class ExcelModuleExporter : ICanvasModuleExporter
     // Given a WorkbookPart, inserts a new worksheet.
     private static WorksheetPart InsertWorksheet(CourseModule module, WorkbookPart workbookPart)
     {
-        WorksheetPart newWorksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+        var newWorksheetPart = workbookPart.AddNewPart<WorksheetPart>();
         newWorksheetPart.Worksheet = new Worksheet(new SheetData());
         newWorksheetPart.Worksheet.Save();
 
-        Sheets sheets = workbookPart.Workbook.GetFirstChild<Sheets>()!;
-        string relationshipId = workbookPart.GetIdOfPart(newWorksheetPart);
+        var sheets = workbookPart.Workbook.GetFirstChild<Sheets>()!;
+        var relationshipId = workbookPart.GetIdOfPart(newWorksheetPart);
 
         uint sheetId = 1;
         if (sheets.Elements<Sheet>().Any())
@@ -86,7 +86,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             sheetId = sheets.Elements<Sheet>().Select(s => s.SheetId!.Value).Max() + 1;
         }
 
-        Sheet sheet = new Sheet() { Id = relationshipId, SheetId = sheetId, Name = module.Name };
+        var sheet = new Sheet() { Id = relationshipId, SheetId = sheetId, Name = module.Name };
         sheets.Append(sheet);
         workbookPart.Workbook.Save();
 
@@ -95,9 +95,9 @@ public class ExcelModuleExporter : ICanvasModuleExporter
 
     private static Cell InsertCellInWorksheet(string columnName, uint rowIndex, WorksheetPart worksheetPart)
     {
-        Worksheet worksheet = worksheetPart.Worksheet;
-        SheetData sheetData = worksheet.GetFirstChild<SheetData>()!;
-        string cellReference = columnName + rowIndex;
+        var worksheet = worksheetPart.Worksheet;
+        var sheetData = worksheet.GetFirstChild<SheetData>()!;
+        var cellReference = columnName + rowIndex;
 
         // If the worksheet does not contain a row with the specified row index, insert one.
         Row row;
@@ -119,8 +119,8 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         else
         {
             // Cells must be in sequential order according to CellReference. Determine where to insert the new cell.
-            Cell refCell = null!;
-            foreach (Cell cell in row.Elements<Cell>())
+            var refCell = new Cell();
+            foreach (var cell in row.Elements<Cell>())
             {
                 if (cell.CellReference?.Value?.Length == cellReference.Length)
                 {
@@ -132,7 +132,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                 }
             }
 
-            Cell newCell = new Cell() { CellReference = cellReference };
+            var newCell = new Cell() { CellReference = cellReference };
             row.InsertBefore(newCell, refCell);
 
             worksheet.Save();

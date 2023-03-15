@@ -29,14 +29,14 @@ public class WordModuleExporter : ICanvasModuleExporter
 
         foreach (var module in data.CourseModules)
         {
-            Table table = new Table();
+            var table = new Table();
 
             table.AppendChild<TableProperties>(GetTableProperties());
             table.Append(AddHeader());
 
             foreach (var kpi in module.Kpis)
             {
-                TableRow row = new TableRow();
+                var row = new TableRow();
                 row.Append(CreateCell($"{kpi.Name} {kpi.Description}"));
 
                 var cellValueBuilder = new StringBuilder();
