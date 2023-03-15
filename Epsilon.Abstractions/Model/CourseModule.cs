@@ -3,6 +3,6 @@
     public class CourseModule
     {
         public string Name { get; set; }
-        public IEnumerable<CourseOutcome> Kpis { get; set; }
+        public IEnumerable<CourseOutcome> Outcomes { get; set; }
     }
 }

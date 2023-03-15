@@ -41,7 +41,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
         foreach (var module in data)
         {
-            foreach (var kpi in module.Kpis)
+            foreach (var kpi in module.Outcomes)
             {
                 foreach (var assignment in kpi.Assignments)
                 {

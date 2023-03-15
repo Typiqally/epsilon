@@ -29,7 +29,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
             _logger.LogInformation("--------------------------------");
             _logger.LogInformation("Module: {ModuleName}", module.Name);
 
-            foreach (var kpi in module.Kpis)
+            foreach (var kpi in module.Outcomes)
             {
                 await writer.WriteLineAsync("");
                 await writer.WriteLineAsync($"KPI: {kpi.Name}");

@@ -23,7 +23,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         foreach (var module in data.CourseModules)
         {
             var worksheet = new Worksheet(module.Name);
-            var kpis = module.Kpis;
+            var kpis = module.Outcomes;
 
             worksheet.Cells[0, 0] = new Cell("KPI");
             worksheet.Cells[0, 1] = new Cell("Assignment(s)");

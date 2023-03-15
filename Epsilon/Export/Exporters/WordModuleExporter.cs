@@ -38,7 +38,7 @@ public class WordModuleExporter : ICanvasModuleExporter
             table.Rows[0].Cells[1].Paragraphs[0].Append("Assignment(s)");
             table.Rows[0].Cells[2].Paragraphs[0].Append("Score");
 
-            foreach (var kpi in module.Kpis)
+            foreach (var kpi in module.Outcomes)
             {
                 var row = table.InsertRow();
                 row.Cells[0].Paragraphs[0].Append(kpi.Name);
