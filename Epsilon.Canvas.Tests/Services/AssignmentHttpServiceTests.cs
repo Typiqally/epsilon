@@ -28,7 +28,7 @@ namespace Epsilon.Canvas.Service.Tests
         }
 
         [Fact]
-        public async Task GetAll_ReturnsAssignments()
+        public async Task GivenCourseIdAndIncludeSubmissionAndRubricAssessment_WhenCanvasAssignmentsAreRetrieved_ThenAssignmentsAreReturned()
         {
             // Arrange
             var courseId = 123;

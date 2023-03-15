@@ -9,7 +9,7 @@ namespace Epsilon.Tests.Exporters
     public class ExcelModuleExporterTests
     {
         [Fact]
-        public async Task Export_WithValidData_ReturnsStreamWithExpectedContent()
+        public async Task GivenExportData_WhenExportToExcel_ThenFileShouldContainExportData()
         {
             // Arrange
             var data = new ExportData
