@@ -10,19 +10,23 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 {
     private readonly IModuleHttpService _moduleService;
     private readonly IOutcomeHttpService _outcomeService;
+    private readonly IPageHttpService _pageService;
 
     public CanvasModuleCollectionFetcher(
         ILogger<CanvasModuleCollectionFetcher> logger,
         IModuleHttpService moduleService,
-        IOutcomeHttpService outcomeService
+        IOutcomeHttpService outcomeService,
+        IPageHttpService pageService
     )
     {
         _moduleService = moduleService;
         _outcomeService = outcomeService;
+        _pageService = pageService;
     }
 
     public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, IEnumerable<string>? allowedModules)
     {
+        var pages = await _pageService.GetPageByName(courseId,"front_page");
         var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
         var modules = await _moduleService.GetAll(courseId, new[] { "items" });
 
