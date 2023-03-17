@@ -120,16 +120,12 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         {
             // Cells must be in sequential order according to CellReference. Determine where to insert the new cell.
             Cell refCell = null!;
-            foreach (var cell in row.Elements<Cell>())
+            foreach (var cell in row.Elements<Cell>().Where(c =>
+                         c.CellReference?.Value?.Length == cellReference.Length && String.Compare(c.CellReference.Value,
+                             cellReference, StringComparison.OrdinalIgnoreCase) > 0))
             {
-                if (cell.CellReference?.Value?.Length == cellReference.Length)
-                {
-                    if (String.Compare(cell.CellReference.Value, cellReference, StringComparison.OrdinalIgnoreCase) > 0)
-                    {
-                        refCell = cell;
-                        break;
-                    }
-                }
+                refCell = cell;
+                break;
             }
 
             var newCell = new Cell() { CellReference = cellReference };
