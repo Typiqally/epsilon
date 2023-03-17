@@ -2,7 +2,7 @@
 {
     public class CourseModule
     {
-        public string Name { get; set; }
-        public IEnumerable<CourseOutcome> Outcomes { get; set; }
+        public string Name { get; set; } = String.Empty;
+        public IEnumerable<CourseOutcome> Outcomes { get; set; } = Enumerable.Empty<CourseOutcome>();
     }
 }
