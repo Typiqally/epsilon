@@ -39,7 +39,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             CreateTextCell("Grade", "C", 1, worksheetPart);
 
             uint count = 2;
-            foreach (var kpi in module.Kpis)
+            foreach (var kpi in module.Outcomes)
             {
                 CreateTextCell($"{kpi.Name} {kpi.Description}", "A", count, worksheetPart);
 
