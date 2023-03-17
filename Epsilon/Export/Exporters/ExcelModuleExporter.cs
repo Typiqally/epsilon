@@ -119,7 +119,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         else
         {
             // Cells must be in sequential order according to CellReference. Determine where to insert the new cell.
-            var refCell = new Cell();
+            Cell refCell = null!;
             foreach (var cell in row.Elements<Cell>())
             {
                 if (cell.CellReference?.Value?.Length == cellReference.Length)
