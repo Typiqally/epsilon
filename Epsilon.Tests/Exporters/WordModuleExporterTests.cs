@@ -1,15 +1,15 @@
-using Epsilon.Abstractions.Model;
+﻿using Epsilon.Abstractions.Model;
 using Epsilon.Export;
 using Epsilon.Export.Exporters;
 using Microsoft.Extensions.Options;
-using System.Reflection;
+using DocumentFormat.OpenXml.Packaging;
 
 namespace Epsilon.Tests.Exporters
 {
-    public class ExcelModuleExporterTests
+    public class WordModuleExporterTests
     {
         [Fact]
-        public async Task GivenExportData_WhenExportToExcel_ThenFileShouldContainExportData()
+        public async Task GivenExportData_WhenExportToWord_ThenFileShouldContainExportData()
         {
             // Arrange
             var data = new ExportData
@@ -24,10 +24,11 @@ namespace Epsilon.Tests.Exporters
                             new CourseOutcome
                             {
                                 Name = "Outcome 1",
+                                Description = "Short Description",
                                 Assignments = new List<CourseAssignment>
                                 {
-                                    new CourseAssignment { Name = "Assignment 1", Score = "Good" },
-                                    new CourseAssignment { Name = "Assignment 2", Score = "Outstanding" },
+                                    new CourseAssignment { Name = "Assignment 1", Url = "https://assignment1.com/", Score = "Good" },
+                                    new CourseAssignment { Name = "Assignment 2", Url = "https://assignment2.com/", Score = "Outstanding" },
                                 }
                             }
                         }
@@ -38,16 +39,18 @@ namespace Epsilon.Tests.Exporters
             var options = new ExportOptions() { OutputName = "file_name" };
             var mockOptions = Options.Create(options);
 
-            var moduleExporter = new ExcelModuleExporter(mockOptions);
+            var moduleExporter = new WordModuleExporter(mockOptions);
 
             // Act
-            using var stream = await moduleExporter.Export(data, "xls");
-            using var reader = new StreamReader(stream);
-            var content = await reader.ReadToEndAsync();
+            using var stream = await moduleExporter.Export(data, "word");
+            using var document = WordprocessingDocument.Open(stream, false);
+
+            var content = document?.MainDocumentPart?.Document?.Body?.InnerText;
 
             // Assert
             Assert.Contains("Module 1", content);
             Assert.Contains("Outcome 1", content);
+            Assert.Contains("Short Description", content);
             Assert.Contains("Assignment 1", content);
             Assert.Contains("Assignment 2", content);
         }

@@ -65,12 +65,14 @@ namespace Epsilon.Tests
                         {
                             new CourseOutcome
                             {
-                                Name = "Outcome 1 Short Description",
+                                Name = "Outcome 1",
+                                Description = "Short Description",
                                 Assignments = new List<CourseAssignment>
                                 {
                                     new CourseAssignment
                                     {
-                                        Name = "Alignment 2 | https://alignment2.com/",
+                                        Name = "Alignment 2",
+                                        Url = "https://alignment2.com/",
                                         Score = "Satisfactory"
                                     }
                                 }
