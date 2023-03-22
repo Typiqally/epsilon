@@ -8,7 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Epsilon.Cli;
+namespace Epsilon.Host.Cli;
 
 public class Startup : IHostedService
 {
