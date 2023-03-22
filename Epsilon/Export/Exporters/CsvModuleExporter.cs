@@ -1,7 +1,7 @@
 ﻿using System.Data;
 using Epsilon.Abstractions.Export;
-using Microsoft.Extensions.Options;
 using Epsilon.Abstractions.Model;
+using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;
 

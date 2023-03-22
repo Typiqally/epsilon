@@ -26,4 +26,4 @@ public record Outcome(
 
         return trimmed;
     }
-};
+}

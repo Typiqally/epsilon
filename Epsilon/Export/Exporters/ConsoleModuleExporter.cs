@@ -46,7 +46,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
             }
         }
 
-        writer.Flush();
+        await writer.FlushAsync();
         stream.Seek(0, SeekOrigin.Begin);
 
         return stream;
