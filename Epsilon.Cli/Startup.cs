@@ -81,7 +81,7 @@ public class Startup : IHostedService
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
                 // ReSharper disable once PossibleMultipleEnumeration
-                await exporter.Export(formattedItems, format);
+                exporter.Export(formattedItems, format);
             }
         }
         catch (Exception ex)
