@@ -1,9 +1,10 @@
-﻿using System.Drawing;
+﻿using System.Text;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
 using Microsoft.Extensions.Options;
-using Xceed.Document.NET;
-using Xceed.Words.NET;
 
 namespace Epsilon.Export.Exporters;
 
@@ -11,49 +12,83 @@ public class WordModuleExporter : ICanvasModuleExporter
 {
     private readonly ExportOptions _options;
 
+    private static readonly TableBorders s_defaultBorders = new(
+        new TopBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new BottomBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new LeftBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new RightBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new InsideHorizontalBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6 },
+        new InsideVerticalBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6 }
+    );
+
+    private static readonly TableProperties s_defaultTableProperties = new(s_defaultBorders);
+
+    private static readonly TableRow s_defaultHeader = new(
+        CreateTextCell("KPI's"),
+        CreateTextCell("Assignments"),
+        CreateTextCell("Score")
+    );
+
     public WordModuleExporter(IOptions<ExportOptions> options)
     {
         _options = options.Value;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "word" };
+    public IEnumerable<string> Formats { get; } = new[] { "word", "docx" };
 
-    public async Task Export(ExportData data, string format)
+    public void Export(ExportData data, string format)
     {
-        using var document = DocX.Create($"{_options.FormattedOutputName}.docx");
+        using var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx", WordprocessingDocumentType.Document);
 
-        document.AddFooters();
-        var link = document.AddHyperlink(Constants.ProjectName, Constants.RepositoryUri);
+        document.AddMainDocumentPart();
+        document.MainDocumentPart!.Document = new Document(new Body());
 
-        document.Footers.Odd
-            .InsertParagraph("Created with ")
-            .AppendHyperlink(link).Color(Color.Blue).UnderlineStyle(UnderlineStyle.singleLine);
-        
+        var body = document.MainDocumentPart.Document.Body;
+        var cellValueBuilder = new StringBuilder();
+        var cellValueOutComeResultsBuilder = new StringBuilder();
+
         foreach (var module in data.CourseModules)
         {
-            var table = document.AddTable(1, 3);
+            body?.Append(CreateText(module.Name));
 
-            table.Rows[0].Cells[0].Paragraphs[0].Append("KPI");
-            table.Rows[0].Cells[1].Paragraphs[0].Append("Assignment(s)");
-            table.Rows[0].Cells[2].Paragraphs[0].Append("Score");
+            var table = new Table();
 
-            foreach (var kpi in module.Kpis)
+            table.AppendChild(s_defaultTableProperties.CloneNode(true));
+            table.Append(s_defaultHeader.CloneNode(true));
+
+            var rows = module.Kpis.Select(kpi =>
             {
-                var row = table.InsertRow();
-                row.Cells[0].Paragraphs[0].Append(kpi.Name);
-
                 foreach (var assignment in kpi.Assignments)
                 {
-                    row.Cells[1].Paragraphs[0].Append(assignment.Name);
-                    row.Cells[2].Paragraphs[0].Append(assignment.Score);
-                } 
-            }
+                    cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
+                    cellValueOutComeResultsBuilder.AppendLine(assignment.Score);
+                }
 
-            var par = document.InsertParagraph(module.Name);
-            par.FontSize(24);
-            par.InsertTableAfterSelf(table).InsertPageBreakAfterSelf();
+                var row = new TableRow(
+                    CreateTextCell($"{kpi.Name} {kpi.Description}"),
+                    CreateTextCell(cellValueBuilder.ToString()),
+                    CreateTextCell(cellValueOutComeResultsBuilder.ToString())
+                );
+
+                cellValueBuilder.Clear();
+                cellValueOutComeResultsBuilder.Clear();
+
+                return row;
+            });
+
+            table.Append(rows);
+
+            body?.Append(table);
         }
 
         document.Save();
+        document.Close();
     }
+
+    private static Paragraph CreateText(string text) => new(new Run(new Text(text)));
+
+    private static TableCell CreateTextCell(string text) => new(
+        CreateText(text),
+        new TableCellProperties(new TableCellWidth { Type = TableWidthUnitValues.Auto })
+    );
 }
