@@ -1,4 +1,4 @@
-﻿using Epsilon.Cli;
+﻿using Epsilon.Host.Cli;
 using Epsilon.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
