@@ -4,14 +4,11 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
-using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;
 
 public class WordModuleExporter : ICanvasModuleExporter
 {
-    private readonly ExportOptions _options;
-
     private static readonly TableBorders s_defaultBorders = new(
         new TopBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
         new BottomBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
@@ -29,17 +26,14 @@ public class WordModuleExporter : ICanvasModuleExporter
         CreateTextCell("Score")
     );
 
-    public WordModuleExporter(IOptions<ExportOptions> options)
-    {
-        _options = options.Value;
-    }
-
     public IEnumerable<string> Formats { get; } = new[] { "word", "docx" };
-    
+
+    public string FileExtension => "docx";
+
     public async Task<Stream> Export(ExportData data, string format)
     {
-        var filePath = $"{_options.FormattedOutputName}.docx";
-        using var document = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document);
+        var stream = new MemoryStream();
+        using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
         document.MainDocumentPart!.Document = new Document(new Body());
@@ -84,8 +78,8 @@ public class WordModuleExporter : ICanvasModuleExporter
 
         document.Save();
         document.Close();
-        
-        return new FileStream(filePath, FileMode.Open);
+
+        return stream;
     }
 
     private static Paragraph CreateText(string text) => new(new Run(new Text(text)));

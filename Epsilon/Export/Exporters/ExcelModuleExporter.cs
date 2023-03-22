@@ -4,28 +4,21 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
-using Microsoft.Extensions.Options;
 
 namespace Epsilon.Export.Exporters;
 
 public class ExcelModuleExporter : ICanvasModuleExporter
 {
-    private readonly ExportOptions _options;
-
-    public ExcelModuleExporter(IOptions<ExportOptions> options)
-    {
-        _options = options.Value;
-    }
-
     public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
+
+    public string FileExtension => "xlsx";
 
     public async Task<Stream> Export(ExportData data, string format)
     {
-        var filePath = $"{_options.FormattedOutputName}.xlsx";
-        using SpreadsheetDocument spreadsheetDocument =
-            SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook);
-        var workbookpart = spreadsheetDocument.AddWorkbookPart();
-        workbookpart.Workbook = new Workbook();
+        var stream = new MemoryStream();
+        using var spreadsheetDocument = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook);
+        var workbookPart = spreadsheetDocument.AddWorkbookPart();
+        workbookPart.Workbook = new Workbook();
 
         // Add Sheets to the Workbook.
         spreadsheetDocument.WorkbookPart!.Workbook.AppendChild<Sheets>(new Sheets());
@@ -76,7 +69,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             }
         }
 
-        return new FileStream(filePath, FileMode.Open);
+        return stream;
     }
 
     // Given a WorkbookPart, inserts a new worksheet.
