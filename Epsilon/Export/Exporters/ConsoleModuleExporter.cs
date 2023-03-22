@@ -12,27 +12,43 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     {
         _logger = logger;
     }
-    
-    public IEnumerable<string> Formats { get; } = new[] { "console", "logs" };
 
-    public void Export(ExportData data, string format)
+    public IEnumerable<string> Formats { get; } = new[] { "console", "logs", "txt" };
+
+    public string FileExtension => "txt";
+
+
+    public async Task<Stream> Export(ExportData data, string format)
     {
+        var stream = new MemoryStream();
+        var writer = new StreamWriter(stream);
+
         foreach (var module in data.CourseModules)
         {
-            _logger.LogInformation("--------------------------------");
-            _logger.LogInformation("Module: {Module}", module.Name);
+            await WriteLineAndLog(writer, "--------------------------------");
+            await WriteLineAndLog(writer, $"Module: {module.Name}");
 
             foreach (var kpi in module.Kpis)
             {
-                _logger.LogInformation("");
-                _logger.LogInformation("KPI: {Kpi}", kpi.Name);
+                await WriteLineAndLog(writer, "");
+                await WriteLineAndLog(writer, $"KPI: {kpi.Name}");
 
                 foreach (var assignment in kpi.Assignments)
                 {
-                    _logger.LogInformation("- Assignment: {Assignment}", assignment.Name);
-                    _logger.LogInformation("  Score: {Score}", assignment.Score);
+                    await WriteLineAndLog(writer, $"- Assignment: {assignment.Name}");
+                    await WriteLineAndLog(writer, $"  Score: {assignment.Score}");
                 }
             }
         }
+
+        await writer.FlushAsync();
+
+        return stream;
+    }
+
+    private async Task WriteLineAndLog(TextWriter writer, string line)
+    {
+        await writer.WriteLineAsync(line);
+        _logger.LogInformation(line);
     }
 }
