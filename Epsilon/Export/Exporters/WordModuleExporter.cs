@@ -12,6 +12,23 @@ public class WordModuleExporter : ICanvasModuleExporter
 {
     private readonly ExportOptions _options;
 
+    private static readonly TableBorders s_defaultBorders = new(
+        new TopBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new BottomBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new LeftBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new RightBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3 },
+        new InsideHorizontalBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6 },
+        new InsideVerticalBorder { Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6 }
+    );
+
+    private static readonly TableProperties s_defaultTableProperties = new(s_defaultBorders);
+
+    private static readonly TableRow s_defaultHeader = new(
+        CreateTextCell("KPI's"),
+        CreateTextCell("Assignments"),
+        CreateTextCell("Score")
+    );
+
     public WordModuleExporter(IOptions<ExportOptions> options)
     {
         _options = options.Value;
@@ -21,105 +38,57 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public void Export(ExportData data, string format)
     {
-        using var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx",
-            WordprocessingDocumentType.Document);
+        using var document = WordprocessingDocument.Create($"{_options.FormattedOutputName}.docx", WordprocessingDocumentType.Document);
+
         document.AddMainDocumentPart();
         document.MainDocumentPart!.Document = new Document(new Body());
+
         var body = document.MainDocumentPart.Document.Body;
+        var cellValueBuilder = new StringBuilder();
+        var cellValueOutComeResultsBuilder = new StringBuilder();
 
         foreach (var module in data.CourseModules)
         {
+            body?.Append(CreateText(module.Name));
+
             var table = new Table();
 
-            table.AppendChild<TableProperties>(GetTableProperties());
-            table.Append(AddHeader());
+            table.AppendChild(s_defaultTableProperties.CloneNode(true));
+            table.Append(s_defaultHeader.CloneNode(true));
 
-            foreach (var kpi in module.Kpis)
+            var rows = module.Kpis.Select(kpi =>
             {
-                var row = new TableRow();
-                row.Append(CreateCell($"{kpi.Name} {kpi.Description}"));
-
-                var cellValueBuilder = new StringBuilder();
-                var cellValueOutComeResultsBuilder = new StringBuilder();
-
                 foreach (var assignment in kpi.Assignments)
                 {
                     cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
                     cellValueOutComeResultsBuilder.AppendLine(assignment.Score);
                 }
 
-                row.Append(CreateCell(cellValueBuilder.ToString()));
-                row.Append(CreateCell(cellValueOutComeResultsBuilder.ToString()));
+                var row = new TableRow(
+                    CreateTextCell($"{kpi.Name} {kpi.Description}"),
+                    CreateTextCell(cellValueBuilder.ToString()),
+                    CreateTextCell(cellValueOutComeResultsBuilder.ToString())
+                );
 
-                table.Append(row);
-            }
+                cellValueBuilder.Clear();
+                cellValueOutComeResultsBuilder.Clear();
 
-            body?.Append(CreateText(module.Name));
+                return row;
+            });
+
+            table.Append(rows);
+
             body?.Append(table);
         }
 
-        document?.Save();
-        document?.Close();
+        document.Save();
+        document.Close();
     }
 
-    private static TableRow AddHeader()
-    {
-        var tr = new TableRow();
-        tr.Append(CreateCell("KPI's"));
-        tr.Append(CreateCell("Assignments"));
-        tr.Append(CreateCell("Score"));
-        return tr;
-    }
+    private static Paragraph CreateText(string text) => new(new Run(new Text(text)));
 
-    private static Paragraph CreateText(string text)
-    {
-        return new Paragraph(new Run(new Text(text)));
-    }
-
-    private static TableCell CreateCell(string text)
-    {
-        var tc = new TableCell();
-        tc.Append(CreateText(text));
-        tc.Append(new TableCellProperties(
-            new TableCellWidth { Type = TableWidthUnitValues.Auto }));
-        return tc;
-    }
-
-
-    private static TableProperties GetTableProperties()
-    {
-        var properties = new TableProperties();
-        properties.Append(new TableBorders(
-            new TopBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new BottomBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new LeftBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new RightBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 3
-            },
-            new InsideHorizontalBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 6
-            },
-            new InsideVerticalBorder
-            {
-                Val = new EnumValue<BorderValues>(BorderValues.Single),
-                Size = 6
-            }));
-        return properties;
-    }
+    private static TableCell CreateTextCell(string text) => new(
+        CreateText(text),
+        new TableCellProperties(new TableCellWidth { Type = TableWidthUnitValues.Auto })
+    );
 }
