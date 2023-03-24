@@ -75,34 +75,24 @@ public class PageHttpService : HttpService, IPageHttpService
         return null;
     }
 
-    private async Task GetPageImages(Page page)
+    private async Task<string> GetPageImages(Page page)
     {
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(page.Body);
-    
-        string imageSrc = htmlDoc.DocumentNode
-            .SelectNodes("//img")
-            .First()
-            .Attributes["src"].Value;
         
-        string imageAlt = htmlDoc.DocumentNode
-            .SelectNodes("//img")
-            .First()
-            .Attributes["alt"].Value;
-        
-        if(imageSrc == null || imageAlt == null)
+        foreach (var node in htmlDoc.DocumentNode.SelectNodes("//img"))
         {
-            throw new Exception("No image found");
-        }
-        
-        try
-        {
+            string imageSrc = htmlDoc.DocumentNode
+                .SelectNodes("//img")
+                .First()
+                .Attributes["src"].Value;
+
             byte[] imageBytes = await Client.GetByteArrayAsync(imageSrc);
-            await File.WriteAllBytesAsync(imageAlt, imageBytes);
+            string imageBase64 = Convert.ToBase64String(imageBytes);
+
+            node.SetAttributeValue("src", $"data:image/jpeg;base64,{imageBase64}");
         }
-        catch(Exception e)
-        { 
-            throw new Exception(e.Message);
-        }
+
+        return htmlDoc.DocumentNode.WriteTo();
     }
 }
