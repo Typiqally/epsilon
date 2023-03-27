@@ -14,7 +14,7 @@ public class FileHttpService : HttpService, IFileHttpService
     {
     }
 
-    public async Task<byte[]> GetFileByteArray(string url)
+    public async Task<IEnumerable<byte>?> GetFileByteArray(string url)
     {
         var client = new HttpClient();
         var response = new byte[0];

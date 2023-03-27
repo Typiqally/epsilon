@@ -11,7 +11,7 @@ public class CoursePage
     public string Published { get; set; }
     public string HideFromStudents { get; set; }
     public string FrontPage { get; set; }
-    public string HTMLUrl { get; set; }
+    public string HtmlUrl { get; set; }
     public string TodoDate { get; set; }
     public string PublishedAt { get; set; }
     public string UpdatedAt { get; set; }

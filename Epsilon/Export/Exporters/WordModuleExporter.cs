@@ -130,7 +130,7 @@ public class WordModuleExporter : ICanvasModuleExporter
                 throw new ArgumentNullException(nameof(imageSrc));
 
             var imageBytes = await _fileService.GetFileByteArray(imageSrc);
-            var imageBase64 = Convert.ToBase64String(imageBytes);
+            var imageBase64 = Convert.ToBase64String(imageBytes.ToArray());
 
             node.SetAttributeValue("src", $"data:image/jpeg;base64,{imageBase64}");
         }
