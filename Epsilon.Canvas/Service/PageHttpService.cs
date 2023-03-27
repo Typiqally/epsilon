@@ -9,11 +9,8 @@ namespace Epsilon.Canvas.Service;
 
 public class PageHttpService : HttpService, IPageHttpService
 {
-    private readonly ILinkHeaderConverter _headerConverter;
-
-    public PageHttpService(HttpClient client, ILinkHeaderConverter headerConverter) : base(client)
+    public PageHttpService(HttpClient client) : base(client)
     {
-        _headerConverter = headerConverter;
     }
 
     public async Task<string?> GetPageByName(int courseId, string pageName)
@@ -21,15 +18,6 @@ public class PageHttpService : HttpService, IPageHttpService
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
         var response = await Client.SendAsync(request);
         request.Dispose();
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-            throw new Exception("Not found");
-
-        if (response.StatusCode == HttpStatusCode.Forbidden)
-            throw new Exception("Forbidden");
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-            throw new Exception("Unauthorized");
 
         if (response.StatusCode == HttpStatusCode.OK)
             return (await response.Content.ReadFromJsonAsync<Page>()).Body;
@@ -42,15 +30,6 @@ public class PageHttpService : HttpService, IPageHttpService
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
         var response = await Client.SendAsync(request);
         request.Dispose();
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-            throw new Exception("Not found");
-
-        if (response.StatusCode == HttpStatusCode.Forbidden)
-            throw new Exception("Forbidden");
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-            throw new Exception("Unauthorized");
 
         if (response.StatusCode == HttpStatusCode.OK)
             return await response.Content.ReadFromJsonAsync<IEnumerable<Page>>();

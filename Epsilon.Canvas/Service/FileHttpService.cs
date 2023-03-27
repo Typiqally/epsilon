@@ -10,18 +10,12 @@ namespace Epsilon.Canvas.Service;
 
 public class FileHttpService : HttpService, IFileHttpService
 {
-    private readonly ILinkHeaderConverter _headerConverter;
-
-    public FileHttpService(HttpClient client, ILinkHeaderConverter headerConverter) : base(client)
+    public FileHttpService(HttpClient client) : base(client)
     {
-        _headerConverter = headerConverter;
     }
 
     public async Task<byte[]> GetFileByteArray(string url)
     {
-        if (url == null)
-            throw new ArgumentNullException(nameof(url));
-
         return await Client.GetByteArrayAsync(url);
     }
 }

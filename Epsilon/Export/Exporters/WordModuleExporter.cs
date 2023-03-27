@@ -117,11 +117,8 @@ public class WordModuleExporter : ICanvasModuleExporter
         new TableCellProperties(new TableCellWidth {Type = TableWidthUnitValues.Auto})
     );
 
-    private async Task ReplaceSrcWithBase64String(HtmlDocument htmlDoc)
+    private async Task ReplaceImageSrcWithBase64String(HtmlDocument htmlDoc)
     {
-        if (htmlDoc == null)
-            throw new ArgumentNullException(nameof(htmlDoc));
-
         foreach (var node in htmlDoc.DocumentNode.SelectNodes("//img"))
         {
             var imageSrc = node
