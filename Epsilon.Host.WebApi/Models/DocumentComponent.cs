@@ -1,11 +1,10 @@
 ﻿namespace Epsilon.Host.WebApi.Models;
 
-public abstract class DocumentComponent<TConfig, TData>
-{
-    public abstract int Id { get; set; }
-    public abstract string Type { get; set; }
-    public abstract string Title { get; set; }
-    public abstract string Description { get; set; }
-    public abstract TConfig Config { get; set; }
-    public abstract TData Data { get; set; }
+public interface IDocumentComponent<TData> 
+{ 
+    string Type { get; set; }
+    string Title { get; set; }
+    string Description { get; set; }
+    IDictionary<string, string> Config { get; set; }
+    TData Data  { get; set; }
 }
