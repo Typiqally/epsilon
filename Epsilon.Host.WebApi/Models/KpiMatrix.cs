@@ -1,7 +1,10 @@
-﻿namespace Epsilon.Host.WebApi.Models;
+﻿using Epsilon.Host.WebApi.Interfaces;
 
-public class KpiMatrix : IDocumentComponent<KpiMatrixData>
+namespace Epsilon.Host.WebApi.Models;
+
+public record KpiMatrix : IComponent<KpiMatrixData>
 {
+    public int Id { get; set; }
     public string Type { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
@@ -9,7 +12,7 @@ public class KpiMatrix : IDocumentComponent<KpiMatrixData>
     public KpiMatrixData Data { get; set; }
 }
 
-public class KpiMatrixData
+public record KpiMatrixData
 {
-    public string[] Colors { get; set; }
+    public string[] SomeKpiMatrixDataArray { get; set; }
 }

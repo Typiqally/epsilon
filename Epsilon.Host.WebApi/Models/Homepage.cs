@@ -1,7 +1,10 @@
-﻿namespace Epsilon.Host.WebApi.Models;
+﻿using Epsilon.Host.WebApi.Interfaces;
 
-public class HomePage : IDocumentComponent<HomePageData>
+namespace Epsilon.Host.WebApi.Models;
+
+public record HomePage : IComponent<HomePageData>
 {
+    public int Id { get; set; }
     public string Type { get; set; }
     public string Title { get; set; }
     public string Description { get; set; }
@@ -9,7 +12,7 @@ public class HomePage : IDocumentComponent<HomePageData>
     public HomePageData Data { get; set; }
 }
 
-public class HomePageData
+public record HomePageData
 {
-    public string[] colors { get; set; }
+    public string[] SomeHomePageDataArray { get; set; }
 }
