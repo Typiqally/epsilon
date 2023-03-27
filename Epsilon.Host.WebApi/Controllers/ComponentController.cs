@@ -1,4 +1,5 @@
-﻿using Epsilon.Host.WebApi.Models;
+﻿using Epsilon.Host.WebApi.Interfaces;
+using Epsilon.Host.WebApi.Models;
 using Epsilon.Host.WebApi.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,29 +9,46 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("api/component")]
 public class ComponentController : Controller
 {
-    private static readonly KpiMatrix _kpiMatrix = new KpiMatrix
+    private readonly List<IComponent> _components = new()
     {
-        Id = 1,
-        Type = "KpiMatrix",
-        Title = "KPI Matrix",
-        Description = "KPI Matrix",
-        Config = new KpiMatrixConfig
+        new KpiMatrix
         {
-            columns = new[] { "Column 1", "Column 2", "Column 3" },
-            rows = new[] { "Row 1", "Row 2", "Row 3" }
+            Id = 1,
+            Type = "kpi-matrix",
+            Title = "KPI Matrix",
+            Description = "A matrix of KPIs",
+            Config = new Dictionary<string, string>
+            {
+                { "KpiConfigRecord", "Sven" },
+            },
+            Data = new KpiMatrixData
+            {
+                SomeKpiMatrixDataArray = new[] { "red", "green", "blue" }
+            }
         },
-        Data = new KpiMatrixData
+        new HomePage
         {
-            colors = new[] { "Red", "Green", "Blue" }
+            Id = 2,
+            Type = "homepage",
+            Title = "Homepage",
+            Description = "The homepage of the website",
+            Config = new Dictionary<string, string>
+            {
+                { "HomePageRecord", "Jelle" },
+            },
+            Data = new HomePageData
+            {
+                SomeHomePageDataArray = new[] { "red", "green", "blue" }
+            }
         }
     };
     
-    [HttpGet("{componentId:int}")]
-    public IActionResult GetDocumentComponent(int componentId)
+    [HttpGet("random")]
+    public IActionResult GetRandomComponent()
     {
         return Ok(new GetComponentResponse
         {
-            
+            Component = _components[new Random().Next(0, _components.Count)]
         });
     }
 }

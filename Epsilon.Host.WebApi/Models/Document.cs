@@ -1,6 +1,7 @@
 ﻿namespace Epsilon.Host.WebApi.Models;
 
-public class Document
+public record CompetenceDocument
 {
-    public IEnumerable<int> ComponentIds { get; set; }
+    public HomePage HomePage { get; set; }
+    public KpiMatrix KpiMatrix { get; set; }
 }
