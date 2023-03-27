@@ -1,39 +1,33 @@
 ﻿using System.Data;
 using Epsilon.Abstractions.Export;
-using Microsoft.Extensions.Options;
 using Epsilon.Abstractions.Model;
 
 namespace Epsilon.Export.Exporters;
 
 public class CsvModuleExporter : ICanvasModuleExporter
 {
-    private readonly ExportOptions _options;
-
-    public CsvModuleExporter(IOptions<ExportOptions> options)
-    {
-        _options = options.Value;
-    }
-
     public IEnumerable<string> Formats { get; } = new[] { "csv" };
+
+    public string FileExtension => "csv";
 
     public async Task<Stream> Export(ExportData data, string format)
     {
-        var filePath = $"{_options.FormattedOutputName}.{format}";
+        var stream = new MemoryStream();
+        var writer = new StreamWriter(stream);
+
         var dt = CreateDataTable(data.CourseModules);
-    
-        var stream = new StreamWriter(filePath, false);
-        WriteHeader(stream, dt);
-        WriteRows(stream, dt);
+        WriteHeader(writer, dt);
+        WriteRows(writer, dt);
 
-        stream.Close();
+        await writer.FlushAsync();
 
-        return new FileStream(filePath, FileMode.Open);
+        return stream;
     }
 
     private static DataTable CreateDataTable(IEnumerable<CourseModule> data)
     {
         var dataTable = new DataTable();
-        
+
         dataTable.Columns.Add("Module", typeof(string));
         dataTable.Columns.Add("KPI", typeof(string));
         dataTable.Columns.Add("Assignment", typeof(string));

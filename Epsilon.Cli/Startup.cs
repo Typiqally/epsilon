@@ -64,7 +64,7 @@ public class Startup : IHostedService
                 _lifetime.StopApplication();
                 return;
             }
-            
+
             var modules = _exportOptions.Modules?.Split(",");
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId,
                 _canvasSettings.ApiUrl);
@@ -80,8 +80,13 @@ public class Startup : IHostedService
             foreach (var (format, exporter) in exporters)
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
-                // ReSharper disable once PossibleMultipleEnumeration
-                exporter.Export(formattedItems, format);
+
+                var stream = await exporter.Export(formattedItems, format);
+
+                await using var fileStream = new FileStream($"{_exportOptions.FormattedOutputName}.{exporter.FileExtension}", FileMode.Create, FileAccess.Write);
+
+                stream.Position = 0; // Reset position to zero to prepare for copy
+                await stream.CopyToAsync(fileStream);
             }
         }
         catch (Exception ex)

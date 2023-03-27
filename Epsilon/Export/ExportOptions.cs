@@ -6,7 +6,7 @@ public class ExportOptions
 
     public string Formats { get; set; } = "console";
 
-    public string? Modules { get; set; } = null;
+    public string? Modules { get; set; }
 
     public string FormattedOutputName => OutputName
         .Replace("{DateTime}", DateTime.Now.ToString("ddMMyyyyHHmmss"));

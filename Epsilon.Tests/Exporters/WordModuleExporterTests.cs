@@ -36,10 +36,7 @@ namespace Epsilon.Tests.Exporters
                 }
             };
 
-            var options = new ExportOptions() { OutputName = "file_name" };
-            var mockOptions = Options.Create(options);
-
-            var moduleExporter = new WordModuleExporter(mockOptions);
+            var moduleExporter = new WordModuleExporter();
 
             // Act
             using var stream = await moduleExporter.Export(data, "word");

@@ -1,8 +1,6 @@
 ﻿using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System.IO;
 
 namespace Epsilon.Export.Exporters;
 
@@ -14,41 +12,43 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     {
         _logger = logger;
     }
-    
-    public IEnumerable<string> Formats { get; } = new[] { "console", "logs" };
+
+    public IEnumerable<string> Formats { get; } = new[] { "console", "logs", "txt" };
+
+    public string FileExtension => "txt";
+
 
     public async Task<Stream> Export(ExportData data, string format)
     {
-        using var stream = new MemoryStream();
-        using var writer = new StreamWriter(stream);
-        
+        var stream = new MemoryStream();
+        var writer = new StreamWriter(stream);
+
         foreach (var module in data.CourseModules)
         {
-            await writer.WriteLineAsync("--------------------------------");
-            await writer.WriteLineAsync($"Module: {module.Name}");
-            _logger.LogInformation("--------------------------------");
-            _logger.LogInformation("Module: {ModuleName}", module.Name);
+            await WriteLineAndLog(writer, "--------------------------------");
+            await WriteLineAndLog(writer, $"Module: {module.Name}");
 
-            foreach (var kpi in module.Outcomes)
+            foreach (var outcome in module.Outcomes)
             {
-                await writer.WriteLineAsync("");
-                await writer.WriteLineAsync($"KPI: {kpi.Name}");
-                _logger.LogInformation("");
-                _logger.LogInformation("KPI: {KpiName}", kpi.Name);
+                await WriteLineAndLog(writer, "");
+                await WriteLineAndLog(writer, $"KPI: {outcome.Name}");
 
-                foreach (var assignment in kpi.Assignments)
+                foreach (var assignment in outcome.Assignments)
                 {
-                    await writer.WriteLineAsync($"- Assignment: {assignment.Name}");
-                    await writer.WriteLineAsync($"  Score: {assignment.Score}");
-                    _logger.LogInformation("- Assignment: {AssignmentName}", assignment.Name);
-                    _logger.LogInformation("  Score: {AssignmentScore}", assignment.Score);
+                    await WriteLineAndLog(writer, $"- Assignment: {assignment.Name}");
+                    await WriteLineAndLog(writer, $"  Score: {assignment.Score}");
                 }
             }
         }
 
-        writer.Flush();
-        stream.Seek(0, SeekOrigin.Begin);
+        await writer.FlushAsync();
 
         return stream;
+    }
+
+    private async Task WriteLineAndLog(TextWriter writer, string line)
+    {
+        await writer.WriteLineAsync(line);
+        _logger.LogInformation(line);
     }
 }
