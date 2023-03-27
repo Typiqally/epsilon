@@ -4,5 +4,5 @@ public abstract class HttpService
 {
     protected HttpService(HttpClient client) => Client = client;
 
-    protected HttpClient Client { get; }
+    public HttpClient Client { get; }
 }

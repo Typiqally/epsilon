@@ -10,25 +10,22 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 {
     private readonly IModuleHttpService _moduleService;
     private readonly IOutcomeHttpService _outcomeService;
-    private readonly IPageHttpService _pageService;
 
     public CanvasModuleCollectionFetcher(
         ILogger<CanvasModuleCollectionFetcher> logger,
         IModuleHttpService moduleService,
-        IOutcomeHttpService outcomeService,
-        IPageHttpService pageService
+        IOutcomeHttpService outcomeService
     )
     {
         _moduleService = moduleService;
         _outcomeService = outcomeService;
-        _pageService = pageService;
     }
 
-    public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, IEnumerable<string>? allowedModules)
+    public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId,
+        IEnumerable<string>? allowedModules)
     {
-        var pages = await _pageService.GetPageByName(courseId,"front_page");
-        var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
-        var modules = await _moduleService.GetAll(courseId, new[] { "items" });
+        var response = await _outcomeService.GetResults(courseId, new[] {"outcomes", "alignments"});
+        var modules = await _moduleService.GetAll(courseId, new[] {"items"});
 
         Debug.Assert(response != null, nameof(response) + " != null");
         Debug.Assert(modules != null, nameof(modules) + " != null");
@@ -45,7 +42,7 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
 
                 yield return new ModuleOutcomeResultCollection(module, new OutcomeResultCollection(
                     response.OutcomeResults.Where(r => ids.Contains(r.Link.Alignment)),
-                    response.Links with { Alignments = response.Links.Alignments.Where(a => ids.Contains(a.Id)) }
+                    response.Links with {Alignments = response.Links.Alignments.Where(a => ids.Contains(a.Id))}
                 ));
             }
         }
