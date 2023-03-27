@@ -16,14 +16,11 @@ public class PageHttpService : HttpService, IPageHttpService
     {
         try
         {
-            using var httpClient = new HttpClient();
-            {
-                var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
-                var response = await httpClient.SendAsync(request);
+            var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
+            using var response = await Client.SendAsync(request);
 
-                if (response.StatusCode == HttpStatusCode.OK)
-                    return (await response.Content.ReadFromJsonAsync<Page>()).Body;
-            }
+            if (response.StatusCode == HttpStatusCode.OK)
+                return (await response.Content.ReadFromJsonAsync<Page>()).Body;
         }
         catch (Exception e)
         {
@@ -37,10 +34,9 @@ public class PageHttpService : HttpService, IPageHttpService
     {
         try
         {
-            using var httpClient = new HttpClient();
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
-                var response = await Client.SendAsync(request);
+                using var response = await Client.SendAsync(request);
 
                 if (response.StatusCode == HttpStatusCode.OK)
                     return await response.Content.ReadFromJsonAsync<IEnumerable<Page>>();

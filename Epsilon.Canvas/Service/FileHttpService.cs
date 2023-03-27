@@ -18,10 +18,7 @@ public class FileHttpService : HttpService, IFileHttpService
     {
         try
         {
-            using var httpClient = new HttpClient();
-            {
-                return await Client.GetByteArrayAsync(url);
-            }
+            return await Client.GetByteArrayAsync(url);
         }
         catch (Exception e)
         {
