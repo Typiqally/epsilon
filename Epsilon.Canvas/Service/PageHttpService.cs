@@ -20,6 +20,7 @@ public class PageHttpService : HttpService, IPageHttpService
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
         var response = await Client.SendAsync(request);
+        request.Dispose();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             throw new Exception("Not found");
@@ -40,6 +41,7 @@ public class PageHttpService : HttpService, IPageHttpService
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
         var response = await Client.SendAsync(request);
+        request.Dispose();
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             throw new Exception("Not found");

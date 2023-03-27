@@ -54,6 +54,7 @@ public class WordModuleExporter : ICanvasModuleExporter
         var personaHTML = new HtmlDocument();
         personaHTML.LoadHtml(data.PersonaHtml);
 
+
         var ms = new MemoryStream(new UTF8Encoding(true).GetPreamble()
             .Concat(Encoding.UTF8.GetBytes($"<html>{personaHTML.Text}</html>")).ToArray());
 
@@ -66,6 +67,7 @@ public class WordModuleExporter : ICanvasModuleExporter
         altChunk.Id = altChunkId;
 
         body?.Append(altChunk);
+        ms.DisposeAsync();
         body?.Append(new Paragraph(new Run(new Break() {Type = BreakValues.Page})));
 
         foreach (var module in data.CourseModules)
