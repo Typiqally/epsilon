@@ -16,6 +16,21 @@ public class FileHttpService : HttpService, IFileHttpService
 
     public async Task<byte[]> GetFileByteArray(string url)
     {
-        return await Client.GetByteArrayAsync(url);
+        var client = new HttpClient();
+        var response = new byte[0];
+        try
+        {
+            response = await Client.GetByteArrayAsync(url);
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Error in GetFileByteArray: {e.Message}");
+        }
+        finally
+        {
+            client?.Dispose();
+        }
+
+        return response;
     }
 }
