@@ -1,4 +1,4 @@
-﻿using Epsilon.Abstractions.Service;
+using Epsilon.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
