@@ -16,7 +16,7 @@ public class PageHttpService : HttpService, IPageHttpService
     {
         try
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
+            using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
             using var response = await Client.SendAsync(request);
 
             if (response.StatusCode == HttpStatusCode.OK)
@@ -35,7 +35,7 @@ public class PageHttpService : HttpService, IPageHttpService
         try
         {
             {
-                var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
+                using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
                 using var response = await Client.SendAsync(request);
 
                 if (response.StatusCode == HttpStatusCode.OK)

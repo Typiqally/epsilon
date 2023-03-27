@@ -55,7 +55,7 @@ public class WordModuleExporter : ICanvasModuleExporter
         personaHTML.LoadHtml(data.PersonaHtml);
 
 
-        var ms = new MemoryStream(new UTF8Encoding(true).GetPreamble()
+        using var ms = new MemoryStream(new UTF8Encoding(true).GetPreamble()
             .Concat(Encoding.UTF8.GetBytes($"<html>{personaHTML.Text}</html>")).ToArray());
 
         var formatImportPart =
