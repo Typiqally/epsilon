@@ -1,22 +1,15 @@
 ﻿namespace Epsilon.Host.WebApi.Models;
 
-public class KpiMatrix : DocumentComponent<KpiMatrixConfig, KpiMatrixData>
+public class KpiMatrix : IDocumentComponent<KpiMatrixData>
 {
-    public override int Id { get; set; }
-    public override string Type { get; set; }
-    public override string Title { get; set; }
-    public override string Description { get; set; }
-    public override KpiMatrixConfig Config { get; set; }
-    public override KpiMatrixData Data { get; set; }
+    public string Type { get; set; }
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public IDictionary<string, string> Config { get; set; }
+    public KpiMatrixData Data { get; set; }
 }
 
-public class KpiMatrixConfig
-{
-    public string[] columns { get; set; }
-    public string[] rows { get; set; }
-}
-    
 public class KpiMatrixData
 {
-    public string[] colors { get; set; }
+    public string[] Colors { get; set; }
 }
