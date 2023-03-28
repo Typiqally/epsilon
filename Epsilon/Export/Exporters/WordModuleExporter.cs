@@ -37,6 +37,11 @@ public class WordModuleExporter : ICanvasModuleExporter
         _fileService = fileService;
     }
 
+    public WordModuleExporter()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Stream> Export(ExportData data, string format)
     {
         var stream = new MemoryStream();

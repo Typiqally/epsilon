@@ -20,6 +20,11 @@ public class ExportDataPackager : IExportDataPackager
         _canvasSettings = canvasSettings.Value;
     }
 
+    public ExportDataPackager()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<ExportData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
     {
         var courseId = _canvasSettings.CourseId;
