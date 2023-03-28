@@ -80,6 +80,7 @@ public class Startup : IHostedService
             foreach (var (format, exporter) in exporters)
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
+
                 var stream = await exporter.Export(formattedItems, format);
 
                 await using var fileStream = new FileStream($"{_exportOptions.FormattedOutputName}.{exporter.FileExtension}", FileMode.Create, FileAccess.Write);

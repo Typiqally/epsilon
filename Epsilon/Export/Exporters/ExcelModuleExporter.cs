@@ -46,9 +46,9 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             );
 
             uint count = 2;
-            foreach (var kpi in module.Kpis)
+            foreach (var outcome in module.Outcomes)
             {
-                foreach (var assignment in kpi.Assignments)
+                foreach (var assignment in outcome.Assignments)
                 {
                     cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
                     cellValueOutComeResultsBuilder.AppendLine(assignment.Score);
@@ -57,7 +57,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                 InsertCellsInWorksheet(
                     worksheetPart,
                     count,
-                    CreateTextCell($"{kpi.Name} {kpi.Description}", "A", count),
+                    CreateTextCell($"{outcome.Name} {outcome.Description}", "A", count),
                     CreateTextCell(cellValueBuilder.ToString(), "B", count),
                     CreateTextCell(cellValueOutComeResultsBuilder.ToString(), "C", count)
                 );

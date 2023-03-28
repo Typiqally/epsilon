@@ -2,17 +2,18 @@
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
+using System.Text.Json;
 
 namespace Epsilon.Export;
 
 public class ExportDataPackager : IExportDataPackager
 {
     public async Task<ExportData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
-    {
+    { 
         var output = new List<CourseModule>();
 
         await foreach (var item in data.Where(m => m.Collection.OutcomeResults.Any()))
-        {
+        { 
             var module = new CourseModule { Name = item.Module.Name };
             var links = item.Collection.Links;
 
@@ -21,7 +22,7 @@ public class ExportDataPackager : IExportDataPackager
             var alignments = links.AlignmentsDictionary;
             var outcomes = links.OutcomesDictionary;
 
-            var moduleKpis = new List<CourseOutcome>();
+            var moduleOutcomes = new List<CourseOutcome>();
 
             foreach (var (outcomeId, outcome) in outcomes)
             {
@@ -42,7 +43,7 @@ public class ExportDataPackager : IExportDataPackager
                         })
                         .ToList();
 
-                    moduleKpis.Add(new CourseOutcome
+                    moduleOutcomes.Add(new CourseOutcome
                     {
                         Name = outcome.Title,
                         Description = outcome.ShortDescription(),
@@ -51,8 +52,8 @@ public class ExportDataPackager : IExportDataPackager
                 }
             }
 
-            module.Kpis = moduleKpis;
-
+            module.Outcomes = moduleOutcomes;
+            
             output.Add(module);
         }
 
