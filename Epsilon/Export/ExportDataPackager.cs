@@ -2,7 +2,7 @@
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
-using Epsilon.Canvas.Abstractions;
+using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.Extensions.Options;
 
@@ -10,31 +10,24 @@ namespace Epsilon.Export;
 
 public class ExportDataPackager : IExportDataPackager
 {
-    private readonly ICanvasModuleCollectionFetcher _moduleCollectionFetcher;
     private readonly IPageHttpService _pageService;
-    private readonly ExportOptions _exportOptions;
     private readonly CanvasSettings _canvasSettings;
 
-    public ExportDataPackager(ICanvasModuleCollectionFetcher moduleCollectionFetcher, IPageHttpService pageService,
-        IOptions<CanvasSettings> canvasSettings, IOptions<ExportOptions> exportOptions)
+    public ExportDataPackager(IPageHttpService pageService,
+        IOptions<CanvasSettings> canvasSettings)
     {
-        _moduleCollectionFetcher = moduleCollectionFetcher;
         _pageService = pageService;
-        _exportOptions = exportOptions.Value;
         _canvasSettings = canvasSettings.Value;
     }
 
-    public async Task<ExportData> GetExportData()
+    public async Task<ExportData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
     {
-        var modules = _exportOptions.Modules?.Split(",");
         var courseId = _canvasSettings.CourseId;
-
-        var moduleOutcomes = _moduleCollectionFetcher.GetAll(courseId, modules);
         var personaHtml = await _pageService.GetPageByName(courseId, "front_page");
 
         var output = new List<CourseModule>();
 
-        await foreach (var item in moduleOutcomes.Where(m => m.Collection.OutcomeResults.Any()))
+        await foreach (var item in data.Where(m => m.Collection.OutcomeResults.Any()))
         {
             var module = new CourseModule {Name = item.Module.Name};
             var links = item.Collection.Links;
@@ -44,7 +37,7 @@ public class ExportDataPackager : IExportDataPackager
             var alignments = links.AlignmentsDictionary;
             var outcomes = links.OutcomesDictionary;
 
-            var moduleKpis = new List<CourseOutcome>();
+            var moduleOutcomes = new List<CourseOutcome>();
 
             foreach (var (outcomeId, outcome) in outcomes)
             {
@@ -65,7 +58,7 @@ public class ExportDataPackager : IExportDataPackager
                         })
                         .ToList();
 
-                    moduleKpis.Add(new CourseOutcome
+                    moduleOutcomes.Add(new CourseOutcome
                     {
                         Name = outcome.Title,
                         Description = outcome.ShortDescription(),
@@ -74,7 +67,7 @@ public class ExportDataPackager : IExportDataPackager
                 }
             }
 
-            module.Kpis = moduleKpis;
+            module.Outcomes = moduleOutcomes;
 
             output.Add(module);
         }
