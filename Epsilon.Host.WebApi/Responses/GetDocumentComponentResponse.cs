@@ -2,7 +2,7 @@
 
 namespace Epsilon.Host.WebApi.Responses;
 
-public record GetComponentResponse
+public record GetDocumentComponentResponse
 {
     public IComponent Component { get; set; }
 }

@@ -1,11 +1,13 @@
-﻿using Epsilon.Host.WebApi.Models;
+﻿using Epsilon.Abstractions.Model;
+using Epsilon.Export.Exporters;
+using Epsilon.Host.WebApi.Models;
 using Epsilon.Host.WebApi.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
 
 [ApiController]
-[Route("api/document/{documentId:int}")]
+[Route("api/document/{documentId:int}/")]
 public class DocumentController : Controller
 {
     private static int GetRandomNumber()
@@ -21,6 +23,45 @@ public class DocumentController : Controller
             DocumentId = documentId,
             ComponentIds = new[] { GetRandomNumber(), GetRandomNumber(), GetRandomNumber() }
         });
+    }
+    
+    [HttpGet("word")]
+    public async Task<IActionResult> GetWord(int documentId)
+    {
+        var wordExporter = new WordModuleExporter();
+        var wordContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        var stream = await wordExporter.Export(new ExportData
+        {
+            CourseModules = new []
+            {
+                new CourseModule
+                {
+                    Name = "Module 1",
+                    Kpis = new List<CourseOutcome>
+                    {
+                        new CourseOutcome
+                        {
+                            Name = "Outcome 1",
+                            Description = "Description 1",
+                            Assignments = new List<CourseAssignment>
+                            {
+                                new CourseAssignment
+                                {
+                                    Name = "Assignment 1",
+                                    Url = "https://google.com/",
+                                    Score = "Outstanding"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }, "word");
+        
+        // Reset position to zero to prepare for copy
+        stream.Position = 0;
+
+        return File(stream, wordContentType, "CompetenceDocument.docx");
     }
     
     [HttpGet("home-page")]
@@ -46,7 +87,7 @@ public class DocumentController : Controller
             }
         });
     }
-    
+
     [HttpGet("kpi-matrix")]
     public IActionResult GetKpiMatrix(int documentId)
     {
