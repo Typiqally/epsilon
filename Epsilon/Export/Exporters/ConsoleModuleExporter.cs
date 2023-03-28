@@ -28,12 +28,12 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
             await WriteLineAndLog(writer, "--------------------------------");
             await WriteLineAndLog(writer, $"Module: {module.Name}");
 
-            foreach (var kpi in module.Kpis)
+            foreach (var outcome in module.Outcomes)
             {
                 await WriteLineAndLog(writer, "");
-                await WriteLineAndLog(writer, $"KPI: {kpi.Name}");
+                await WriteLineAndLog(writer, $"KPI: {outcome.Name}");
 
-                foreach (var assignment in kpi.Assignments)
+                foreach (var assignment in outcome.Assignments)
                 {
                     await WriteLineAndLog(writer, $"- Assignment: {assignment.Name}");
                     await WriteLineAndLog(writer, $"  Score: {assignment.Score}");

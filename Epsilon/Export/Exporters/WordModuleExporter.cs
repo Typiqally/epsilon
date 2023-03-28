@@ -51,7 +51,7 @@ public class WordModuleExporter : ICanvasModuleExporter
             table.AppendChild(s_defaultTableProperties.CloneNode(true));
             table.Append(s_defaultHeader.CloneNode(true));
 
-            var rows = module.Kpis.Select(kpi =>
+            var rows = module.Outcomes.Select(kpi =>
             {
                 foreach (var assignment in kpi.Assignments)
                 {
