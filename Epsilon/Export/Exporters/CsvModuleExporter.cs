@@ -6,7 +6,7 @@ namespace Epsilon.Export.Exporters;
 
 public class CsvModuleExporter : ICanvasModuleExporter
 {
-    public IEnumerable<string> Formats { get; } = new[] { "csv" };
+    public IEnumerable<string> Formats { get; } = new[] {"csv"};
 
     public string FileExtension => "csv";
 
@@ -35,7 +35,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
 
         foreach (var module in data)
         {
-            foreach (var kpi in module.Kpis)
+            foreach (var kpi in module.Outcomes)
             {
                 foreach (var assignment in kpi.Assignments)
                 {

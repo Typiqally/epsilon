@@ -9,7 +9,7 @@ namespace Epsilon.Export.Exporters;
 
 public class ExcelModuleExporter : ICanvasModuleExporter
 {
-    public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
+    public IEnumerable<string> Formats { get; } = new[] {"xls", "xlsx", "excel"};
 
     public string FileExtension => "xlsx";
 
@@ -29,13 +29,6 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         foreach (var module in data.CourseModules)
         {
             var worksheetPart = CreateWorksheet(module, workbookPart);
-            worksheetPart.Worksheet.Append(
-                new Columns(
-                    new Column { Min = 1, Max = 1, Width = 30, CustomWidth = true },
-                    new Column { Min = 2, Max = 2, Width = 60, CustomWidth = true },
-                    new Column { Min = 3, Max = 3, Width = 10, CustomWidth = true }
-                )
-            );
 
             InsertCellsInWorksheet(
                 worksheetPart,
@@ -46,9 +39,9 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             );
 
             uint count = 2;
-            foreach (var kpi in module.Kpis)
+            foreach (var outcome in module.Outcomes)
             {
-                foreach (var assignment in kpi.Assignments)
+                foreach (var assignment in outcome.Assignments)
                 {
                     cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
                     cellValueOutComeResultsBuilder.AppendLine(assignment.Score);
@@ -57,7 +50,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
                 InsertCellsInWorksheet(
                     worksheetPart,
                     count,
-                    CreateTextCell($"{kpi.Name} {kpi.Description}", "A", count),
+                    CreateTextCell($"{outcome.Name} {outcome.Description}", "A", count),
                     CreateTextCell(cellValueBuilder.ToString(), "B", count),
                     CreateTextCell(cellValueOutComeResultsBuilder.ToString(), "C", count)
                 );
@@ -88,7 +81,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             sheetId = sheets.Elements<Sheet>().Select(static s => s.SheetId!.Value).Max() + 1;
         }
 
-        var sheet = new Sheet { Id = relationshipId, SheetId = sheetId, Name = module.Name };
+        var sheet = new Sheet {Id = relationshipId, SheetId = sheetId, Name = module.Name};
         sheets.Append(sheet);
 
         workbookPart.Workbook.Save();
@@ -104,7 +97,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         var row = sheetData.Elements<Row>().FirstOrDefault(r => r.RowIndex! == rowIndex);
         if (row == null)
         {
-            row = new Row { RowIndex = rowIndex };
+            row = new Row {RowIndex = rowIndex};
             sheetData.Append(row);
         }
 

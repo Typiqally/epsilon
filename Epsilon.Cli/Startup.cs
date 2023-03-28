@@ -15,6 +15,7 @@ public class Startup : IHostedService
     private readonly IHostApplicationLifetime _lifetime;
     private readonly ExportOptions _exportOptions;
     private readonly CanvasSettings _canvasSettings;
+    private readonly ICanvasModuleCollectionFetcher _collectionFetcher;
     private readonly IModuleExporterCollection _exporterCollection;
     private readonly IExportDataPackager _exporterDataCollection;
 
@@ -23,6 +24,7 @@ public class Startup : IHostedService
         IHostApplicationLifetime lifetime,
         IOptions<CanvasSettings> canvasSettings,
         IOptions<ExportOptions> exportSettings,
+        ICanvasModuleCollectionFetcher collectionFetcher,
         IModuleExporterCollection exporterCollection,
         IExportDataPackager exporterDataCollection)
     {
@@ -30,6 +32,7 @@ public class Startup : IHostedService
         _canvasSettings = canvasSettings.Value;
         _exportOptions = exportSettings.Value;
         _lifetime = lifetime;
+        _collectionFetcher = collectionFetcher;
         _exporterCollection = exporterCollection;
         _exporterDataCollection = exporterDataCollection;
     }
@@ -62,11 +65,12 @@ public class Startup : IHostedService
                 return;
             }
 
+            var modules = _exportOptions.Modules?.Split(",");
             _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId,
                 _canvasSettings.ApiUrl);
             _logger.LogInformation("Downloading results, this may take a few seconds...");
-
-            var formattedItems = await _exporterDataCollection.GetExportData();
+            var items = _collectionFetcher.GetAll(_canvasSettings.CourseId, modules);
+            var formattedItems = await _exporterDataCollection.GetExportData(items);
 
             var formats = _exportOptions.Formats.Split(",");
             var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
@@ -76,6 +80,7 @@ public class Startup : IHostedService
             foreach (var (format, exporter) in exporters)
             {
                 _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
+
                 var stream = await exporter.Export(formattedItems, format);
 
                 await using var fileStream =
