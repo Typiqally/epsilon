@@ -16,13 +16,6 @@ public class FileHttpService : HttpService, IFileHttpService
 
     public async Task<IEnumerable<byte>?> GetFileByteArray(string url)
     {
-        try
-        {
-            return await Client.GetByteArrayAsync(url);
-        }
-        catch (Exception e)
-        {
-            throw new Exception($"Error in GetFileByteArray: {e.Message}");
-        }
+        return await Client.GetByteArrayAsync(url);
     }
 }

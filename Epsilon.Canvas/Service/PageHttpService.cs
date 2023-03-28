@@ -14,38 +14,22 @@ public class PageHttpService : HttpService, IPageHttpService
 
     public async Task<string?> GetPageByName(int courseId, string pageName)
     {
-        try
-        {
-            using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
-            using var response = await Client.SendAsync(request);
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
+        using var response = await Client.SendAsync(request);
 
-            if (response.StatusCode == HttpStatusCode.OK)
-                return (await response.Content.ReadFromJsonAsync<Page>()).Body;
-        }
-        catch (Exception e)
-        {
-            throw new Exception($"Error in GetPageByName: {e.Message}");
-        }
+        if (response.StatusCode == HttpStatusCode.OK)
+            return (await response.Content.ReadFromJsonAsync<Page>()).Body;
 
         return null;
     }
 
     public async Task<IEnumerable<Page>?> GetAll(int courseId, IEnumerable<string> include)
     {
-        try
-        {
-            {
-                using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
-                using var response = await Client.SendAsync(request);
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
+        using var response = await Client.SendAsync(request);
 
-                if (response.StatusCode == HttpStatusCode.OK)
-                    return await response.Content.ReadFromJsonAsync<IEnumerable<Page>>();
-            }
-        }
-        catch (Exception e)
-        {
-            throw new Exception($"Error in GetAll: {e.Message}");
-        }
+        if (response.StatusCode == HttpStatusCode.OK)
+            return await response.Content.ReadFromJsonAsync<IEnumerable<Page>>();
 
         return null;
     }
