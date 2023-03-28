@@ -37,7 +37,7 @@ public class DocumentController : Controller
                 new CourseModule
                 {
                     Name = "Module 1",
-                    Kpis = new List<CourseOutcome>
+                    Outcomes = new List<CourseOutcome>
                     {
                         new CourseOutcome
                         {
