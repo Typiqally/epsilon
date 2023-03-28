@@ -46,7 +46,7 @@ public class ComponentController : Controller
     [HttpGet("random")]
     public IActionResult GetRandomComponent()
     {
-        return Ok(new GetComponentResponse
+        return Ok(new GetDocumentComponentResponse
         {
             Component = _components[new Random().Next(0, _components.Count)]
         });
