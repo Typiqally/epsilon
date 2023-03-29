@@ -13,7 +13,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
         _logger = logger;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] { "console", "logs", "txt" };
+    public IEnumerable<string> Formats { get; } = new[] {"console", "logs", "txt"};
 
     public string FileExtension => "txt";
 

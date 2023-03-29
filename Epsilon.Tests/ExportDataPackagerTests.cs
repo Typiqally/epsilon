@@ -14,7 +14,8 @@ namespace Epsilon.Tests
     public class ExportDataPackagerTests
     {
         [Fact]
-        public async Task GivenListOfModuleOutcomeResultCollection_WhenRequiringOpenLearningOutcomeStructure_ThenOutcomeStructureShouldBeTransformed()
+        public async Task
+            GivenListOfModuleOutcomeResultCollection_WhenRequiringOpenLearningOutcomeStructure_ThenOutcomeStructureShouldBeTransformed()
         {
             // Arrange
             var module = new Module(1, "Module 1", 3, new List<ModuleItem>
