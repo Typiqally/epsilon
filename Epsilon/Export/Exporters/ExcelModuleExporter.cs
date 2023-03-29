@@ -9,7 +9,7 @@ namespace Epsilon.Export.Exporters;
 
 public class ExcelModuleExporter : ICanvasModuleExporter
 {
-    public IEnumerable<string> Formats { get; } = new[] { "xls", "xlsx", "excel" };
+    public IEnumerable<string> Formats { get; } = new[] {"xls", "xlsx", "excel"};
 
     public string FileExtension => "xlsx";
 
@@ -81,7 +81,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             sheetId = sheets.Elements<Sheet>().Select(static s => s.SheetId!.Value).Max() + 1;
         }
 
-        var sheet = new Sheet { Id = relationshipId, SheetId = sheetId, Name = module.Name };
+        var sheet = new Sheet {Id = relationshipId, SheetId = sheetId, Name = module.Name};
         sheets.Append(sheet);
 
         workbookPart.Workbook.Save();
@@ -97,7 +97,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         var row = sheetData.Elements<Row>().FirstOrDefault(r => r.RowIndex! == rowIndex);
         if (row == null)
         {
-            row = new Row { RowIndex = rowIndex };
+            row = new Row {RowIndex = rowIndex};
             sheetData.Append(row);
         }
 

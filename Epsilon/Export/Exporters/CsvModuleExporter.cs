@@ -6,7 +6,7 @@ namespace Epsilon.Export.Exporters;
 
 public class CsvModuleExporter : ICanvasModuleExporter
 {
-    public IEnumerable<string> Formats { get; } = new[] { "csv" };
+    public IEnumerable<string> Formats { get; } = new[] {"csv"};
 
     public string FileExtension => "csv";
 

@@ -24,7 +24,8 @@ public static class CanvasServiceCollectionExtensions
                 var settings = provider.GetRequiredService<IOptions<CanvasSettings>>().Value;
 
                 client.BaseAddress = settings.ApiUrl;
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.AccessToken);
+                client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", settings.AccessToken);
             });
 
         services.AddHttpClient<IPaginatorHttpService, PaginatorHttpService>(CanvasHttpClient);
@@ -32,9 +33,11 @@ public static class CanvasServiceCollectionExtensions
         services.AddHttpClient<IAssignmentHttpService, AssignmentHttpService>(CanvasHttpClient);
         services.AddHttpClient<IOutcomeHttpService, OutcomeHttpService>(CanvasHttpClient);
         services.AddHttpClient<ISubmissionHttpService, SubmissionHttpService>(CanvasHttpClient);
+        services.AddHttpClient<IPageHttpService, PageHttpService>(CanvasHttpClient);
+        services.AddHttpClient<IFileHttpService, FileHttpService>(CanvasHttpClient);
 
         services.AddScoped<ILinkHeaderConverter, LinkHeaderConverter>();
-        
+
         services.AddScoped<ICanvasModuleCollectionFetcher, CanvasModuleCollectionFetcher>();
 
         return services;

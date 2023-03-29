@@ -83,7 +83,9 @@ public class Startup : IHostedService
 
                 var stream = await exporter.Export(formattedItems, format);
 
-                await using var fileStream = new FileStream($"{_exportOptions.FormattedOutputName}.{exporter.FileExtension}", FileMode.Create, FileAccess.Write);
+                await using var fileStream =
+                    new FileStream($"{_exportOptions.FormattedOutputName}.{exporter.FileExtension}", FileMode.Create,
+                        FileAccess.Write);
 
                 stream.Position = 0; // Reset position to zero to prepare for copy
                 await stream.CopyToAsync(fileStream);
