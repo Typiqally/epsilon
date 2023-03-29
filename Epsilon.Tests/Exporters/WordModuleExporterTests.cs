@@ -27,8 +27,12 @@ namespace Epsilon.Tests.Exporters
                                 Description = "Short Description",
                                 Assignments = new List<CourseAssignment>
                                 {
-                                    new CourseAssignment { Name = "Assignment 1", Url = "https://assignment1.com/", Score = "Good" },
-                                    new CourseAssignment { Name = "Assignment 2", Url = "https://assignment2.com/", Score = "Outstanding" },
+                                    new CourseAssignment
+                                        {Name = "Assignment 1", Url = "https://assignment1.com/", Score = "Good"},
+                                    new CourseAssignment
+                                    {
+                                        Name = "Assignment 2", Url = "https://assignment2.com/", Score = "Outstanding"
+                                    },
                                 }
                             }
                         }

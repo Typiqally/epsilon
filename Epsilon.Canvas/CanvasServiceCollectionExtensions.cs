@@ -36,8 +36,10 @@ public static class CanvasServiceCollectionExtensions
         services.AddHttpClient<IFileHttpService, FileHttpService>(CanvasHttpClient);
         services.AddHttpClient<IGraphQlHttpService, GraphQlHttpService>(CanvasHttpClient);
         services.AddHttpClient<IAccountHttpService, AccountHttpService>(CanvasHttpClient);
-
+        
         services.AddScoped<ILinkHeaderConverter, LinkHeaderConverter>();
+
+        services.AddScoped<ICanvasModuleCollectionFetcher, CanvasModuleCollectionFetcher>();
 
         return services;
     }

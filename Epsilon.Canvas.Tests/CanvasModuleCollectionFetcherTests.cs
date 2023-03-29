@@ -17,11 +17,12 @@ namespace Epsilon.Canvas.Tests
     public class CanvasModuleCollectionFetcherTests
     {
         [Fact]
-        public async Task GivenAllowedModulesAndCourseId_WhenModuleAndOutcomeServiceAreMocked_ThenReturnsExpectedModuleOutcomeResultCollection()
+        public async Task
+            GivenAllowedModulesAndCourseId_WhenModuleAndOutcomeServiceAreMocked_ThenReturnsExpectedModuleOutcomeResultCollection()
         {
             // Arrange
             var courseId = 123;
-            var allowedModules = new[] { "Module 1", "Module 3" };
+            var allowedModules = new[] {"Module 1", "Module 3"};
             var outcomeServiceMock = new Mock<IOutcomeHttpService>();
             var moduleServiceMock = new Mock<IModuleHttpService>();
 
