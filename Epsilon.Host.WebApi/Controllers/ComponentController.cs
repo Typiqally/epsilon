@@ -1,4 +1,8 @@
 using Epsilon.Abstractions.Model;
+using Epsilon.Canvas;
+using Epsilon.Canvas.Abstractions;
+using Epsilon.Canvas.Abstractions.QueryResponse;
+using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
@@ -7,8 +11,26 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("component")]
 public class ComponentController : ControllerBase
 {
+    private readonly IGraphQlHttpService _graphQlService;
+    private readonly IConfiguration _configuration;
+    
+    public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration)
+    {
+        _graphQlService = graphQlService;
+        _configuration = configuration;
+    }
+
     [HttpGet("competence_profile")]
-    public ActionResult<CompetenceProfile> GetCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public ActionResult<GetUserSubmissionOutcomes> GetCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    {
+        var courseId = _configuration["Canvas:CourseId"];
+        var query = QueryConstants.GetUserSubmissionOutcomes.Replace("$courseId", courseId);
+
+        return _graphQlService.Query<GetUserSubmissionOutcomes>(query).Result!;
+    }
+    
+    [HttpGet("competence_profile_mock")]
+    public ActionResult<CompetenceProfile> GetMockCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         var competenceProfileOutcomes = new List<CompetenceProfileOutcome>();
         for (var i = 0; i < 5; i++)
@@ -25,9 +47,9 @@ public class ComponentController : ControllerBase
     private static CompetenceProfileOutcome GetRandomCompetenceProfileOutcome()
     {
         return new CompetenceProfileOutcome(
-            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers),
-            GetRandom(HboIDomain.HboIDomain2018.Activities),
-            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels),
+            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers).Value,
+            GetRandom(HboIDomain.HboIDomain2018.Activities).Value,
+            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Value,
             GetRandom(new[] { 0, 3, 4, 5 }),
             DateTime.Now
         );

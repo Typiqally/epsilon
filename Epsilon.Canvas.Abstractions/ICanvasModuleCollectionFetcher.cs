@@ -1,4 +1,5 @@
 ﻿using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.QueryResponse;
 
 namespace Epsilon.Canvas.Abstractions;
 
