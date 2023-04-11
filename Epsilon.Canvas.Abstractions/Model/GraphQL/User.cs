@@ -2,6 +2,6 @@
 
 namespace Epsilon.Canvas.Abstractions.Model.GraphQL;
 
-public record SubmissionsConnection(
-    [property: JsonPropertyName("nodes")] List<Node>? Nodes
+public record User(
+    [property: JsonPropertyName("name")] string Name
 );
