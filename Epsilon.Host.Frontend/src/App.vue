@@ -1,27 +1,6 @@
 <template>
-  <div>
-    <a
-      href="https://vitejs.dev"
-      target="_blank"
-    >
-      <img
-        src="./assets/vite.svg"
-        class="logo"
-        alt="Vite logo"
-      >
-    </a>
-    and
-    <a
-      href="https://vuejs.org/"
-      target="_blank"
-    >
-      <img
-        src="./assets/vue.svg"
-        class="logo vue"
-        alt="Vue logo"
-      >
-    </a>
-  </div>
+    <KpiMatrix></KpiMatrix>
+    <KpiTable></KpiTable>
 </template>
 
 <style scoped>
@@ -38,3 +17,7 @@
   filter: drop-shadow(0 0 2em #42b883aa);
 }
 </style>
+<script setup lang="ts">
+import KpiTable from "./components/Competance/KpiTable.vue";
+import KpiMatrix from "./components/Competance/KpiMatrix.vue";
+</script>
