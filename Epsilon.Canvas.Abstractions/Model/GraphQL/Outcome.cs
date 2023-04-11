@@ -3,5 +3,5 @@
 namespace Epsilon.Canvas.Abstractions.Model.GraphQL;
 
 public record Outcome(
-    [property: JsonPropertyName("title")] string Title
+    [property: JsonPropertyName("title")] string? Title
 );
