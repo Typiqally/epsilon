@@ -1,7 +1,13 @@
+using Epsilon.Canvas;
+using Epsilon.Canvas.Abstractions.Service;
+using Epsilon.Canvas.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var canvasConfiguration = builder.Configuration.GetSection("Canvas");
 
+builder.Services.AddCanvas(canvasConfiguration);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
