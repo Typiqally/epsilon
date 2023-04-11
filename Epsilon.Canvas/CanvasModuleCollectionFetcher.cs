@@ -13,7 +13,6 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
     private readonly IOutcomeHttpService _outcomeService;
 
     public CanvasModuleCollectionFetcher(
-        ILogger<CanvasModuleCollectionFetcher> logger,
         IModuleHttpService moduleService,
         IOutcomeHttpService outcomeService
     )
