@@ -1,4 +1,5 @@
 <template>
+    {{hboIDomain}}
   <table>
     <thead>
       <tr>
@@ -57,7 +58,12 @@
 
 <script>
 export default {
-    name: "KpiTable"
+    name: "KpiTable",
+    props:{
+        hboIDomain: {
+            default: {}
+        }
+    }
 }
 </script>
 
