@@ -1,3 +1,3 @@
 namespace Epsilon.Abstractions.Model;
 
-public record MasteryLevel(int Value, string? Color = null);
+public record MasteryLevel(int Level, string? Color = null);
