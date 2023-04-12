@@ -10,7 +10,7 @@
 
 <script lang="ts" setup>
 import apexchart from "vue3-apexcharts";
-import {HboIDomain} from "/@/logic/Api";
+import {HboIDomain} from "@/logic/Api";
 import {watch} from "vue";
 const series = [];
 const chartOptions =  {

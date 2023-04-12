@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import {HboIDomain, MasteryLevel, ProfessionalTaskOutcome} from "/@/logic/Api";
+import {HboIDomain, MasteryLevel, ProfessionalTaskOutcome} from "@/logic/Api";
 
 const props = defineProps<{
     domain: HboIDomain
