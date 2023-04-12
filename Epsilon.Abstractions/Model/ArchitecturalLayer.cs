@@ -1,3 +1,3 @@
 namespace Epsilon.Abstractions.Model;
 
-public record ArchitectureLayer(string Value, string? Color = null);
+public record ArchitectureLayer(string Name, string? Color = null);
