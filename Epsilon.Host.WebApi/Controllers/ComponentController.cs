@@ -1,6 +1,5 @@
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
-using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
