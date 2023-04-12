@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using Epsilon.Canvas.Abstractions.Model.GraphQL;
+using Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 namespace Epsilon.Canvas.Abstractions.QueryResponse;
 
