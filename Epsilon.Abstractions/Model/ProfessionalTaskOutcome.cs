@@ -1,9 +1,9 @@
 namespace Epsilon.Abstractions.Model;
 
 public record ProfessionalTaskOutcome(
-    string ArchitectureLayer,
-    string Activity,
-    int MasteryLevel,
+    int ArchitectureLayerId,
+    int ActivityId,
+    int MasteryLevelId,
     int Grade,
     DateTime AssessedAt
 );

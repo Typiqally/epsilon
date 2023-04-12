@@ -1,42 +1,42 @@
 namespace Epsilon.Abstractions.Model;
 
 public record HboIDomain(
-    IEnumerable<ArchitectureLayer> ArchitectureLayers,
-    IEnumerable<Activity> Activities,
-    IEnumerable<ProfessionalSkill> ProfessionalSkills,
-    IEnumerable<MasteryLevel> MasteryLevels
+    IDictionary<int, ArchitectureLayer> ArchitectureLayers,
+    IDictionary<int, Activity> Activities,
+    IDictionary<int, ProfessionalSkill> ProfessionalSkills,
+    IDictionary<int, MasteryLevel> MasteryLevels
 )
 {
     public static readonly HboIDomain HboIDomain2018 = new(
-        new[]
+        new Dictionary<int, ArchitectureLayer>
         {
-            new ArchitectureLayer("Hardware Interfacing", "H", "#8D9292"),
-            new ArchitectureLayer("Infrastructure", "I", "#6EA7D4"),
-            new ArchitectureLayer("Organisational Processes", "O", "#D16557"),
-            new ArchitectureLayer("User Interaction", "U", "#E29C53"),
-            new ArchitectureLayer("Software", "S", "#96B9C0"),
+            { 0, new ArchitectureLayer("Hardware Interfacing", "H", "#8D9292") },
+            { 1, new ArchitectureLayer("Infrastructure", "I", "#6EA7D4") },
+            { 2, new ArchitectureLayer("Organisational Processes", "O", "#D16557") },
+            { 3, new ArchitectureLayer("User Interaction", "U", "#E29C53") },
+            { 4, new ArchitectureLayer("Software", "S", "#96B9C0") },
         },
-        new[]
+        new Dictionary<int, Activity>
         {
-            new Activity("Manage & Control"),
-            new Activity("Analysis"),
-            new Activity("Advise"),
-            new Activity("Design"),
-            new Activity("Realisation"),
+            { 0, new Activity("Manage & Control") },
+            { 1, new Activity("Analysis") },
+            { 2, new Activity("Advise") },
+            { 3, new Activity("Design") },
+            { 4, new Activity("Realisation") },
         },
-        new[]
+        new Dictionary<int, ProfessionalSkill>
         {
-            new ProfessionalSkill("Future-Oriented Organisation", "FOO"),
-            new ProfessionalSkill("Investigative Problem Solving", "IPS"),
-            new ProfessionalSkill("Personal Leadership", "PL"),
-            new ProfessionalSkill("Targeted Interaction", "TI"),
+            { 0, new ProfessionalSkill("Future-Oriented Organisation", "FOO") },
+            { 1, new ProfessionalSkill("Investigative Problem Solving", "IPS") },
+            { 2, new ProfessionalSkill("Personal Leadership", "PL") },
+            { 3, new ProfessionalSkill("Targeted Interaction", "TI") },
         },
-        new[]
+        new Dictionary<int, MasteryLevel>
         {
-            new MasteryLevel(1, "#00B0F0"),
-            new MasteryLevel(2, "#00B050"),
-            new MasteryLevel(3, "#FFFC00"),
-            new MasteryLevel(4),
+            { 0, new MasteryLevel(1, "#00B0F0") },
+            { 1, new MasteryLevel(2, "#00B050") },
+            { 2, new MasteryLevel(3, "#FFFC00") },
+            { 3, new MasteryLevel(4) },
         }
     );
 }

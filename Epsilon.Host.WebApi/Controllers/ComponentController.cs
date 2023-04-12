@@ -51,9 +51,9 @@ public class ComponentController : ControllerBase
     private static ProfessionalTaskOutcome GetRandomProfessionalTaskOutcome()
     {
         return new ProfessionalTaskOutcome(
-            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers).Name,
-            GetRandom(HboIDomain.HboIDomain2018.Activities).Name,
-            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Level,
+            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers.Keys),
+            GetRandom(HboIDomain.HboIDomain2018.Activities.Keys),
+            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels.Keys),
             GetRandom(new[] { 0, 3, 4, 5 }),
             DateTime.Now
         );
@@ -62,8 +62,8 @@ public class ComponentController : ControllerBase
     private static ProfessionalSkillOutcome GetRandomProfessionalSkillOutcome()
     {
         return new ProfessionalSkillOutcome(
-            GetRandom(HboIDomain.HboIDomain2018.ProfessionalSkills).Name,
-            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Level,
+            GetRandom(HboIDomain.HboIDomain2018.ProfessionalSkills.Keys),
+            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels.Keys),
             GetRandom(new[] { 0, 3, 4, 5 }),
             DateTime.Now
         );

@@ -1,7 +1,7 @@
 namespace Epsilon.Abstractions.Model;
 
 public record ProfessionalSkillOutcome(
-    string ProfessionalSkill,
+    int ProfessionalSkillId,
     int MasteryLevel,
     int Grade,
     DateTime AssessedAt
