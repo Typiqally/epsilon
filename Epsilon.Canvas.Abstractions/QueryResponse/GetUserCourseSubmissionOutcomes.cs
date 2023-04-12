@@ -3,8 +3,8 @@ using Epsilon.Canvas.Abstractions.Model.GraphQL;
 
 namespace Epsilon.Canvas.Abstractions.QueryResponse;
 
-public record GetUserSubmissionOutcomes(
-    [property: JsonPropertyName("data")] GetUserSubmissionOutcomes.CourseData? Data
+public record GetUserCourseSubmissionOutcomes(
+    [property: JsonPropertyName("data")] GetUserCourseSubmissionOutcomes.CourseData? Data
 )
 {
     public record CourseData(

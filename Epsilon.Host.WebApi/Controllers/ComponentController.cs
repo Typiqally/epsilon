@@ -1,3 +1,4 @@
+using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
@@ -13,20 +14,24 @@ public class ComponentController : ControllerBase
 {
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IConfiguration _configuration;
+    private readonly ICompetenceProfileConverter _competenceProfileConverter;
     
-    public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration)
+    public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration, ICompetenceProfileConverter competenceProfileConverter)
     {
         _graphQlService = graphQlService;
         _configuration = configuration;
+        _competenceProfileConverter = competenceProfileConverter;
     }
 
     [HttpGet("competence_profile")]
-    public ActionResult<GetUserSubmissionOutcomes> GetCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public ActionResult<CompetenceProfile> GetCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var courseId = _configuration["Canvas:CourseId"];
-        var query = QueryConstants.GetUserSubmissionOutcomes.Replace("$courseId", courseId);
-
-        return _graphQlService.Query<GetUserSubmissionOutcomes>(query).Result!;
+        var studentId = _configuration["Canvas:StudentId"];
+        var query = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
+        var queryResult = _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query).Result!;
+        
+        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult);
+        return competenceProfile;
     }
     
     [HttpGet("competence_profile_mock")]

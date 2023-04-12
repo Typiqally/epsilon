@@ -2,8 +2,8 @@
 
 public static class QueryConstants
 {
-    public const string GetUserSubmissionOutcomes = @"
-        query GetUserSubmissionOutcomes {
+    public const string GetUserCourseSubmissionOutcomes = @"
+        query GetUserCourseSubmissionOutcomes {
             course(id: $courseId) {
                 name
                 submissionsConnection {
@@ -31,5 +31,31 @@ public static class QueryConstants
                 }
             }
         }
+    ";
+
+    public const string GetAllUserCoursesSubmissionOutcomes = @"
+        query GetAllUserCoursesSubmissionOutcomes {
+            allCourses {
+                name
+                submissionsConnection(studentIds: $studentIds) {
+                    nodes {
+                        postedAt
+                        rubricAssessmentsConnection {
+                            nodes {
+                                assessmentRatings {
+                                    points
+                                    outcome {
+                                        title
+                                    }
+                                }
+                                user {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }   
     ";
 }

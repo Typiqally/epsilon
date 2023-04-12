@@ -1,6 +1,8 @@
+using Epsilon.Abstractions.Component;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Service;
 using Epsilon.Canvas.Service;
+using Epsilon.Component.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 var canvasConfiguration = builder.Configuration.GetSection("Canvas");
 
 builder.Services.AddCanvas(canvasConfiguration);
+builder.Services.AddScoped<ICompetenceProfileConverter, CompetenceProfileConverter>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
