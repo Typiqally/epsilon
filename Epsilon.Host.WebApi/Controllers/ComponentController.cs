@@ -33,14 +33,18 @@ public class ComponentController : ControllerBase
     public ActionResult<CompetenceProfile> GetMockCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
         var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
+        var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
+
         for (var i = 0; i < 5; i++)
         {
             professionalTaskOutcomes.Add(GetRandomProfessionalTaskOutcome());
+            professionalSkillOutcomes.Add(GetRandomProfessionalSkillOutcome());
         }
 
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018,
-            professionalTaskOutcomes
+            professionalTaskOutcomes,
+            professionalSkillOutcomes
         );
     }
 
@@ -49,6 +53,16 @@ public class ComponentController : ControllerBase
         return new ProfessionalTaskOutcome(
             GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers).Name,
             GetRandom(HboIDomain.HboIDomain2018.Activities).Name,
+            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Level,
+            GetRandom(new[] { 0, 3, 4, 5 }),
+            DateTime.Now
+        );
+    }
+
+    private static ProfessionalSkillOutcome GetRandomProfessionalSkillOutcome()
+    {
+        return new ProfessionalSkillOutcome(
+            GetRandom(HboIDomain.HboIDomain2018.ProfessionalSkills).Name,
             GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Level,
             GetRandom(new[] { 0, 3, 4, 5 }),
             DateTime.Now
