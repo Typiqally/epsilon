@@ -1,6 +1,6 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Model.GraphQL;
+using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 
 namespace Epsilon.Component.Converters;
@@ -13,50 +13,60 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
         var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
 
-        // ProfessionalTaskOutcomes
-        foreach (var course in getAllUserCoursesSubmissionOutcomes?.Data?.Courses)
+        foreach (var course in getAllUserCoursesSubmissionOutcomes.Data.Courses)
         {
-            foreach (var submission in course?.SubmissionsConnection?.Nodes)
+            foreach (var submission in course.SubmissionsConnection.Nodes)
             {
-                var assessmentRatings = submission?.RubricAssessmentsConnection?.Nodes;
+                var assessmentRatings = submission.RubricAssessmentsConnection?.Nodes;
 
                 foreach (var assessmentRating in assessmentRatings)
                 {
-                    professionalTaskOutcomes.AddRange(
-                        assessmentRating.AssessmentRatings?.Select(
-                            rating => ConvertFrom(rating, submission.PostedAt)));
+                    foreach (var rating in assessmentRating.AssessmentRatings)
+                    {
+                        var outcome = rating.Outcome;
+
+                        if (outcome != null)
+                        {
+                            switch (outcome.DeterminateCategory())
+                            {
+                                case "Task":
+                                    var (architectureLayerId, activityId, tMasteryLevelId) = outcome.GetTaskDetails();
+                                    if (architectureLayerId != -1 && activityId != -1 && tMasteryLevelId != -1)
+                                    {
+                                        if (rating.Grade() == -1) break;
+                                        professionalTaskOutcomes.Add(new ProfessionalTaskOutcome(
+                                            architectureLayerId,
+                                            activityId,
+                                            tMasteryLevelId,
+                                            rating.Grade(),
+                                            submission.PostedAt ?? DateTime.Now
+                                        ));
+                                    }
+                                    break;
+                                case "Skill":
+                                    var (professionalSkillId, sMasteryLevelId) = outcome.GetSkillDetails();
+                                    if (professionalSkillId != -1 && sMasteryLevelId != -1)
+                                    {
+                                        if (rating.Grade() == -1) break;
+                                        professionalSkillOutcomes.Add(new ProfessionalSkillOutcome(
+                                            professionalSkillId,
+                                            sMasteryLevelId,
+                                            rating.Grade(),
+                                            submission.PostedAt ?? DateTime.Now
+                                        ));
+                                    }
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
         }
-        
-        // ProfessionalSkillOutcomes
-        
-        
-        // check each outcome for nulls, if any nulls are found, remove the outcome
-        professionalTaskOutcomes.Where(outcome => 
-            outcome.ArchitectureLayer == null || 
-            outcome.Activity == null || 
-            outcome.MasteryLevel == null ||
-            outcome.Grade == null ||
-            outcome.AssessedAt == null
-        ).ToList().ForEach(outcome => professionalTaskOutcomes.Remove(outcome));
 
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018, 
             professionalTaskOutcomes,
             professionalSkillOutcomes
-        );
-    }
-    
-    public ProfessionalTaskOutcome ConvertFrom(AssessmentRating assessmentRating, DateTime? assessedAt)
-    {
-        var outcome = assessmentRating.Outcome;
-        return new ProfessionalTaskOutcome(
-            outcome?.ArchitectureLayer(),
-            outcome?.Activity(),
-            outcome?.MasteryLevel(),
-            assessmentRating.Grade(),
-            assessedAt
         );
     }
 }

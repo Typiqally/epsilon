@@ -39,6 +39,9 @@ public static class QueryConstants
                 name
                 submissionsConnection(studentIds: $studentIds) {
                     nodes {
+                        assignment {
+                            name
+                        }
                         postedAt
                         rubricAssessmentsConnection {
                             nodes {
@@ -56,6 +59,6 @@ public static class QueryConstants
                     }
                 }
             }
-        }   
+        }
     ";
 }

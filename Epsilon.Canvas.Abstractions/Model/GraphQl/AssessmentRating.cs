@@ -7,7 +7,7 @@ public record AssessmentRating(
     [property: JsonPropertyName("outcome")] Outcome? Outcome
 )
 {
-    public int? Grade()
+    public int Grade()
     {
         return Points switch
         {
@@ -15,7 +15,7 @@ public record AssessmentRating(
             3 => 3,
             4 => 4,
             5 => 5,
-            _ => null
+            _ => -1
         };
     }
 }

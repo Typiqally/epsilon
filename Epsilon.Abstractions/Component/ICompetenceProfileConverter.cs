@@ -7,5 +7,4 @@ namespace Epsilon.Abstractions.Component;
 public interface ICompetenceProfileConverter
 {
     public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes);
-    public ProfessionalTaskOutcome ConvertFrom(AssessmentRating assessmentRating, DateTime? assessedAt);
 }
