@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Epsilon.Canvas.Abstractions.Model.GraphQL;
+namespace Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 public record SubmissionsConnectionNode(
     [property: JsonPropertyName("updatedAt")] DateTime? UpdatedAt,

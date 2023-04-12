@@ -33,33 +33,47 @@ public class ComponentController : ControllerBase
         var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult);
         return competenceProfile;
     }
-    
+
     [HttpGet("competence_profile_mock")]
     public ActionResult<CompetenceProfile> GetMockCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var competenceProfileOutcomes = new List<CompetenceProfileOutcome>();
+        var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
+        var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
+
         for (var i = 0; i < 5; i++)
         {
-            competenceProfileOutcomes.Add(GetRandomCompetenceProfileOutcome());
+            professionalTaskOutcomes.Add(GetRandomProfessionalTaskOutcome());
+            professionalSkillOutcomes.Add(GetRandomProfessionalSkillOutcome());
         }
-        
+
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018,
-            competenceProfileOutcomes
+            professionalTaskOutcomes,
+            professionalSkillOutcomes
         );
     }
-    
-    private static CompetenceProfileOutcome GetRandomCompetenceProfileOutcome()
+
+    private static ProfessionalTaskOutcome GetRandomProfessionalTaskOutcome()
     {
-        return new CompetenceProfileOutcome(
-            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers).Value,
-            GetRandom(HboIDomain.HboIDomain2018.Activities).Value,
-            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Value,
+        return new ProfessionalTaskOutcome(
+            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers.Keys),
+            GetRandom(HboIDomain.HboIDomain2018.Activities.Keys),
+            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels.Keys),
             GetRandom(new[] { 0, 3, 4, 5 }),
             DateTime.Now
         );
     }
-    
+
+    private static ProfessionalSkillOutcome GetRandomProfessionalSkillOutcome()
+    {
+        return new ProfessionalSkillOutcome(
+            GetRandom(HboIDomain.HboIDomain2018.ProfessionalSkills.Keys),
+            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels.Keys),
+            GetRandom(new[] { 0, 3, 4, 5 }),
+            DateTime.Now
+        );
+    }
+
     private static T GetRandom<T>(IEnumerable<T> items)
     {
         var random = new Random();
