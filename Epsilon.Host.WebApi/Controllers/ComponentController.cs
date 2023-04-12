@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Epsilon.Host.WebApi.Controllers;
 
 [ApiController]
-[Route("component")]
+[Route("[controller]")]
 public class ComponentController : ControllerBase
 {
     private readonly IGraphQlHttpService _graphQlService;
