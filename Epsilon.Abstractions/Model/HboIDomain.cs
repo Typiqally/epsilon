@@ -10,11 +10,11 @@ public record HboIDomain(
     public static readonly HboIDomain HboIDomain2018 = new(
         new[]
         {
-            new ArchitectureLayer("Hardware Interfacing", "#8D9292"),
-            new ArchitectureLayer("Infrastructure", "#6EA7D4"),
-            new ArchitectureLayer("Organisational Processes", "#D16557"),
-            new ArchitectureLayer("User Interaction", "#E29C53"),
-            new ArchitectureLayer("Software", "#96B9C0"),
+            new ArchitectureLayer("Hardware Interfacing", "H", "#8D9292"),
+            new ArchitectureLayer("Infrastructure", "I", "#6EA7D4"),
+            new ArchitectureLayer("Organisational Processes", "O", "#D16557"),
+            new ArchitectureLayer("User Interaction", "U", "#E29C53"),
+            new ArchitectureLayer("Software", "S", "#96B9C0"),
         },
         new[]
         {
@@ -26,10 +26,10 @@ public record HboIDomain(
         },
         new[]
         {
-            new ProfessionalSkills("Future-Oriented Organisation"),
-            new ProfessionalSkills("Investigative Problem Solving"),
-            new ProfessionalSkills("Personal Leadership"),
-            new ProfessionalSkills("Targeted Interaction"),
+            new ProfessionalSkills("Future-Oriented Organisation", "FOO"),
+            new ProfessionalSkills("Investigative Problem Solving", "IPS"),
+            new ProfessionalSkills("Personal Leadership", "PL"),
+            new ProfessionalSkills("Targeted Interaction", "TI"),
         },
         new[]
         {
