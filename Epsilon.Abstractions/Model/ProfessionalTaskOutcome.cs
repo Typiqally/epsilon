@@ -1,6 +1,6 @@
 namespace Epsilon.Abstractions.Model;
 
-public record CompetenceProfileOutcome(
+public record ProfessionalTaskOutcome(
     string ArchitectureLayer,
     string Activity,
     int MasteryLevel,

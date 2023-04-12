@@ -32,21 +32,21 @@ public class ComponentController : ControllerBase
     [HttpGet("competence_profile_mock")]
     public ActionResult<CompetenceProfile> GetMockCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        var competenceProfileOutcomes = new List<CompetenceProfileOutcome>();
+        var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
         for (var i = 0; i < 5; i++)
         {
-            competenceProfileOutcomes.Add(GetRandomCompetenceProfileOutcome());
+            professionalTaskOutcomes.Add(GetRandomProfessionalTaskOutcome());
         }
 
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018,
-            competenceProfileOutcomes
+            professionalTaskOutcomes
         );
     }
 
-    private static CompetenceProfileOutcome GetRandomCompetenceProfileOutcome()
+    private static ProfessionalTaskOutcome GetRandomProfessionalTaskOutcome()
     {
-        return new CompetenceProfileOutcome(
+        return new ProfessionalTaskOutcome(
             GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers).Name,
             GetRandom(HboIDomain.HboIDomain2018.Activities).Name,
             GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Level,
