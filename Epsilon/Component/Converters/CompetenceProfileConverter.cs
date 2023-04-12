@@ -10,8 +10,10 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
     public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes)
     {
-        var competenceProfileOutcomes = new List<CompetenceProfileOutcome>();
+        var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
+        var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
 
+        // ProfessionalTaskOutcomes
         foreach (var course in getAllUserCoursesSubmissionOutcomes?.Data?.Courses)
         {
             foreach (var submission in course?.SubmissionsConnection?.Nodes)
@@ -20,42 +22,41 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
                 foreach (var assessmentRating in assessmentRatings)
                 {
-                    competenceProfileOutcomes.AddRange(
+                    professionalTaskOutcomes.AddRange(
                         assessmentRating.AssessmentRatings?.Select(
                             rating => ConvertFrom(rating, submission.PostedAt)));
                 }
             }
         }
         
+        // ProfessionalSkillOutcomes
+        
+        
         // check each outcome for nulls, if any nulls are found, remove the outcome
-        competenceProfileOutcomes.Where(outcome => 
+        professionalTaskOutcomes.Where(outcome => 
             outcome.ArchitectureLayer == null || 
             outcome.Activity == null || 
             outcome.MasteryLevel == null ||
             outcome.Grade == null ||
             outcome.AssessedAt == null
-        )
-            .ToList()
-            .ForEach(outcome => competenceProfileOutcomes.Remove(outcome));
+        ).ToList().ForEach(outcome => professionalTaskOutcomes.Remove(outcome));
 
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018, 
-            competenceProfileOutcomes
+            professionalTaskOutcomes,
+            professionalSkillOutcomes
         );
     }
     
-    public CompetenceProfileOutcome ConvertFrom(AssessmentRating assessmentRating, DateTime? assessedAt)
+    public ProfessionalTaskOutcome ConvertFrom(AssessmentRating assessmentRating, DateTime? assessedAt)
     {
         var outcome = assessmentRating.Outcome;
-        var profile = new CompetenceProfileOutcome(
+        return new ProfessionalTaskOutcome(
             outcome?.ArchitectureLayer(),
             outcome?.Activity(),
             outcome?.MasteryLevel(),
             assessmentRating.Grade(),
             assessedAt
         );
-        Console.WriteLine(assessedAt);
-        Console.WriteLine("--------------------");
-        return profile;
     }
 }
