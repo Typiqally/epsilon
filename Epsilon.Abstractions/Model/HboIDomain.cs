@@ -3,7 +3,7 @@ namespace Epsilon.Abstractions.Model;
 public record HboIDomain(
     IEnumerable<ArchitectureLayer> ArchitectureLayers,
     IEnumerable<Activity> Activities,
-    IEnumerable<ProfessionalSkills> ProfessionalSkills,
+    IEnumerable<ProfessionalSkill> ProfessionalSkills,
     IEnumerable<MasteryLevel> MasteryLevels
 )
 {
@@ -26,10 +26,10 @@ public record HboIDomain(
         },
         new[]
         {
-            new ProfessionalSkills("Future-Oriented Organisation", "FOO"),
-            new ProfessionalSkills("Investigative Problem Solving", "IPS"),
-            new ProfessionalSkills("Personal Leadership", "PL"),
-            new ProfessionalSkills("Targeted Interaction", "TI"),
+            new ProfessionalSkill("Future-Oriented Organisation", "FOO"),
+            new ProfessionalSkill("Investigative Problem Solving", "IPS"),
+            new ProfessionalSkill("Personal Leadership", "PL"),
+            new ProfessionalSkill("Targeted Interaction", "TI"),
         },
         new[]
         {
