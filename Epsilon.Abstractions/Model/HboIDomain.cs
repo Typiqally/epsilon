@@ -33,6 +33,6 @@ public record HboIDomain(
     );
 }
 
-public record ArchitectureLayer(string Value, string? Color = null);
+public record ArchitectureLayer(string Value, string? Color = null, string? Abbreviation = null);
 public record Activity(string Value, string? Color = null);
 public record MasteryLevel(int Value, string? Color = null);
