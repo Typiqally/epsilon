@@ -13,7 +13,7 @@ public class ComponentController : ControllerBase
 {
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IConfiguration _configuration;
-    
+
     public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration)
     {
         _graphQlService = graphQlService;
@@ -28,7 +28,7 @@ public class ComponentController : ControllerBase
 
         return _graphQlService.Query<GetUserSubmissionOutcomes>(query).Result!;
     }
-    
+
     [HttpGet("competence_profile_mock")]
     public ActionResult<CompetenceProfile> GetMockCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
@@ -37,24 +37,24 @@ public class ComponentController : ControllerBase
         {
             competenceProfileOutcomes.Add(GetRandomCompetenceProfileOutcome());
         }
-        
+
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018,
             competenceProfileOutcomes
         );
     }
-    
+
     private static CompetenceProfileOutcome GetRandomCompetenceProfileOutcome()
     {
         return new CompetenceProfileOutcome(
-            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers).Value,
-            GetRandom(HboIDomain.HboIDomain2018.Activities).Value,
-            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Value,
+            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers).Name,
+            GetRandom(HboIDomain.HboIDomain2018.Activities).Name,
+            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels).Level,
             GetRandom(new[] { 0, 3, 4, 5 }),
             DateTime.Now
         );
     }
-    
+
     private static T GetRandom<T>(IEnumerable<T> items)
     {
         var random = new Random();
