@@ -1,5 +1,6 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 
@@ -8,10 +9,15 @@ namespace Epsilon.Component.Converters;
 public class CompetenceProfileConverter : ICompetenceProfileConverter
 {
 
-    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes)
+    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes, IEnumerable<EnrollmentTerm> enrollmentTerms)
     {
         var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
         var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
+        // var filteredTerms = new List<EnrollmentTerm>();
+            
+        
+
+        // return filteredTerms.OrderBy(term => term.StartAt);
 
         foreach (var course in getAllUserCoursesSubmissionOutcomes.Data.Courses)
         {
@@ -62,11 +68,17 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                 }
             }
         }
+        
+        var filteredTerms = enrollmentTerms.Where(term => term.StartAt.HasValue)
+            .Where(term => professionalTaskOutcomes.Any(outcome =>
+                outcome.AssessedAt > term.StartAt.Value && outcome.AssessedAt < term.EndAt))
+            .Distinct();
 
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018, 
             professionalTaskOutcomes,
-            professionalSkillOutcomes
+            professionalSkillOutcomes,
+            filteredTerms
         );
     }
 }
