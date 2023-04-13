@@ -70,15 +70,17 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         }
         
         var filteredTerms = enrollmentTerms.Where(term => term.StartAt.HasValue)
-            .Where(term => professionalTaskOutcomes.Any(outcome =>
-                outcome.AssessedAt > term.StartAt.Value && outcome.AssessedAt < term.EndAt))
+            .Where(term => professionalTaskOutcomes.Any(taskOutcome =>
+                taskOutcome.AssessedAt > term.StartAt.Value && taskOutcome.AssessedAt < term.EndAt || 
+                professionalSkillOutcomes.Any(skillOutcome => skillOutcome.AssessedAt > term.StartAt.Value && skillOutcome.AssessedAt < term.EndAt)))
             .Distinct();
+        var sortedFilteredTerms = filteredTerms.OrderBy(term => term.StartAt);
 
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018, 
             professionalTaskOutcomes,
             professionalSkillOutcomes,
-            filteredTerms
+            sortedFilteredTerms
         );
     }
 }

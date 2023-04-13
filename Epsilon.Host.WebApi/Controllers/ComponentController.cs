@@ -33,7 +33,7 @@ public class ComponentController : ControllerBase
         var query = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
         var queryResult = _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query).Result!;
         
-        var terms = _accountHttpService.GetAllTerms(1).Result.Where(t => t.StartAt != null && t.EndAt != null);
+        var terms = _accountHttpService.GetAllTerms(1).Result;
         
         var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, terms);
         return competenceProfile;
