@@ -9,13 +9,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var canvasConfiguration = builder.Configuration.GetSection("Canvas");
 
-builder.Services.AddCanvas(canvasConfiguration);
-builder.Services.AddScoped<ICompetenceProfileConverter, CompetenceProfileConverter>();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(builder.Configuration["Lti:TargetUri"])
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCanvas(canvasConfiguration);
+builder.Services.AddScoped<ICompetenceProfileConverter, CompetenceProfileConverter>();
 
 var app = builder.Build();
 
@@ -29,6 +38,8 @@ app.UseSwagger();
 
 
 app.UseHttpsRedirection();
+
+app.UseCors();
 
 app.UseAuthorization();
 
