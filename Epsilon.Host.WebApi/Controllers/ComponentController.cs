@@ -54,8 +54,7 @@ public class ComponentController : ControllerBase
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018,
             professionalTaskOutcomes,
-            professionalSkillOutcomes,
-            terms
+            professionalSkillOutcomes
         );
     }
 
