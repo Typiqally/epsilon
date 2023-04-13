@@ -7,7 +7,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(ac , i) of props.domain.activities">
+        <tr v-for="(ac , i) of props.domain.architectureLayers">
             <th>{{ ac.name }}</th>
             <td v-for="(ar ,x) of props.domain.activities" :style="{backgroundColor: getCellColor(i, x)?.color}">
                 {{ getKpis(i, x).length }}

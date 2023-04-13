@@ -1,9 +1,8 @@
 <template>
-    <apexcharts type="bar" :options="chartOptions" :series="series" v-if="!!domain"></apexcharts>
+    <apexcharts type="bar" :options="chartOptions" :series="series"></apexcharts>
 </template>
 
 <script lang="ts" setup>
-import apexcharts from "vue3-apexcharts";
 import {HboIDomain, ProfessionalTaskOutcome} from "@/logic/Api";
 import {watch} from "vue";
 

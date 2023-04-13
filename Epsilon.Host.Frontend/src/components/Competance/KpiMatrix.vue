@@ -4,16 +4,15 @@
     height="350"
     :options="chartOptions"
     :series="series"
-    v-if="!!domain"
   />
 </template>
 
 <script lang="ts" setup>
 import apexchart from "vue3-apexcharts";
 import {HboIDomain} from "@/logic/Api";
-import {watch} from "vue";
-const series = [];
-const chartOptions =  {
+import {ref, watch} from "vue";
+const series = []
+const chartOptions = {
     annotations: {
         yaxis: [
             {
@@ -70,32 +69,32 @@ const chartOptions =  {
     tooltip:{
         enabled: false
     }
-};
+}
 
 const props = defineProps<{
     domain: HboIDomain
 }>()
 
-watch(() => props.domain, () => {
-    for (const ac in props.domain.activities) {
-        chartOptions.xaxis.categories.push(props.domain.activities[ac].name as never)
-    }
+for (const ac in props.domain.activities) {
+    chartOptions.xaxis.categories.push(props.domain.activities[ac].name as never)
+}
 
-    for (const i in props.domain.architectureLayers) {
-        const ar = props.domain.architectureLayers[i]
-        series.push({
-            name: ar.name,
-            color: ar.color,
-            data: [
-                Math.random(),
-                Math.random(),
-                Math.random(),
-                Math.random(),
-                Math.random(),
-            ]
-        })
-    }
-})
+for (const i in props.domain.architectureLayers) {
+    console.log(i)
+    const ar = props.domain.architectureLayers[i]
+    console.log(ar)
+    series.push({
+        name: ar.name,
+        color: ar.color,
+        data: [
+            Math.random(),
+            Math.random(),
+            Math.random(),
+            Math.random(),
+            Math.random(),
+        ]
+    })
+}
 </script>
 
 <style scoped>
