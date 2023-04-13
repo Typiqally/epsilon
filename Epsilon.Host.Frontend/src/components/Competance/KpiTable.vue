@@ -1,15 +1,15 @@
 <template>
-    <table v-if="!!data">
+    <table v-if="!!props.data">
         <thead>
         <tr>
             <td/>
-            <th v-for="i of hboIDomain.activities">{{ i.name }}</th>
+            <th v-for="i of props.domain.activities">{{ i.name }}</th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(ac , i) of hboIDomain.architectureLayers">
+        <tr v-for="(ac , i) of props.domain.activities">
             <th>{{ ac.name }}</th>
-            <td v-for="(ar ,x) of hboIDomain.activities" :style="{backgroundColor: getCellColor(i, x)?.color}">
+            <td v-for="(ar ,x) of props.domain.activities" :style="{backgroundColor: getCellColor(i, x)?.color}">
                 {{ getKpis(i, x).length }}
             </td>
         </tr>
@@ -17,32 +17,24 @@
     </table>
 </template>
 
-<script lang="ts">
-import {MasteryLevel} from "/@/logic/Api";
+<script lang="ts" setup>
+import {HboIDomain, MasteryLevel, ProfessionalTaskOutcome} from "/@/logic/Api";
 
-export default {
-    name: "KpiTable",
-    props: {
-        hboIDomain: {
-            default: {}
-        },
-        data: {
-            default: {}
-        }
-    },
-    methods: {
-        getKpis(arId: string, acId: string): [] {
-            return this.data?.filter(o => parseInt(o.architectureLayerId) === parseInt(arId) && parseInt(o.activityId) === parseInt(acId))
-        },
-        getCellColor(arId: number, acId: number) {
-            const maxLevelId =  Math.max(this.getKpis(arId, acId).map(i => {
-                return i.masteryLevelId;
-            }))
-            const maxLevels = this.hboIDomain.masteryLevels as MasteryLevel[]
-            console.log(maxLevels[maxLevelId - 1], maxLevels)
-            return maxLevels[maxLevelId - 1]
-        }
-    }
+const props = defineProps<{
+    domain: HboIDomain
+    data: ProfessionalTaskOutcome[]
+}>()
+
+
+function getKpis(arId: string, acId: string): ProfessionalTaskOutcome[] {
+    return props.data.filter(o => o.architectureLayerId === parseInt(arId) && o.activityId === parseInt(acId))
+}
+
+function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
+    const kpis = getKpis(arId, acId).sort((a, b) => {
+        return props.domain.masteryLevels?.[a?.masteryLevelId].level - props.domain.masteryLevels?.[b?.masteryLevelId].level
+    })
+    return props.domain.masteryLevels?.[kpis[0]?.masteryLevelId as number]
 }
 </script>
 
