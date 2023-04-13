@@ -1,8 +1,10 @@
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
+using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 using Epsilon.Canvas.Abstractions.Service;
+using Epsilon.Canvas.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
@@ -14,22 +16,26 @@ public class ComponentController : ControllerBase
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IConfiguration _configuration;
     private readonly ICompetenceProfileConverter _competenceProfileConverter;
+    private readonly IAccountHttpService _accountHttpService;
     
-    public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration, ICompetenceProfileConverter competenceProfileConverter)
+    public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration, ICompetenceProfileConverter competenceProfileConverter, IAccountHttpService accountHttpService)
     {
         _graphQlService = graphQlService;
         _configuration = configuration;
         _competenceProfileConverter = competenceProfileConverter;
+        _accountHttpService = accountHttpService;
     }
 
     [HttpGet("competence_profile")]
-    public ActionResult<CompetenceProfile> GetCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+    public ActionResult<CompetenceProfile> GetCompetenceProfile()
     {
         var studentId = _configuration["Canvas:StudentId"];
         var query = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
         var queryResult = _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query).Result!;
         
-        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult);
+        var terms = _accountHttpService.GetAllTerms(1).Result.Where(t => t.StartAt != null && t.EndAt != null);
+        
+        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, terms);
         return competenceProfile;
     }
 
@@ -38,6 +44,7 @@ public class ComponentController : ControllerBase
     {
         var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
         var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
+        var terms = new List<EnrollmentTerm>();
 
         for (var i = 0; i < 5; i++)
         {
@@ -48,7 +55,8 @@ public class ComponentController : ControllerBase
         return new CompetenceProfile(
             HboIDomain.HboIDomain2018,
             professionalTaskOutcomes,
-            professionalSkillOutcomes
+            professionalSkillOutcomes,
+            terms
         );
     }
 
