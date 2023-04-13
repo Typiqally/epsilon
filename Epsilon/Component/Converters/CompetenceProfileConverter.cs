@@ -13,11 +13,6 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
     {
         var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
         var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
-        // var filteredTerms = new List<EnrollmentTerm>();
-            
-        
-
-        // return filteredTerms.OrderBy(term => term.StartAt);
 
         foreach (var course in getAllUserCoursesSubmissionOutcomes.Data.Courses)
         {
@@ -71,8 +66,8 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         
         var filteredTerms = enrollmentTerms.Where(term => term.StartAt.HasValue)
             .Where(term => professionalTaskOutcomes.Any(taskOutcome =>
-                taskOutcome.AssessedAt > term.StartAt.Value && taskOutcome.AssessedAt < term.EndAt || 
-                professionalSkillOutcomes.Any(skillOutcome => skillOutcome.AssessedAt > term.StartAt.Value && skillOutcome.AssessedAt < term.EndAt)))
+                taskOutcome.AssessedAt > term.StartAt && taskOutcome.AssessedAt < term.EndAt || 
+                professionalSkillOutcomes.Any(skillOutcome => skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt)))
             .Distinct();
         var sortedFilteredTerms = filteredTerms.OrderBy(term => term.StartAt);
 

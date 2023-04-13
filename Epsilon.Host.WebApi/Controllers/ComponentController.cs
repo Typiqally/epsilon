@@ -4,7 +4,6 @@ using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 using Epsilon.Canvas.Abstractions.Service;
-using Epsilon.Canvas.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
