@@ -45,7 +45,7 @@ public class ComponentController : ControllerBase
         var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
         var terms = new List<EnrollmentTerm>();
 
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 60; i++)
         {
             professionalTaskOutcomes.Add(GetRandomProfessionalTaskOutcome());
             professionalSkillOutcomes.Add(GetRandomProfessionalSkillOutcome());
