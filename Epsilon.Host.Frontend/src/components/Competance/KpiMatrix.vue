@@ -4,6 +4,7 @@
     height="350"
     :options="chartOptions"
     :series="series"
+    v-if="!!hboIDomain"
   />
 </template>
 
@@ -18,25 +19,31 @@ export default {
             default: {}
         }
     },
+    watch: {
+        hboIDomain() {
+            for (const ac in this.hboIDomain.activities) {
+                this.chartOptions.xaxis.categories.push(this.hboIDomain.activities[ac].name)
+            }
+
+
+            for (const al in this.hboIDomain.activities) {
+                this.series.push({
+                    name: this.hboIDomain.architectureLayers[al].name,
+                    color: this.hboIDomain.architectureLayers[al].color,
+                    data: [
+                        Math.random(),
+                        Math.random(),
+                        Math.random(),
+                        Math.random(),
+                        Math.random(),
+                    ]
+                })
+            }
+        }
+    },
     data() {
         return {
-            series: [{
-                name: 'User interaction',
-                data: [44, 55, 41, 67, 22]
-            }, {
-                name: 'Infrastructure',
-                data: [13, 23, 20, 8, 13]
-            }, {
-                name: 'Organisational processes',
-                data: [11, 17, 15, 15, 21]
-            }, {
-                name: 'Software',
-                data: [21, 7, 25, 13, 22]
-            }, {
-                name: 'Hardware interfacing',
-                data: [21, 7, 25, 13, 22]
-            }
-            ],
+            series: [],
             chartOptions: {
                 annotations: {
                     yaxis: [
@@ -55,7 +62,7 @@ export default {
                         }
                     ]
                 },
-                colors:["#E29C53","#6EA7D4","#D16557", "#96B9C0","#8D9292" ],
+                colors:[],
                 chart: {
                     type: 'bar',
                     height: 350,
@@ -80,13 +87,7 @@ export default {
                 },
                 xaxis: {
                     type: 'string',
-                    categories: [
-                        'Analyse',
-                        'Advise',
-                        'Design',
-                        'Realise',
-                        'Manage & Control'
-                    ],
+                    categories: [],
                 },
                 yaxis:{
                   show: false,
