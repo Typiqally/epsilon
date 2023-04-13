@@ -1,46 +1,53 @@
 <template>
-    <div v-if="data !== {}">
+    <div v-if="data">
         <KpiMatrix :hbo-i-domain="data.hboIDomain"></KpiMatrix>
-        <KpiTable :hbo-i-domain="data.hboIDomain"></KpiTable>
-        <PersonalDevelopmentMatrix></PersonalDevelopmentMatrix>
+        <KpiTable :hbo-i-domain="data.hboIDomain" :data="data.professionalTaskOutcomes"></KpiTable>
+        <PersonalDevelopmentMatrix :hbo-i-domain="data.hboIDomain"></PersonalDevelopmentMatrix>
     </div>
 </template>
 
-<script setup lang="ts">
-import {onMounted} from "vue";
-import router from "@/router";
+<script lang="ts">
+import {Api} from "@/logic/Api";
+import KpiMatrix from "@/components/Competance/KpiMatrix.vue";
+import KpiTable from "@/components/Competance/KpiTable.vue";
 import PersonalDevelopmentMatrix from "@/components/Competance/PersonalDevelopmentMatrix.vue";
-import KpiMatrix from "@/components/KpiMatrix.vue";
-import KpiTable from "@/components/KpiTable.vue";
-import {Api} from "./../Logic/Api";
+import {CompetenceProfile} from "@/logic/Api";
+import {HttpResponse} from "@/logic/Api";
 let data = {};
 
-onMounted(() => {
-    const App = new Api()
+export default {
+    name: "PerformanceDashboard",
+    components: {PersonalDevelopmentMatrix, KpiTable, KpiMatrix},
+    data() {
+      return {
+          App: new Api(),
+          data: {}
+      }
+    },
+    mounted() {
+        this.App.component.competenceProfileMockList()
+            .then((r:HttpResponse<any>) => {
+                this.data = r.data as CompetenceProfile
+            })
 
-
-    App.component.competenceProfileMockList()
-        .then((r) => {
-            data = r.data
-        })
-
-    App.component.competenceProfileList()
-        .then(response => {
-            if (response.ok) {
-                return response.json()
-            }
-
-            return Promise.reject(response);
-        })
-        .then(data => {
-            console.log(data)
-        })
-        .catch(error => {
-            if (error.status == 401) {
-                router.push('/auth')
-            }
-        })
-})
+        this.App.component.competenceProfileList()
+        // .then(response => {
+        //     if (response.ok) {
+        //         return response.json()
+        //     }
+        //
+        //     return Promise.reject(response);
+        // })
+        // .then(data => {
+        //     console.log(data)
+        // })
+        // .catch(error => {
+        //     if (error.status == 401) {
+        //         router.push('/auth')
+        //     }
+        // })
+    }
+}
 </script>
 
 <style scoped>

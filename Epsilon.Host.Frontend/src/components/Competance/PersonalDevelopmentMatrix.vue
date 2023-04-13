@@ -1,5 +1,5 @@
 <template>
-    <apexcharts type="bar" height="350" :options="chartOptions" :series="series"></apexcharts>
+    <apexcharts type="bar" :options="chartOptions" :series="series" v-if="!!hboIDomain"></apexcharts>
 </template>
 
 <script lang="ts">
@@ -8,6 +8,19 @@ import apexcharts from "vue3-apexcharts";
 export default {
     name: "PersonalDevelopmentMatrix",
     components: {apexcharts},
+    props: {
+        hboIDomain: {
+            default: {}
+        }
+    },
+    watch: {
+        hboIDomain() {
+            for (const pd in this.hboIDomain.professionalSkills) {
+                console.log(pd, this.hboIDomain.professionalSkills[pd].name)
+                this.chartOptions.xaxis.categories.push(this.hboIDomain.professionalSkills[pd].name)
+            }
+        }
+    },
     data() {
         return {
             series: [{
@@ -56,12 +69,7 @@ export default {
                 },
                 xaxis: {
                     type: 'string',
-                    categories: [
-                        'Future-Oriented Organisation',
-                        'Investigative Problem Solving',
-                        'Personal Leadership',
-                        'Targeted Interaction'
-                    ],
+                    categories: [],
                 },
                 yaxis: {
                     show: false,

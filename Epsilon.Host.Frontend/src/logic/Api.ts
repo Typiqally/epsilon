@@ -186,7 +186,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "";
+  public baseUrl: string = "https://localhost:7084";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -403,7 +403,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       params: RequestParams = {},
     ) =>
       this.request<GetUserSubmissionOutcomes, any>({
-        path: `https://localhost:7084/Component/competence_profile`,
+        path: `/Component/competence_profile`,
         method: "GET",
         query: query,
         format: "json",
@@ -427,7 +427,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       params: RequestParams = {},
     ) =>
       this.request<CompetenceProfile, any>({
-        path: `https://localhost:7084/Component/competence_profile_mock?ClientId=1`,
+        path: `/Component/competence_profile_mock`,
         method: "GET",
         query: query,
         format: "json",
