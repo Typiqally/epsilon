@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts" setup>
-import apexcharts from "vue3-apexcharts";
 import {HboIDomain, ProfessionalTaskOutcome} from "@/logic/Api";
 import {watch} from "vue";
 
