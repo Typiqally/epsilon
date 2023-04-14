@@ -1,17 +1,27 @@
 <template>
-  <apexchart
+  <apexcharts
     type="bar"
-    height="350"
+    height="320"
+    width="300"
     :options="chartOptions"
     :series="series"
   />
 </template>
 
 <script lang="ts" setup>
-import apexchart from "vue3-apexcharts";
-import {HboIDomain} from "@/logic/Api";
-import {ref, watch} from "vue";
-const series = []
+import apexcharts from "vue3-apexcharts";
+import {HboIDomain, ProfessionalTaskOutcome} from "@/logic/Api";
+
+const props = defineProps<{
+    domain: HboIDomain
+    data: ProfessionalTaskOutcome[]
+}>()
+
+const series = [{
+    name: '',
+    data: [44, 55, 41, 67]
+}
+]
 const chartOptions = {
     annotations: {
         yaxis: [
@@ -30,12 +40,11 @@ const chartOptions = {
             }
         ]
     },
-    colors:[],
-        chart: {
+    colors: ["#A8D08D"],
+    chart: {
         type: 'bar',
-            height: 350,
-            stacked: true,
-            toolbar: {
+        stacked: true,
+        toolbar: {
             show: false
         },
         zoom: {
@@ -48,16 +57,15 @@ const chartOptions = {
     plotOptions: {
         bar: {
             horizontal: false,
-                borderRadius: 4,
-                dataLabels: {
-            }
+            borderRadius: 4,
+            dataLabels: {}
         },
     },
     xaxis: {
         type: 'string',
-            categories: [],
+        categories: [],
     },
-    yaxis:{
+    yaxis: {
         show: false,
     },
     legend: {
@@ -66,33 +74,14 @@ const chartOptions = {
     fill: {
         opacity: 1
     },
-    tooltip:{
+    tooltip: {
         enabled: false
     }
 }
 
-const props = defineProps<{
-    domain: HboIDomain
-}>()
-
-for (const ac in props.domain.activities) {
-    chartOptions.xaxis.categories.push(props.domain.activities[ac].name as never)
-}
-
-for (const i in props.domain.architectureLayers) {
-    const ar = props.domain.architectureLayers[i]
-    series.push({
-        name: ar.name,
-        color: ar.color,
-        data: [
-            Math.random(),
-            Math.random(),
-            Math.random(),
-            Math.random(),
-            Math.random(),
-        ]
-    })
-}
+props.domain.professionalSkills.forEach(skill => {
+    chartOptions.xaxis.categories.push(skill.shortName)
+})
 </script>
 
 <style scoped>

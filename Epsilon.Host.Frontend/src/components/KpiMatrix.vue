@@ -1,27 +1,18 @@
 <template>
-  <apexcharts
+  <apexchart
     type="bar"
-    height="320"
-    width="300"
+    height="350"
     :options="chartOptions"
     :series="series"
   />
 </template>
 
 <script lang="ts" setup>
-import apexcharts from "vue3-apexcharts";
-import {HboIDomain, ProfessionalTaskOutcome} from "@/logic/Api";
+import apexchart from "vue3-apexcharts";
+import {HboIDomain} from "@/logic/Api";
+import {ref, watch} from "vue";
 
-const props = defineProps<{
-    domain: HboIDomain
-    data: ProfessionalTaskOutcome[]
-}>()
-
-const series = [{
-    name: '',
-    data: [44, 55, 41, 67]
-}
-]
+const series = []
 const chartOptions = {
     annotations: {
         yaxis: [
@@ -40,9 +31,10 @@ const chartOptions = {
             }
         ]
     },
-    colors: ["#A8D08D"],
+    colors: [],
     chart: {
         type: 'bar',
+        height: 350,
         stacked: true,
         toolbar: {
             show: false
@@ -79,9 +71,28 @@ const chartOptions = {
     }
 }
 
-props.domain.professionalSkills.forEach(skill =>{
-    chartOptions.xaxis.categories.push(skill.shortName)
-})
+const props = defineProps<{
+    domain: HboIDomain
+}>()
+
+for (const ac in props.domain.activities) {
+    chartOptions.xaxis.categories.push(props.domain.activities[ac].name as never)
+}
+
+for (const i in props.domain.architectureLayers) {
+    const ar = props.domain.architectureLayers[i]
+    series.push({
+        name: ar.name,
+        color: ar.color,
+        data: [
+            Math.random(),
+            Math.random(),
+            Math.random(),
+            Math.random(),
+            Math.random(),
+        ]
+    })
+}
 </script>
 
 <style scoped>

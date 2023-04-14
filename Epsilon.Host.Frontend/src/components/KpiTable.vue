@@ -4,29 +4,29 @@
     class="kpitable"
   >
     <thead>
-      <tr>
-        <td />
-        <th
-          v-for="activity of props.domain.activities"
-          class="kpitable__header kpitable__header-column"
-        >
-          {{ activity.name }}
-        </th>
-      </tr>
+    <tr>
+      <td/>
+      <th
+        v-for="activity of props.domain.activities"
+        class="kpitable__header kpitable__header-column"
+      >
+        {{ activity.name }}
+      </th>
+    </tr>
     </thead>
     <tbody>
-      <tr v-for="(architectureLayer , i) of props.domain.architectureLayers">
-        <th class="kpitable__header kpitable__header-row">
-          {{ architectureLayer.name }}
-        </th>
-        <td
-          v-for="(_, x) of props.domain.activities"
-          :style="{backgroundColor: getCellColor(i, x)?.color}"
-          class="kpitable__data"
-        >
-          {{ getKpis(i, x).length }}
-        </td>
-      </tr>
+    <tr v-for="(architectureLayer , i) of props.domain.architectureLayers">
+      <th class="kpitable__header kpitable__header-row">
+        {{ architectureLayer.name }}
+      </th>
+      <td
+        v-for="(_, x) of props.domain.activities"
+        :style="{backgroundColor: getCellColor(i, x)?.color}"
+        class="kpitable__data"
+      >
+        {{ getKpis(i, x).length }}
+      </td>
+    </tr>
     </tbody>
   </table>
 </template>
@@ -54,31 +54,31 @@ function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
 </script>
 
 <style>
-  .kpitable {
+.kpitable {
     border-collapse: collapse;
     height: 250px;
-  }
+}
 
-  .kpitable__header {
+.kpitable__header {
     padding: 0.5rem;
     font-weight: 600;
-  }
-  
-  .kpitable__header-row {
+}
+
+.kpitable__header-row {
     text-align: left;
-    border: 2px solid #000;
+    border: 1px solid #e6e6e6;
     border-left: transparent;
-  }
-  
-  .kpitable__header-column {
+}
+
+.kpitable__header-column {
     text-align: center;
-    border: 2px solid #000;
+    border: 1px solid #e6e6e6;
     border-top: transparent;
-  }
-  
-  .kpitable__data {
+}
+
+.kpitable__data {
     padding: 0.5rem;
     min-width: 5rem;
-    border: 2px solid #000;
-  }
+    border: 0px solid #e6e6e6;
+}
 </style>
