@@ -7,7 +7,7 @@
       :domain="data.hboIDomain"
       :data="data.professionalTaskOutcomes"
     />
-    <CompetenceProfileLegend />
+    <CompetenceProfileLegend/>
     <CompetenceGraph
       :domain="data.hboIDomain"
       :data="data.decayingAveragesPerTask"
@@ -67,8 +67,8 @@ const App = new Api();
 
 onMounted(() => {
     App.component.competenceProfileList()
-        .then((r: HttpResponse<any>) => {
-            data.value = r.data as CompetenceProfile
+        .then((r: HttpResponse<CompetenceProfile>) => {
+            data.value = r.data
         })
 })
 </script>

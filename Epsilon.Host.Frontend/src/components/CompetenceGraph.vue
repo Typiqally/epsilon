@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts";
 import {DecayingAveragePerLayer, IHboIDomain} from "../logic/Api";
-import {onMounted, ref, watch} from "vue";
+import {onMounted} from "vue";
 
 const series: Array<{ name: string, color: string, data: Array<string | number> | undefined }> = []
 const chartOptions = {
@@ -105,7 +105,3 @@ onMounted(() => {
 })
 
 </script>
-
-<style scoped>
-
-</style>
