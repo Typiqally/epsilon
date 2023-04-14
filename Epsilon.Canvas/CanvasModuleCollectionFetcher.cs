@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.QueryResponse;
 using Epsilon.Canvas.Abstractions.Service;
 
 namespace Epsilon.Canvas;

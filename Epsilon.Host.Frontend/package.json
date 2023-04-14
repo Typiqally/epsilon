@@ -4,15 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "prestart": "node aspnetcore-https && node aspnetcore-vue",
+    "prestart": "node aspnetcore-https && node aspnetcore-vite",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint --ext .ts,vue --ignore-path .gitignore ."
+    "lint": "eslint --ext .ts,vue --ignore-path .gitignore .",
+    "modelGeneration" : "npx swagger-typescript-api -p https://localhost:7084/swagger/v1/swagger.json  -o src/logic -n Api.ts"
   },
   "dependencies": {
+    "apexcharts": "^3.37.3",
     "typescript": "^4.9.5",
-    "vue": "^3.2.45"
+    "vue": "^3.2.45",
+    "vue-router": "^4.1.6",
+    "vue3-apexcharts": "^1.4.1"
   },
   "devDependencies": {
     "@types/node": "^18.15.3",
