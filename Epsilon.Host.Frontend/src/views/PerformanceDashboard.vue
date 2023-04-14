@@ -2,7 +2,7 @@
     <div v-if="data">
         <KpiMatrix :domain="data.hboIDomain"></KpiMatrix>
         <KpiTable :domain="data.hboIDomain" :data="data.professionalTaskOutcomes"></KpiTable>
-        <PersonalDevelopmentMatrix :domain="data.hboIDomain" :data="data"></PersonalDevelopmentMatrix>
+        <PersonalDevelopmentMatrix :domain="data.hboIDomain" :data="data.professionalSkillOutcomes"></PersonalDevelopmentMatrix>
     </div>
 </template>
 

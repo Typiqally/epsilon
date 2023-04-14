@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts" setup>
+import apexcharts from "vue3-apexcharts";
 import {HboIDomain, ProfessionalTaskOutcome} from "@/logic/Api";
 import {watch} from "vue";
 
@@ -73,12 +74,9 @@ const chartOptions = {
     }
 }
 
-watch
-(() => props.domain, () => {
-    for (const pd in props.domain.professionalSkills) {
-        chartOptions.xaxis.categories.push(props.domain.professionalSkills?.[pd].name)
-    }
-})
+for (const pd in props.domain.professionalSkills) {
+    chartOptions.xaxis.categories.push(props.domain.professionalSkills?.[pd].name)
+}
 </script>
 
 <style scoped>
