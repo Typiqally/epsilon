@@ -1,13 +1,36 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 
 namespace Epsilon.Component.Converters;
 
 public class CompetenceProfileConverter : ICompetenceProfileConverter
 {
-    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes, IEnumerable<EnrollmentTerm> enrollmentTerms)
+    public IEnumerable<DecayingAveragePerOutcome> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskOutcomes)
+    {
+        return domain.ArchitectureLayers.Select(layer =>
+        {
+            var decayingAverage = taskOutcomes.Where(outcome => outcome.ArchitectureLayer == layer.Id)
+                .Aggregate<ProfessionalTaskResult, double>(0, (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
+
+            return new DecayingAveragePerOutcome(layer.Id, decayingAverage);
+        });
+    }
+
+    public IEnumerable<DecayingAveragePerOutcome> GetDecayingAverageSkills(IHboIDomain domain, IEnumerable<ProfessionalSkillResult> skillOutcomes)
+    {
+        return domain.ProfessionalSkills.Select(skill =>
+        {
+            var decayingAverage = skillOutcomes.Where(outcome => outcome.Skill == skill.Id)
+                .Aggregate<ProfessionalSkillResult, double>(0, (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
+
+            return new DecayingAveragePerOutcome(skill.Id, decayingAverage);
+        });
+    }
+    
+    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes, IHboIDomain domain, IEnumerable<EnrollmentTerm> enrollmentTerms)
     {
         var taskResults = new List<ProfessionalTaskResult>();
         var professionalResults = new List<ProfessionalSkillResult>();
@@ -57,12 +80,13 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
             .Distinct()
             .OrderBy(static term => term.StartAt);
 
-
         return new CompetenceProfile(
-            new HboIDomain2018(),
+            domain,
             taskResults,
             professionalResults,
-            filteredTerms
+            filteredTerms,
+            GetDecayingAverageTasks(domain, taskResults),
+            GetDecayingAverageSkills(domain, professionalResults)
         );
     }
 }

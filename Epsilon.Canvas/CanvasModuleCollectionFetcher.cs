@@ -24,7 +24,7 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
     {
         var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
         
-        Console.WriteLine(response.GetDecayingAverage());
+        // Console.WriteLine(response.GetDecayingAverage());
         
         var modules = await _moduleService.GetAll(courseId, new[] { "items" });
 

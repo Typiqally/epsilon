@@ -6,5 +6,7 @@ public record CompetenceProfile(
     IHboIDomain HboIDomain,
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
     IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes,
-    IEnumerable<EnrollmentTerm> Terms
+    IEnumerable<EnrollmentTerm> Terms,
+    IEnumerable<DecayingAveragePerOutcome> DecayingAveragesPerTask,
+    IEnumerable<DecayingAveragePerOutcome> DecayingAveragesPerSkill
 );
