@@ -3,6 +3,5 @@
 namespace Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 public record RubricAssessmentNode(
-    [property: JsonPropertyName("assessmentRatings")] List<AssessmentRating>? AssessmentRatings, 
-    [property: JsonPropertyName("user")] User? User
+    [property: JsonPropertyName("assessmentRatings")] IReadOnlyList<AssessmentRating> AssessmentRatings
 );

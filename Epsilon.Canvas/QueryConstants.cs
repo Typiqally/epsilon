@@ -34,33 +34,32 @@ public static class QueryConstants
     ";
 
     public const string GetAllUserCoursesSubmissionOutcomes = @"
-        query GetAllUserCoursesSubmissionOutcomes {
-            allCourses {
-                name
-                submissionsConnection(studentIds: $studentIds) {
-                    nodes {
-                        assignment {
-                            name
-                        }
-                        postedAt
-                        rubricAssessmentsConnection {
-                            nodes {
-                                assessmentRatings {
-                                    points
-                                    outcome {
-                                        _id
-                                        title
-                                        masteryPoints
-                                    }
-                                }
-                                user {
-                                    name
-                                }
+        query MyQuery {
+          allCourses {
+            submissionsConnection(studentIds: $studentIds) {
+              nodes {
+                submissionHistoriesConnection {
+                  nodes {
+                    rubricAssessmentsConnection {
+                      nodes {
+                        assessmentRatings {
+                          criterion {
+                            outcome {
+                              _id
                             }
+                            masteryPoints
+                          }
+                          points
                         }
+                      }
                     }
+                    attempt
+                  }
                 }
+                postedAt
+              }
             }
+          }
         }
     ";
 }
