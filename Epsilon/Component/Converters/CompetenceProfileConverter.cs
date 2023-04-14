@@ -14,11 +14,12 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
         foreach (var course in getAllUserCoursesSubmissionOutcomes.Data.Courses)
         {
-            foreach (var submission in course.SubmissionsConnection.Nodes.Where(static s => s.PostedAt != null))
+            foreach (var submissionsConnection in course.SubmissionsConnection.Nodes.Where(static s => s.PostedAt != null))
             {
-                var rubricAssessments = submission.RubricAssessmentsConnection?.Nodes;
+                var submission = submissionsConnection.SubmissionsHistories.Nodes.MaxBy(static h => h.Attempt);
+                var rubricAssessments = submission?.RubricAssessments?.Nodes;
 
-                foreach (var assessmentRating in rubricAssessments.SelectMany(rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar => ar is { Points: not null, Criterion.MasteryPoints: not null, Criterion.Outcome: not null } && ar.Points >= ar.Criterion.MasteryPoints)))
+                foreach (var assessmentRating in rubricAssessments.SelectMany(static rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar => ar is { Points: not null, Criterion.MasteryPoints: not null, Criterion.Outcome: not null } && ar.Points >= ar.Criterion.MasteryPoints)))
                 {
                     if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))
                     {
@@ -28,7 +29,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                                 professionalTask.Activity,
                                 professionalTask.MasteryLevel,
                                 assessmentRating.Points!.Value,
-                                submission.PostedAt!.Value
+                                submissionsConnection.PostedAt!.Value
                             )
                         );
                     }
@@ -39,7 +40,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                                 professionalSkill.Skill,
                                 professionalSkill.MasteryLevel,
                                 assessmentRating.Points!.Value,
-                                submission.PostedAt!.Value
+                                submissionsConnection.PostedAt!.Value
                             )
                         );
                     }

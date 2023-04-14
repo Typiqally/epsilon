@@ -3,5 +3,5 @@
 namespace Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 public record SubmissionsConnection(
-    [property: JsonPropertyName("nodes")] IReadOnlyList<SubmissionsConnectionNode>? Nodes
+    [property: JsonPropertyName("nodes")] IReadOnlyList<SubmissionsConnectionNode> Nodes
 );

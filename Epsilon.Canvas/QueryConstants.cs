@@ -38,17 +38,22 @@ public static class QueryConstants
           allCourses {
             submissionsConnection(studentIds: $studentIds) {
               nodes {
-                rubricAssessmentsConnection {
+                submissionHistoriesConnection {
                   nodes {
-                    assessmentRatings {
-                      criterion {
-                        masteryPoints
-                        outcome {
-                          _id
+                    rubricAssessmentsConnection {
+                      nodes {
+                        assessmentRatings {
+                          criterion {
+                            outcome {
+                              _id
+                            }
+                            masteryPoints
+                          }
+                          points
                         }
                       }
-                      points
                     }
+                    attempt
                   }
                 }
                 postedAt
