@@ -1,7 +1,6 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 
 namespace Epsilon.Component.Converters;
