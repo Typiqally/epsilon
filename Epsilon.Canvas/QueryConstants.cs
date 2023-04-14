@@ -48,7 +48,9 @@ public static class QueryConstants
                                 assessmentRatings {
                                     points
                                     outcome {
+                                        _id
                                         title
+                                        masteryPoints
                                     }
                                 }
                                 user {
