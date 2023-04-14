@@ -1,6 +1,7 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 
 namespace Epsilon.Component.Converters;
@@ -33,8 +34,10 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         });
     }
 
-    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes,
-        IHboIDomain domain, IEnumerable<EnrollmentTerm> enrollmentTerms)
+    public CompetenceProfile ConvertFrom(
+        GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes,
+        IHboIDomain domain,
+        IEnumerable<EnrollmentTerm> enrollmentTerms)
     {
         var taskResults = new List<ProfessionalTaskResult>();
         var professionalResults = new List<ProfessionalSkillResult>();
@@ -82,7 +85,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         }
 
         var filteredTerms = enrollmentTerms
-            .Where(static term => term is {StartAt: not null, EndAt: not null})
+            .Where(static term => term is { StartAt: not null, EndAt: not null })
             .Where(term => taskResults.Any(taskOutcome =>
                                taskOutcome.AssessedAt >= term.StartAt && taskOutcome.AssessedAt <= term.EndAt)
                            || professionalResults.Any(skillOutcome =>
