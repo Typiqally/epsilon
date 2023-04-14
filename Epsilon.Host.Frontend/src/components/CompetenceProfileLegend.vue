@@ -1,31 +1,27 @@
 <template>
   <table class="competence-profile-legend">
-    <tr class="competence-profile-legend-row">
-      <td class="kpi-color mastery-level-1"/>
+    <tr
+      v-for="level of props.domain.masteryLevels"
+      class="competence-profile-legend-row"
+    >
+      <td
+        class="kpi-color"
+        :style="{ backgroundColor: level.color}"
+      />
       <th class="kpi-text">
-        Lvl 1
-      </th>
-    </tr>
-    <tr class="competence-profile-legend-row">
-      <td class="kpi-color mastery-level-2"/>
-      <th class="kpi-text">
-        Lvl 2
-      </th>
-    </tr>
-    <tr class="competence-profile-legend-row">
-      <td class="kpi-color mastery-level-3"/>
-      <th class="kpi-text">
-        Lvl 3
-      </th>
-    </tr>
-    <tr class="competence-profile-legend-row">
-      <td class="kpi-color mastery-level-4"/>
-      <th class="kpi-text">
-        Lvl 4
+        Level {{ level.level }}
       </th>
     </tr>
   </table>
 </template>
+
+<script lang="ts" setup>
+import {IHboIDomain} from "../logic/Api";
+
+const props = defineProps<{
+    domain: IHboIDomain
+}>()
+</script>
 
 <style>
 .competence-profile-legend {
@@ -42,22 +38,6 @@
 
 .kpi-color {
     width: 3rem;
-}
-
-.mastery-level-1 {
-    background-color: #8EAADB;
-}
-
-.mastery-level-2 {
-    background-color: #A8D08D;
-}
-
-.mastery-level-3 {
-    background-color: #FFD965;
-}
-
-.mastery-level-4 {
-    background-color: #B15EB2;
 }
 
 .competence-profile-legend-row {

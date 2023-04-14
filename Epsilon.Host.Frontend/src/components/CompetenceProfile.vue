@@ -4,33 +4,33 @@
     class="competence-profile"
   >
     <thead>
-    <tr>
-      <td/>
-      <th
-        v-for="activity of props.domain.activities"
-        class="competence-profile-header competence-profile-header-col"
-      >
-        {{ activity.name }}
-      </th>
-    </tr>
+      <tr>
+        <td />
+        <th
+          v-for="activity of props.domain.activities"
+          class="competence-profile-header competence-profile-header-col"
+        >
+          {{ activity.name }}
+        </th>
+      </tr>
     </thead>
     <tbody>
-    <tr
-      v-for="(architectureLayer, i) of props.domain.architectureLayers"
-      :key="i"
-    >
-      <th class="competence-profile-header competence-profile-header-row">
-        {{ architectureLayer.name }}
-      </th>
-      <td
-        v-for="(activity, j) of props.domain.activities"
-        :key="j"
-        :style="{backgroundColor: getCellColor(i, j)?.color}"
-        class="competence-profile-data"
+      <tr
+        v-for="(architectureLayer, i) of props.domain.architectureLayers"
+        :key="i"
       >
-        {{ getKpis(i, j).length }}
-      </td>
-    </tr>
+        <th class="competence-profile-header competence-profile-header-row">
+          {{ architectureLayer.name }}
+        </th>
+        <td
+          v-for="(activity, j) of props.domain.activities"
+          :key="j"
+          :style="{backgroundColor: getCellColor(i, j)?.color}"
+          class="competence-profile-data"
+        >
+          {{ getKpis(i, j).length }}
+        </td>
+      </tr>
     </tbody>
   </table>
 </template>

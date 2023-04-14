@@ -7,7 +7,7 @@
       :domain="data.hboIDomain"
       :data="data.professionalTaskOutcomes"
     />
-    <CompetenceProfileLegend/>
+    <CompetenceProfileLegend :domain="data.hboIDomain" />
     <CompetenceGraph
       :domain="data.hboIDomain"
       :data="data.decayingAveragesPerTask"
