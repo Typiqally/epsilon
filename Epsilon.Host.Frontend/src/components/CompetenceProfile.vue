@@ -4,29 +4,33 @@
     class="kpitable"
   >
     <thead>
-    <tr>
-      <td/>
-      <th
-        v-for="activity of props.domain.activities"
-        class="kpitable__header kpitable__header-column"
-      >
-        {{ activity.name }}
-      </th>
-    </tr>
+      <tr>
+        <td />
+        <th
+          v-for="activity of props.domain.activities"
+          class="kpitable__header kpitable__header-column"
+        >
+          {{ activity.name }}
+        </th>
+      </tr>
     </thead>
     <tbody>
-    <tr v-for="(architectureLayer , i) of props.domain.architectureLayers">
-      <th class="kpitable__header kpitable__header-row">
-        {{ architectureLayer.name }}
-      </th>
-      <td
-        v-for="(_, x) of props.domain.activities"
-        :style="{backgroundColor: getCellColor(i, x)?.color}"
-        class="kpitable__data"
+      <tr
+        v-for="(architectureLayer, i) of props.domain.architectureLayers"
+        :key="i"
       >
-        {{ getKpis(i, x).length }}
-      </td>
-    </tr>
+        <th class="kpitable__header kpitable__header-row">
+          {{ architectureLayer.name }}
+        </th>
+        <td
+          v-for="(activity, j) of props.domain.activities"
+          :key="j"
+          :style="{backgroundColor: getCellColor(i, j)?.color}"
+          class="kpitable__data"
+        >
+          {{ getKpis(i, j).length }}
+        </td>
+      </tr>
     </tbody>
   </table>
 </template>

@@ -1,8 +1,8 @@
 <template>
   <div class="performance-dashboard" v-if="data">
-    <KpiTable :domain="data.hboIDomain" :data="data.professionalTaskOutcomes"></KpiTable>
-    <KpiLegend/>
-    <KpiMatrix :domain="data.hboIDomain"></KpiMatrix>
+    <CompetenceProfileComponent :domain="data.hboIDomain" :data="data.professionalTaskOutcomes"></CompetenceProfileComponent>
+    <CompetenceProfileLegend/>
+    <CompetenceGraph :domain="data.hboIDomain"></CompetenceGraph>
     <PersonalDevelopmentMatrix :domain="data.hboIDomain" :data="data.professionalSkillOutcomes"
     ></PersonalDevelopmentMatrix>
   </div>
@@ -10,10 +10,10 @@
 
 <script lang="ts" setup>
 import {Api, HttpResponse, CompetenceProfile} from "@/logic/Api";
-import KpiMatrix from "@/components/KpiMatrix.vue";
-import KpiTable from "@/components/KpiTable.vue";
-import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentMatrix.vue";
-import KpiLegend from "@/components/KpiLegend.vue";
+import CompetenceProfileComponent from "@/components/CompetenceProfile.vue";
+import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue";
+import CompetenceGraph from "@/components/CompetenceGraph.vue";
+import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue";
 import {onMounted, ref} from "vue";
 
 const data = ref(undefined);
