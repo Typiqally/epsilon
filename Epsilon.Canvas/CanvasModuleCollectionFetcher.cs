@@ -23,9 +23,6 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
     public async IAsyncEnumerable<ModuleOutcomeResultCollection> GetAll(int courseId, IEnumerable<string>? allowedModules)
     {
         var response = await _outcomeService.GetResults(courseId, new[] { "outcomes", "alignments" });
-        
-        // Console.WriteLine(response.GetDecayingAverage());
-        
         var modules = await _moduleService.GetAll(courseId, new[] { "items" });
 
         Debug.Assert(response != null, nameof(response) + " != null");
