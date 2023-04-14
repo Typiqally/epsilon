@@ -11,6 +11,8 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class ComponentController : ControllerBase
 {
+    private static readonly IHboIDomain s_hboIDomain2018 = new HboIDomain2018();
+
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IConfiguration _configuration;
     private readonly ICompetenceProfileConverter _competenceProfileConverter;
@@ -29,11 +31,13 @@ public class ComponentController : ControllerBase
     {
         var studentId = _configuration["Canvas:StudentId"];
         var query = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
-        var queryResult = await _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query);
 
-        var terms = await _accountHttpService.GetAllTerms(1);
+        var queryResult = _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query);
+        var terms = _accountHttpService.GetAllTerms(1);
 
-        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, new HboIDomain2018(), terms);
+        await Task.WhenAll(queryResult, terms);
+
+        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult.Result, s_hboIDomain2018, terms.Result);
         return competenceProfile;
     }
 }
