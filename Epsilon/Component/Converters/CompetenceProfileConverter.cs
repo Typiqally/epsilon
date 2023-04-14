@@ -14,13 +14,13 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
         foreach (var course in getAllUserCoursesSubmissionOutcomes.Data.Courses)
         {
-            foreach (var submission in course.SubmissionsConnection.Nodes)
+            foreach (var submission in course.SubmissionsConnection.Nodes.Where(static s => s.PostedAt != null))
             {
                 var assessmentRatings = submission.RubricAssessmentsConnection?.Nodes;
 
                 foreach (var assessmentRating in assessmentRatings)
                 {
-                    foreach (var (points, outcome) in assessmentRating.AssessmentRatings.Where(ar => ar is { Points: not null, Outcome: not null } && ar.Points >= ar.Outcome.MasteryPoints))
+                    foreach (var (points, outcome) in assessmentRating.AssessmentRatings.Where(static ar => ar is { Points: not null, Outcome: not null } && ar.Points >= ar.Outcome.MasteryPoints))
                     {
                         if (FhictConstants.ProfessionalTasks.TryGetValue(outcome!.Id, out var professionalTask))
                         {
