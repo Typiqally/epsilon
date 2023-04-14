@@ -80,9 +80,7 @@ for (const ac in props.domain.activities) {
 }
 
 for (const i in props.domain.architectureLayers) {
-    console.log(i)
     const ar = props.domain.architectureLayers[i]
-    console.log(ar)
     series.push({
         name: ar.name,
         color: ar.color,
