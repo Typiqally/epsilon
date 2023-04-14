@@ -27,6 +27,8 @@ public class OutcomeHttpService : HttpService, IOutcomeHttpService
     {
         var url = new StringBuilder($"v1/courses/{courseId}/outcome_results");
         var query = $"?include[]={string.Join("&include[]=", include)}";
+        
+        //Console.WriteLine("URL + QUERY " + url + query);
 
         var responses = await _paginator.GetAllPages<OutcomeResultCollection>(HttpMethod.Get, url + query);
         var responsesArray = responses.ToArray();
