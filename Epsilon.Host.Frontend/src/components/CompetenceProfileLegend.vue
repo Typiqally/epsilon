@@ -1,20 +1,28 @@
 <template>
   <table class="kpi-legend">
     <tr class="legend__row">
-      <td class="kpi-color lvl1"/>
-      <th class="kpi-text">Lvl 1</th>
+      <td class="kpi-color lvl1" />
+      <th class="kpi-text">
+        Lvl 1
+      </th>
     </tr>
     <tr class="legend__row">
-      <td class="kpi-color lvl2"/>
-      <th class="kpi-text">Lvl 2</th>
+      <td class="kpi-color lvl2" />
+      <th class="kpi-text">
+        Lvl 2
+      </th>
     </tr>
     <tr class="legend__row">
-      <td class="kpi-color lvl3"/>
-      <th class="kpi-text">Lvl 3</th>
+      <td class="kpi-color lvl3" />
+      <th class="kpi-text">
+        Lvl 3
+      </th>
     </tr>
     <tr class="legend__row">
-      <td class="kpi-color lvl4"/>
-      <th class="kpi-text">Lvl 4</th>
+      <td class="kpi-color lvl4" />
+      <th class="kpi-text">
+        Lvl 4
+      </th>
     </tr>
   </table>
 </template>

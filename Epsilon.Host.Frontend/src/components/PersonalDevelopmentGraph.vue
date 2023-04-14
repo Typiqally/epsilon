@@ -1,5 +1,5 @@
 <template>
-  <apexcharts
+  <ApexChart
     type="bar"
     height="320"
     width="200"
@@ -9,24 +9,21 @@
 </template>
 
 <script lang="ts" setup>
-import apexcharts from "vue3-apexcharts";
-import {HboIDomain, ProfessionalTaskOutcome} from "@/logic/Api";
+import ApexChart from "vue3-apexcharts";
+import {DecayingAveragePerSkill, IHboIDomain} from "../logic/Api";
+import {onMounted} from "vue";
 
 const props = defineProps<{
-    domain: HboIDomain
-    data: ProfessionalTaskOutcome[]
+    domain: IHboIDomain
+    data: DecayingAveragePerSkill[]
 }>()
 
-const series = [{
-    name: '',
-    data: [44, 55, 41, 67]
-}
-]
+const series: Array<{ name: string, data: Array<number | string> }> = []
 const chartOptions = {
     annotations: {
         yaxis: [
             {
-                y: 40,
+                y: 3,
                 borderColor: 'red',
                 strokeDashArray: 0,
                 label: {
@@ -75,12 +72,25 @@ const chartOptions = {
         opacity: 1
     },
     tooltip: {
-        enabled: false
+        enabled: true
     }
 }
 
-props.domain.professionalSkills.forEach(skill => {
-    chartOptions.xaxis.categories.push(skill.shortName)
+onMounted(() => {
+    // Setup categories
+    const professionalSkills = props.domain.professionalSkills
+
+    if (professionalSkills != null) {
+        professionalSkills.forEach(s => {
+            chartOptions.xaxis.categories.push(s.shortName as never)
+        })
+    }
+
+    // Add data
+    series.push({
+        name: "Decaying Average",
+        data: props.data.map(decayingAverage => decayingAverage.decayingAverage?.toFixed(2) as string),
+    })
 })
 </script>
 

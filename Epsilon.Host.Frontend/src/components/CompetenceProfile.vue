@@ -36,19 +36,23 @@
 </template>
 
 <script lang="ts" setup>
-import {HboIDomain, MasteryLevel, ProfessionalTaskOutcome} from "@/logic/Api";
+import {IHboIDomain, MasteryLevel, ProfessionalTaskResult} from "../logic/Api";
 
 const props = defineProps<{
-    domain: HboIDomain
-    data: ProfessionalTaskOutcome[]
+    domain: IHboIDomain
+    data: ProfessionalTaskResult[]
 }>()
 
 
-function getKpis(arId: string, acId: string): ProfessionalTaskOutcome[] {
+function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
     return props.data.filter(o => o.architectureLayer === parseInt(arId) && o.activity === parseInt(acId))
 }
 
 function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
+    if (props.domain.masteryLevels == null) {
+        return undefined
+    }
+
     const kpis = getKpis(arId, acId).sort((a, b) => {
         return props.domain.masteryLevels?.find(masteryLevel => masteryLevel.id == b?.masteryLevel).level - props.domain.masteryLevels?.find(ml => ml.id == a?.masteryLevel).level
     })

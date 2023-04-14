@@ -11,134 +11,102 @@
  */
 
 export interface Activity {
+    /** @format int32 */
+    id?: number;
     name?: string | null;
     color?: string | null;
 }
 
 export interface ArchitectureLayer {
+    /** @format int32 */
+    id?: number;
     name?: string | null;
     shortName?: string | null;
     color?: string | null;
 }
 
-export interface AssessmentRating {
-    /** @format double */
-    points?: number | null;
-    outcome?: Outcome;
-}
-
-export interface Assignment {
-    name?: string | null;
-    modules?: Module[] | null;
-}
-
 export interface CompetenceProfile {
-    hboIDomain?: HboIDomain;
-    professionalTaskOutcomes?: ProfessionalTaskOutcome[] | null;
-    professionalSkillOutcomes?: ProfessionalSkillOutcome[] | null;
+    hboIDomain?: IHboIDomain;
+    professionalTaskOutcomes?: ProfessionalTaskResult[] | null;
+    professionalSkillOutcomes?: ProfessionalSkillResult[] | null;
+    terms?: EnrollmentTerm[] | null;
+    decayingAveragesPerTask?: DecayingAveragePerLayer[] | null;
+    decayingAveragesPerSkill?: DecayingAveragePerSkill[] | null;
 }
 
-export interface Course {
+export interface DecayingAveragePerActivity {
+    /** @format int32 */
+    activity?: number;
+    /** @format double */
+    decayingAverage?: number;
+}
+
+export interface DecayingAveragePerLayer {
+    /** @format int32 */
+    architectureLayer?: number;
+    layerActivities?: DecayingAveragePerActivity[] | null;
+}
+
+export interface DecayingAveragePerSkill {
+    /** @format int32 */
+    skill?: number;
+    /** @format double */
+    decayingAverage?: number;
+}
+
+export interface EnrollmentTerm {
     name?: string | null;
-    submissionsConnection?: SubmissionsConnection;
+    /** @format date-time */
+    start_at?: string | null;
+    /** @format date-time */
+    end_at?: string | null;
 }
 
-export interface CourseData {
-    course?: Course;
-}
-
-export interface GetUserSubmissionOutcomes {
-    data?: CourseData;
-}
-
-export interface HboIDomain {
-    architectureLayers?: Record<string, ArchitectureLayer>;
-    activities?: Record<string, Activity>;
-    professionalSkills?: Record<string, ProfessionalSkill>;
-    masteryLevels?: Record<string, MasteryLevel>;
-}
-
-export interface LtiOpenIdConnectCallback {
-    authenticityToken?: string | null;
-    idToken?: string | null;
-    state?: string | null;
-    ltiStorageTarget?: string | null;
-}
-
-export interface LtiOpenIdConnectLaunch {
-    issuer?: string | null;
-    loginHint?: string | null;
-    clientId?: string | null;
-    /** @format uri */
-    targetLinkUri?: string | null;
-    encodedLtiMessageHint?: string | null;
-    ltiStorageTarget?: string | null;
+export interface IHboIDomain {
+    architectureLayers?: ArchitectureLayer[] | null;
+    activities?: Activity[] | null;
+    professionalSkills?: ProfessionalSkill[] | null;
+    masteryLevels?: MasteryLevel[] | null;
 }
 
 export interface MasteryLevel {
+    /** @format int32 */
+    id?: number;
     /** @format int32 */
     level?: number;
     color?: string | null;
 }
 
-export interface Module {
-    name?: string | null;
-}
-
-export interface Node {
-    assignment?: Assignment;
-    rubricAssessmentsConnection?: RubricAssessmentsConnection;
-}
-
-export interface Outcome {
-    title?: string | null;
-}
-
 export interface ProfessionalSkill {
+    /** @format int32 */
+    id?: number;
     name?: string | null;
     shortName?: string | null;
     color?: string | null;
 }
 
-export interface ProfessionalSkillOutcome {
+export interface ProfessionalSkillResult {
     /** @format int32 */
-    professionalSkillId?: number;
+    skill?: number;
     /** @format int32 */
     masteryLevel?: number;
-    /** @format int32 */
+    /** @format double */
     grade?: number;
     /** @format date-time */
     assessedAt?: string;
 }
 
-export interface ProfessionalTaskOutcome {
+export interface ProfessionalTaskResult {
     /** @format int32 */
-    architectureLayerId?: number;
+    architectureLayer?: number;
     /** @format int32 */
-    activityId?: number;
+    activity?: number;
     /** @format int32 */
-    masteryLevelId?: number;
-    /** @format int32 */
+    masteryLevel?: number;
+    /** @format double */
     grade?: number;
     /** @format date-time */
     assessedAt?: string;
-}
-
-export interface RubricAssessmentNode {
-    assessmentRatings?: AssessmentRating[] | null;
-    user?: User;
-}
-
-export interface RubricAssessmentsConnection {
-    nodes?: RubricAssessmentNode[] | null;
-}
-
-export interface SubmissionsConnection {
-    nodes?: Node[] | null;
-}
-
-export interface User {
-    name?: string | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -393,86 +361,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          * @name CompetenceProfileList
          * @request GET:/Component/competence_profile
          */
-        competenceProfileList: (
-            query?: {
-                courseId?: string;
-                /** @format date-time */
-                startDate?: string;
-                /** @format date-time */
-                endDate?: string;
-            },
-            params: RequestParams = {},
-        ) =>
-            this.request<GetUserSubmissionOutcomes, any>({
+        competenceProfileList: (params: RequestParams = {}) =>
+            this.request<CompetenceProfile, any>({
                 path: `/Component/competence_profile`,
                 method: "GET",
-                query: query,
                 format: "json",
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Component
-         * @name CompetenceProfileMockList
-         * @request GET:/Component/competence_profile_mock
-         */
-        competenceProfileMockList: (
-            query?: {
-                /** @format date-time */
-                startDate?: string;
-                /** @format date-time */
-                endDate?: string;
-            },
-            params: RequestParams = {},
-        ) =>
-            this.request<CompetenceProfile, any>({
-                path: `/Component/competence_profile_mock`,
-                method: "GET",
-                query: query,
-                format: "json",
-                ...params,
-            }),
-    };
-    lti = {
-        /**
-         * No description
-         *
-         * @tags Lti
-         * @name OidcAuthCreate
-         * @request POST:/lti/oidc/auth
-         */
-        oidcAuthCreate: (
-            query?: {
-                launchRequest?: LtiOpenIdConnectLaunch;
-            },
-            params: RequestParams = {},
-        ) =>
-            this.request<void, any>({
-                path: `/lti/oidc/auth`,
-                method: "POST",
-                query: query,
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Lti
-         * @name OidcCallbackCreate
-         * @request POST:/lti/oidc/callback
-         */
-        oidcCallbackCreate: (
-            query?: {
-                callback?: LtiOpenIdConnectCallback;
-            },
-            params: RequestParams = {},
-        ) =>
-            this.request<void, any>({
-                path: `/lti/oidc/callback`,
-                method: "POST",
-                query: query,
                 ...params,
             }),
     };

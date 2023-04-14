@@ -7,11 +7,14 @@
       :domain="data.hboIDomain"
       :data="data.professionalTaskOutcomes"
     />
-    <CompetenceProfileLegend/>
-    <CompetenceGraph :domain="data.hboIDomain"/>
+    <CompetenceProfileLegend />
+    <CompetenceGraph
+      :domain="data.hboIDomain"
+      :data="data.decayingAveragesPerTask"
+    />
     <PersonalDevelopmentMatrix
       :domain="data.hboIDomain"
-      :data="data.professionalSkillOutcomes"
+      :data="data.decayingAveragesPerSkill"
     />
   </div>
   <div v-else>
@@ -52,14 +55,14 @@
 </template>
 
 <script lang="ts" setup>
-import {Api, HttpResponse, CompetenceProfile} from "@/logic/Api";
+import {Api, HttpResponse, CompetenceProfile} from "../logic/Api";
 import CompetenceProfileComponent from "@/components/CompetenceProfile.vue";
 import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue";
 import CompetenceGraph from "@/components/CompetenceGraph.vue";
 import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue";
-import {onMounted, ref} from "vue";
+import {onMounted, Ref, ref} from "vue";
 
-const data: CompetenceProfile = ref(undefined);
+const data: Ref<CompetenceProfile | undefined> = ref(undefined);
 const App = new Api();
 
 onMounted(() => {

@@ -1,5 +1,5 @@
 <template>
-  <apexchart
+  <ApexChart
     type="bar"
     height="350"
     :options="chartOptions"
@@ -8,16 +8,16 @@
 </template>
 
 <script lang="ts" setup>
-import apexchart from "vue3-apexcharts";
-import {HboIDomain} from "@/logic/Api";
-import {ref, watch} from "vue";
+import ApexChart from "vue3-apexcharts";
+import {DecayingAveragePerLayer, IHboIDomain} from "../logic/Api";
+import {onMounted, ref, watch} from "vue";
 
-const series = []
+const series: Array<{ name: string, color: string, data: Array<string | number> | undefined }> = []
 const chartOptions = {
     annotations: {
         yaxis: [
             {
-                y: 40,
+                y: 9,
                 borderColor: 'red',
                 strokeDashArray: 0,
                 label: {
@@ -67,32 +67,43 @@ const chartOptions = {
         opacity: 1
     },
     tooltip: {
-        enabled: false
+        enabled: true
     }
 }
 
 const props = defineProps<{
-    domain: HboIDomain
+    domain: IHboIDomain,
+    data: DecayingAveragePerLayer[]
 }>()
 
-for (const ac in props.domain.activities) {
-    chartOptions.xaxis.categories.push(props.domain.activities[ac].name as never)
-}
+onMounted(() => {
+    // Setup categories
+    const activities = props.domain.activities
 
-for (const i in props.domain.architectureLayers) {
-    const ar = props.domain.architectureLayers[i]
-    series.push({
-        name: ar.name,
-        color: ar.color,
-        data: [
-            Math.random(),
-            Math.random(),
-            Math.random(),
-            Math.random(),
-            Math.random(),
-        ]
-    })
-}
+    if (activities != null) {
+        activities.forEach(s => {
+            chartOptions.xaxis.categories.push(s.name as never)
+        })
+    }
+
+    // Add data
+    const layers = props.domain.architectureLayers
+
+    if (layers != null) {
+        props.data.forEach(layerDecayingAverage => {
+            const layer = layers.find(layer => layer.id == layerDecayingAverage.architectureLayer)
+
+            if (layer != undefined) {
+                series.push({
+                    name: layer.name as string,
+                    color: layer.color as string,
+                    data: layerDecayingAverage.layerActivities?.map(decayingAverage => decayingAverage.decayingAverage?.toFixed(2) as string)
+                })
+            }
+        })
+    }
+})
+
 </script>
 
 <style scoped>
