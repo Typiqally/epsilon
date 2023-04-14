@@ -2,6 +2,6 @@
 
 namespace Epsilon.Canvas.Abstractions.Model.GraphQl;
 
-public record Module(
-    [property: JsonPropertyName("name")] string Name
+public record User(
+    [property: JsonPropertyName("name")] string? Name
 );
