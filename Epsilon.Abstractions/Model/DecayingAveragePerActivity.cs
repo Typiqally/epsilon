@@ -1,6 +1,6 @@
 ﻿namespace Epsilon.Abstractions.Model;
 
-public record DecayingAveragePerOutcome(
-    int ReferenceId,
+public record DecayingAveragePerActivity(
+    int Activity,
     double DecayingAverage
 );

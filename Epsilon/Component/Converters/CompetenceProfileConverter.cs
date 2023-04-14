@@ -8,29 +8,34 @@ namespace Epsilon.Component.Converters;
 
 public class CompetenceProfileConverter : ICompetenceProfileConverter
 {
-    public IEnumerable<DecayingAveragePerOutcome> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskOutcomes)
+    public IEnumerable<DecayingAveragePerLayer> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskResults)
     {
-        return domain.ArchitectureLayers.Select(layer =>
-        {
-            var decayingAverage = taskOutcomes.Where(outcome => outcome.ArchitectureLayer == layer.Id)
-                .Aggregate<ProfessionalTaskResult, double>(0, (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
+        return domain.ArchitectureLayers.Select(layer => new DecayingAveragePerLayer(layer.Id,
+            domain.Activities.Select(activity =>
+            {
+                var decayingAverage = taskResults
+                    .Where(task => task.ArchitectureLayer == layer.Id && task.Activity == activity.Id)
+                    .Aggregate<ProfessionalTaskResult, double>(0,
+                        (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
 
-            return new DecayingAveragePerOutcome(layer.Id, decayingAverage);
-        });
+                return new DecayingAveragePerActivity(activity.Id, decayingAverage);
+            })));
     }
 
-    public IEnumerable<DecayingAveragePerOutcome> GetDecayingAverageSkills(IHboIDomain domain, IEnumerable<ProfessionalSkillResult> skillOutcomes)
+    public IEnumerable<DecayingAveragePerSkill> GetDecayingAverageSkills(IHboIDomain domain, IEnumerable<ProfessionalSkillResult> skillResults)
     {
         return domain.ProfessionalSkills.Select(skill =>
         {
-            var decayingAverage = skillOutcomes.Where(outcome => outcome.Skill == skill.Id)
-                .Aggregate<ProfessionalSkillResult, double>(0, (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
+            var decayingAverage = skillResults.Where(outcome => outcome.Skill == skill.Id)
+                .Aggregate<ProfessionalSkillResult, double>(0,
+                    (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
 
-            return new DecayingAveragePerOutcome(skill.Id, decayingAverage);
+            return new DecayingAveragePerSkill(skill.Id, decayingAverage);
         });
     }
-    
-    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes, IHboIDomain domain, IEnumerable<EnrollmentTerm> enrollmentTerms)
+
+    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes,
+        IHboIDomain domain, IEnumerable<EnrollmentTerm> enrollmentTerms)
     {
         var taskResults = new List<ProfessionalTaskResult>();
         var professionalResults = new List<ProfessionalSkillResult>();
@@ -43,7 +48,8 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
                 foreach (var assessmentRating in assessmentRatings)
                 {
-                    foreach (var (points, outcome) in assessmentRating.AssessmentRatings.Where(static ar => ar is { Points: not null, Outcome: not null } && ar.Points >= ar.Outcome.MasteryPoints))
+                    foreach (var (points, outcome) in assessmentRating.AssessmentRatings.Where(static ar =>
+                                 ar is {Points: not null, Outcome: not null} && ar.Points >= ar.Outcome.MasteryPoints))
                     {
                         if (FhictConstants.ProfessionalTasks.TryGetValue(outcome!.Id, out var professionalTask))
                         {
@@ -74,9 +80,11 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         }
 
         var filteredTerms = enrollmentTerms
-            .Where(static term => term is { StartAt: not null, EndAt: not null })
-            .Where(term => taskResults.Any(taskOutcome => taskOutcome.AssessedAt >= term.StartAt && taskOutcome.AssessedAt <= term.EndAt)
-                           || professionalResults.Any(skillOutcome => skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt))
+            .Where(static term => term is {StartAt: not null, EndAt: not null})
+            .Where(term => taskResults.Any(taskOutcome =>
+                               taskOutcome.AssessedAt >= term.StartAt && taskOutcome.AssessedAt <= term.EndAt)
+                           || professionalResults.Any(skillOutcome =>
+                               skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt))
             .Distinct()
             .OrderBy(static term => term.StartAt);
 

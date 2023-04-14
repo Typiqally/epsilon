@@ -7,6 +7,6 @@ public record CompetenceProfile(
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
     IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes,
     IEnumerable<EnrollmentTerm> Terms,
-    IEnumerable<DecayingAveragePerOutcome> DecayingAveragesPerTask,
-    IEnumerable<DecayingAveragePerOutcome> DecayingAveragesPerSkill
+    IEnumerable<DecayingAveragePerLayer> DecayingAveragesPerTask,
+    IEnumerable<DecayingAveragePerSkill> DecayingAveragesPerSkill
 );
