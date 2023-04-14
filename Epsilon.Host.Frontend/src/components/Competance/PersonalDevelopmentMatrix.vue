@@ -1,10 +1,16 @@
 <template>
-    <apexcharts type="bar" :options="chartOptions" :series="series"></apexcharts>
+  <apexcharts
+    type="bar"
+    height="320"
+    width="300"
+    :options="chartOptions"
+    :series="series"
+  />
 </template>
 
 <script lang="ts" setup>
+import apexcharts from "vue3-apexcharts";
 import {HboIDomain, ProfessionalTaskOutcome} from "@/logic/Api";
-import {watch} from "vue";
 
 const props = defineProps<{
     domain: HboIDomain
@@ -73,11 +79,8 @@ const chartOptions = {
     }
 }
 
-watch
-(() => props.domain, () => {
-    for (const pd in props.domain.professionalSkills) {
-        chartOptions.xaxis.categories.push(props.domain.professionalSkills?.[pd].name)
-    }
+props.domain.professionalSkills.forEach(skill =>{
+    chartOptions.xaxis.categories.push(skill.shortName)
 })
 </script>
 

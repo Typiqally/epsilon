@@ -1,19 +1,28 @@
 <template>
-  <table v-if="!!props.data">
+  <table
+    v-if="!!props.data"
+    class="kpitable"
+  >
     <thead>
       <tr>
         <td />
-        <th v-for="activity of props.domain.activities">
+        <th
+          v-for="activity of props.domain.activities"
+          class="kpitable__header kpitable__header-column"
+        >
           {{ activity.name }}
         </th>
       </tr>
     </thead>
     <tbody>
       <tr v-for="(architectureLayer , i) of props.domain.architectureLayers">
-        <th>{{ architectureLayer.name }}</th>
+        <th class="kpitable__header kpitable__header-row">
+          {{ architectureLayer.name }}
+        </th>
         <td
           v-for="(_, x) of props.domain.activities"
           :style="{backgroundColor: getCellColor(i, x)?.color}"
+          class="kpitable__data"
         >
           {{ getKpis(i, x).length }}
         </td>
@@ -45,28 +54,31 @@ function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
 </script>
 
 <style>
-tbody tr th {
-    text-align: left;
-}
-
-tbody tr td {
-    padding: 8px;
-    min-width: 100px;
-}
-
-tbody tr {
-    border-bottom: 2px solid black;
-}
-
-tbody td {
-    border: 2px solid black;
-}
-
-table {
+  .kpitable {
     border-collapse: collapse;
-}
+    height: 250px;
+  }
 
-thead th {
-
-}
+  .kpitable__header {
+    padding: 0.5rem;
+    font-weight: 600;
+  }
+  
+  .kpitable__header-row {
+    text-align: left;
+    border: 2px solid #000;
+    border-left: transparent;
+  }
+  
+  .kpitable__header-column {
+    text-align: center;
+    border: 2px solid #000;
+    border-top: transparent;
+  }
+  
+  .kpitable__data {
+    padding: 0.5rem;
+    min-width: 5rem;
+    border: 2px solid #000;
+  }
 </style>
