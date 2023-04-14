@@ -16,35 +16,32 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         {
             foreach (var submission in course.SubmissionsConnection.Nodes.Where(static s => s.PostedAt != null))
             {
-                var assessmentRatings = submission.RubricAssessmentsConnection?.Nodes;
+                var rubricAssessments = submission.RubricAssessmentsConnection?.Nodes;
 
-                foreach (var assessmentRating in assessmentRatings)
+                foreach (var assessmentRating in rubricAssessments.SelectMany(rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar => ar is { Points: not null, Criterion.MasteryPoints: not null, Criterion.Outcome: not null } && ar.Points >= ar.Criterion.MasteryPoints)))
                 {
-                    foreach (var (points, outcome) in assessmentRating.AssessmentRatings.Where(static ar => ar is { Points: not null, Outcome: not null } && ar.Points >= ar.Outcome.MasteryPoints))
+                    if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))
                     {
-                        if (FhictConstants.ProfessionalTasks.TryGetValue(outcome!.Id, out var professionalTask))
-                        {
-                            taskResults.Add(
-                                new ProfessionalTaskResult(
-                                    professionalTask.Layer,
-                                    professionalTask.Activity,
-                                    professionalTask.MasteryLevel,
-                                    points!.Value,
-                                    submission.PostedAt!.Value
-                                )
-                            );
-                        }
-                        else if (FhictConstants.ProfessionalSkills.TryGetValue(outcome.Id, out var professionalSkill))
-                        {
-                            professionalResults.Add(
-                                new ProfessionalSkillResult(
-                                    professionalSkill.Skill,
-                                    professionalSkill.MasteryLevel,
-                                    points!.Value,
-                                    submission.PostedAt!.Value
-                                )
-                            );
-                        }
+                        taskResults.Add(
+                            new ProfessionalTaskResult(
+                                professionalTask.Layer,
+                                professionalTask.Activity,
+                                professionalTask.MasteryLevel,
+                                assessmentRating.Points!.Value,
+                                submission.PostedAt!.Value
+                            )
+                        );
+                    }
+                    else if (FhictConstants.ProfessionalSkills.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalSkill))
+                    {
+                        professionalResults.Add(
+                            new ProfessionalSkillResult(
+                                professionalSkill.Skill,
+                                professionalSkill.MasteryLevel,
+                                assessmentRating.Points!.Value,
+                                submission.PostedAt!.Value
+                            )
+                        );
                     }
                 }
             }
