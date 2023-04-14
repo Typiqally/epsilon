@@ -1,18 +1,16 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 
 namespace Epsilon.Component.Converters;
 
 public class CompetenceProfileConverter : ICompetenceProfileConverter
 {
-
     public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes, IEnumerable<EnrollmentTerm> enrollmentTerms)
     {
-        var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
-        var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
+        var taskResults = new List<ProfessionalTaskResult>();
+        var professionalResults = new List<ProfessionalSkillResult>();
 
         foreach (var course in getAllUserCoursesSubmissionOutcomes.Data.Courses)
         {
@@ -22,60 +20,49 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
                 foreach (var assessmentRating in assessmentRatings)
                 {
-                    foreach (var rating in assessmentRating.AssessmentRatings)
+                    foreach (var (points, outcome) in assessmentRating.AssessmentRatings.Where(ar => ar is { Points: not null, Outcome: not null } && ar.Points >= ar.Outcome.MasteryPoints))
                     {
-                        var outcome = rating.Outcome;
-
-                        if (outcome != null)
+                        if (FhictConstants.ProfessionalTasks.TryGetValue(outcome!.Id, out var professionalTask))
                         {
-                            switch (outcome.DeterminateCategory())
-                            {
-                                case "Task":
-                                    var (architectureLayerId, activityId, tMasteryLevelId) = outcome.GetTaskDetails();
-                                    if (architectureLayerId != -1 && activityId != -1 && tMasteryLevelId != -1)
-                                    {
-                                        if (rating.Grade() == -1) break;
-                                        professionalTaskOutcomes.Add(new ProfessionalTaskOutcome(
-                                            architectureLayerId,
-                                            activityId,
-                                            tMasteryLevelId,
-                                            rating.Grade(),
-                                            submission.PostedAt ?? DateTime.Now
-                                        ));
-                                    }
-                                    break;
-                                case "Skill":
-                                    var (professionalSkillId, sMasteryLevelId) = outcome.GetSkillDetails();
-                                    if (professionalSkillId != -1 && sMasteryLevelId != -1)
-                                    {
-                                        if (rating.Grade() == -1) break;
-                                        professionalSkillOutcomes.Add(new ProfessionalSkillOutcome(
-                                            professionalSkillId,
-                                            sMasteryLevelId,
-                                            rating.Grade(),
-                                            submission.PostedAt ?? DateTime.Now
-                                        ));
-                                    }
-                                    break;
-                            }
+                            taskResults.Add(
+                                new ProfessionalTaskResult(
+                                    professionalTask.Layer,
+                                    professionalTask.Activity,
+                                    professionalTask.MasteryLevel,
+                                    points!.Value,
+                                    submission.PostedAt!.Value
+                                )
+                            );
+                        }
+                        else if (FhictConstants.ProfessionalSkills.TryGetValue(outcome.Id, out var professionalSkill))
+                        {
+                            professionalResults.Add(
+                                new ProfessionalSkillResult(
+                                    professionalSkill.Skill,
+                                    professionalSkill.MasteryLevel,
+                                    points!.Value,
+                                    submission.PostedAt!.Value
+                                )
+                            );
                         }
                     }
                 }
             }
         }
-        
-        var filteredTerms = enrollmentTerms.Where(term => term.StartAt.HasValue)
-            .Where(term => professionalTaskOutcomes.Any(taskOutcome =>
-                taskOutcome.AssessedAt > term.StartAt && taskOutcome.AssessedAt < term.EndAt || 
-                professionalSkillOutcomes.Any(skillOutcome => skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt)))
-            .Distinct();
-        var sortedFilteredTerms = filteredTerms.OrderBy(term => term.StartAt);
+
+        var filteredTerms = enrollmentTerms
+            .Where(static term => term is { StartAt: not null, EndAt: not null })
+            .Where(term => taskResults.Any(taskOutcome => taskOutcome.AssessedAt >= term.StartAt && taskOutcome.AssessedAt <= term.EndAt)
+                           || professionalResults.Any(skillOutcome => skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt))
+            .Distinct()
+            .OrderBy(static term => term.StartAt);
+
 
         return new CompetenceProfile(
-            HboIDomain.HboIDomain2018, 
-            professionalTaskOutcomes,
-            professionalSkillOutcomes,
-            sortedFilteredTerms
+            new HboIDomain2018(),
+            taskResults,
+            professionalResults,
+            filteredTerms
         );
     }
 }

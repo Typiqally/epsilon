@@ -1,7 +1,6 @@
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
-using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +15,7 @@ public class ComponentController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly ICompetenceProfileConverter _competenceProfileConverter;
     private readonly IAccountHttpService _accountHttpService;
-    
+
     public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration, ICompetenceProfileConverter competenceProfileConverter, IAccountHttpService accountHttpService)
     {
         _graphQlService = graphQlService;
@@ -26,64 +25,15 @@ public class ComponentController : ControllerBase
     }
 
     [HttpGet("competence_profile")]
-    public ActionResult<CompetenceProfile> GetCompetenceProfile()
+    public async Task<ActionResult<CompetenceProfile>> GetCompetenceProfile()
     {
         var studentId = _configuration["Canvas:StudentId"];
         var query = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
-        var queryResult = _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query).Result!;
-        
-        var terms = _accountHttpService.GetAllTerms(1).Result;
-        
+        var queryResult = await _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query);
+
+        var terms = await _accountHttpService.GetAllTerms(1);
+
         var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, terms);
         return competenceProfile;
-    }
-
-    [HttpGet("competence_profile_mock")]
-    public ActionResult<CompetenceProfile> GetMockCompetenceProfile([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
-    {
-        var professionalTaskOutcomes = new List<ProfessionalTaskOutcome>();
-        var professionalSkillOutcomes = new List<ProfessionalSkillOutcome>();
-        var terms = new List<EnrollmentTerm>();
-
-        for (var i = 0; i < 60; i++)
-        {
-            professionalTaskOutcomes.Add(GetRandomProfessionalTaskOutcome());
-            professionalSkillOutcomes.Add(GetRandomProfessionalSkillOutcome());
-        }
-
-        return new CompetenceProfile(
-            HboIDomain.HboIDomain2018,
-            professionalTaskOutcomes,
-            professionalSkillOutcomes
-        );
-    }
-
-    private static ProfessionalTaskOutcome GetRandomProfessionalTaskOutcome()
-    {
-        return new ProfessionalTaskOutcome(
-            GetRandom(HboIDomain.HboIDomain2018.ArchitectureLayers.Keys),
-            GetRandom(HboIDomain.HboIDomain2018.Activities.Keys),
-            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels.Keys),
-            GetRandom(new[] { 0, 3, 4, 5 }),
-            DateTime.Now
-        );
-    }
-
-    private static ProfessionalSkillOutcome GetRandomProfessionalSkillOutcome()
-    {
-        return new ProfessionalSkillOutcome(
-            GetRandom(HboIDomain.HboIDomain2018.ProfessionalSkills.Keys),
-            GetRandom(HboIDomain.HboIDomain2018.MasteryLevels.Keys),
-            GetRandom(new[] { 0, 3, 4, 5 }),
-            DateTime.Now
-        );
-    }
-
-    private static T GetRandom<T>(IEnumerable<T> items)
-    {
-        var random = new Random();
-        var itemsArray = items.ToArray();
-        var index = random.Next(0, itemsArray.Length);
-        return itemsArray.ElementAt(index);
     }
 }

@@ -33,6 +33,7 @@ public static class CanvasServiceCollectionExtensions
         services.AddHttpClient<IOutcomeHttpService, OutcomeHttpService>(CanvasHttpClient);
         services.AddHttpClient<ISubmissionHttpService, SubmissionHttpService>(CanvasHttpClient);
         services.AddHttpClient<IGraphQlHttpService, GraphQlHttpService>(CanvasHttpClient);
+        services.AddHttpClient<IAccountHttpService, AccountHttpService>(CanvasHttpClient);
 
         services.AddScoped<ILinkHeaderConverter, LinkHeaderConverter>();
         
