@@ -1,10 +1,10 @@
 ﻿using System.Text.Json.Serialization;
-using Epsilon.Canvas.Abstractions.Model.GraphQL;
+using Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 namespace Epsilon.Canvas.Abstractions.QueryResponse;
 
-public record GetUserSubmissionOutcomes(
-    [property: JsonPropertyName("data")] GetUserSubmissionOutcomes.CourseData? Data
+public record GetUserCourseSubmissionOutcomes(
+    [property: JsonPropertyName("data")] GetUserCourseSubmissionOutcomes.CourseData? Data
 )
 {
     public record CourseData(
