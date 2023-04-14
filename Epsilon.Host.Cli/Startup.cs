@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
+using Epsilon.Canvas.Abstractions.Service;
 using Epsilon.Export;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
