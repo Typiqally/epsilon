@@ -1,10 +1,18 @@
 <template>
-  <div class="performance-dashboard" v-if="data">
-    <CompetenceProfileComponent :domain="data.hboIDomain" :data="data.professionalTaskOutcomes"></CompetenceProfileComponent>
-    <CompetenceProfileLegend/>
-    <CompetenceGraph :domain="data.hboIDomain"></CompetenceGraph>
-    <PersonalDevelopmentMatrix :domain="data.hboIDomain" :data="data.professionalSkillOutcomes"
-    ></PersonalDevelopmentMatrix>
+  <div
+    v-if="data"
+    class="performance-dashboard"
+  >
+    <CompetenceProfileComponent
+      :domain="data.hboIDomain"
+      :data="data.professionalTaskOutcomes"
+    />
+    <CompetenceProfileLegend />
+    <CompetenceGraph :domain="data.hboIDomain" />
+    <PersonalDevelopmentMatrix
+      :domain="data.hboIDomain"
+      :data="data.professionalSkillOutcomes"
+    />
   </div>
 </template>
 
@@ -16,7 +24,7 @@ import CompetenceGraph from "@/components/CompetenceGraph.vue";
 import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue";
 import {onMounted, ref} from "vue";
 
-const data = ref(undefined);
+const data: CompetenceProfile = ref(undefined);
 const App = new Api();
 
 onMounted(() => {
