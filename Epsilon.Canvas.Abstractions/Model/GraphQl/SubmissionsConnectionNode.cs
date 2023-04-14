@@ -4,5 +4,5 @@ namespace Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 public record SubmissionsConnectionNode(
     [property: JsonPropertyName("postedAt")] DateTime? PostedAt,
-    [property: JsonPropertyName("rubricAssessmentsConnection")] RubricAssessmentsConnection? RubricAssessmentsConnection
+    [property: JsonPropertyName("submissionHistoriesConnection")] SubmissionsHistoriesConnection SubmissionsHistories
 );
