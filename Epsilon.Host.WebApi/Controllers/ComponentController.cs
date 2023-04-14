@@ -33,7 +33,7 @@ public class ComponentController : ControllerBase
 
         var terms = await _accountHttpService.GetAllTerms(1);
 
-        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, terms);
+        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, new HboIDomain2018(), terms);
         return competenceProfile;
     }
 }

@@ -7,5 +7,5 @@ namespace Epsilon.Abstractions.Component;
 
 public interface ICompetenceProfileConverter
 {
-    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes, IEnumerable<EnrollmentTerm> terms);
+    public CompetenceProfile ConvertFrom(GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes,IHboIDomain domain, IEnumerable<EnrollmentTerm> terms);
 }
