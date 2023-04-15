@@ -1,7 +1,8 @@
 <template>
   <table class="competence-profile-legend">
     <tr
-      v-for="level of props.domain.masteryLevels"
+      v-for="level of props.domain.masteryLevels as MasteryLevel[]"
+      :key="level.id"
       class="competence-profile-legend-row"
     >
       <td
@@ -16,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import {IHboIDomain} from "../logic/Api";
+import {IHboIDomain, MasteryLevel} from "../logic/Api";
 
 const props = defineProps<{
     domain: IHboIDomain

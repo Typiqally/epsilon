@@ -7,7 +7,8 @@
       <tr>
         <td />
         <th
-          v-for="activity of props.domain.activities"
+          v-for="activity of props.domain.activities as Activity[]"
+          :key="activity.id"
           class="competence-profile-header competence-profile-header-col"
         >
           {{ activity.name }}
@@ -16,7 +17,7 @@
     </thead>
     <tbody>
       <tr
-        v-for="(architectureLayer, i) of props.domain.architectureLayers"
+        v-for="(architectureLayer, i) of props.domain.architectureLayers as ArchitectureLayer[]"
         :key="i"
       >
         <th class="competence-profile-header competence-profile-header-row">
@@ -36,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import {IHboIDomain, MasteryLevel, ProfessionalTaskResult} from "../logic/Api";
+import {Activity, ArchitectureLayer, IHboIDomain, MasteryLevel, ProfessionalTaskResult} from "../logic/Api";
 
 const props = defineProps<{
     domain: IHboIDomain
