@@ -4,8 +4,8 @@
     class="performance-dashboard"
   >
     <EnrollmentTermButtons
-      @button-clicked="handleButtonClick"
       :terms="data.terms"
+      @on-term-selected="setTermFilter"
     />
     <CompetenceProfileComponent
       :domain="data.hboIDomain"
@@ -14,7 +14,7 @@
     <CompetenceProfileLegend
       :domain="data.hboIDomain"
     />
-    <div/>
+    <div />
     <CompetenceGraph
       :domain="data.hboIDomain"
       :data="data.decayingAveragesPerTask"
@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import {Api, HttpResponse, CompetenceProfile, EnrollmentTerm  } from "../logic/Api";
+import {Api, HttpResponse, CompetenceProfile, EnrollmentTerm} from "../logic/Api";
 import CompetenceProfileComponent from "@/components/CompetenceProfile.vue";
 import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue";
 import CompetenceGraph from "@/components/CompetenceGraph.vue";
@@ -43,9 +43,14 @@ const App = new Api();
 const selectedTerm = ref<EnrollmentTerm | null>(null)
 
 const filteredProfessionalTaskOutcomes = computed(() => {
-    if (!selectedTerm.value || !data.value){
+    if (!data.value) {
         return []
     }
+
+    if (!selectedTerm.value) {
+        return data.value?.professionalTaskOutcomes
+    }
+
     return data.value.professionalTaskOutcomes.filter(o => o.assessedAt < selectedTerm.value.end_at)
 })
 
@@ -56,8 +61,8 @@ onMounted(() => {
         })
 })
 
-function handleButtonClick(data: { term: EnrollmentTerm}) {
-    selectedTerm.value = data.term
+function setTermFilter(term: EnrollmentTerm): void {
+    selectedTerm.value = term
 }
 </script>
 

@@ -1,26 +1,27 @@
 <template>
   <div class="enrollment-term-buttons">
-    <button class="btn" v-for="term of props.terms" :key="term" @click="handleClick(term)">
+    <button
+      v-for="term of props.terms"
+      :key="term"
+      class="btn"
+      @click="emitTermSelectedEvent(term)"
+    >
       {{ term.name }}
     </button>
   </div>
 </template>
 
 <script lang="ts" setup>
-
-import {EnrollmentTerm} from "@/logic/Api";
+import {EnrollmentTerm} from "../logic/Api";
 
 const props = defineProps<{
     terms: EnrollmentTerm[]
 }>()
 
-const emit = defineEmits(['buttonClicked'])
+const emit = defineEmits(['onTermSelected'])
 
-function handleClick(this: any, term: EnrollmentTerm) {
-    const data = {
-        term: term
-    }
-    emit('buttonClicked', data)
+function emitTermSelectedEvent(term: EnrollmentTerm): void {
+    emit('onTermSelected', term)
 }
 
 </script>
