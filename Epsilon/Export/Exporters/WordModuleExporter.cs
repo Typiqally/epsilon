@@ -56,12 +56,13 @@ public class WordModuleExporter : ICanvasModuleExporter
 
         var altChunkId = "HomePage";
 
-        var personaHTML = new HtmlDocument();
-        personaHTML.LoadHtml(data.PersonaHtml);
+        var personaHtml = new HtmlDocument();
+        personaHtml.LoadHtml(data.PersonaHtml);
 
+        var updatedPersonaHtml = await ReplaceImageSrcWithBase64String(personaHtml);
 
         using var ms = new MemoryStream(new UTF8Encoding(true).GetPreamble()
-            .Concat(Encoding.UTF8.GetBytes($"<html>{personaHTML.Text}</html>")).ToArray());
+            .Concat(Encoding.UTF8.GetBytes($"<html>{updatedPersonaHtml.Text}</html>")).ToArray());
 
         var formatImportPart =
             document.MainDocumentPart.AddAlternativeFormatImportPart(
@@ -122,8 +123,10 @@ public class WordModuleExporter : ICanvasModuleExporter
         new TableCellProperties(new TableCellWidth {Type = TableWidthUnitValues.Auto})
     );
 
-    private async Task ReplaceImageSrcWithBase64String(HtmlDocument htmlDoc)
+    private async Task<HtmlDocument> ReplaceImageSrcWithBase64String(HtmlDocument htmlDoc)
     {
+        if (htmlDoc.DocumentNode.SelectNodes("//img") == null)
+            return null;
         foreach (var node in htmlDoc.DocumentNode.SelectNodes("//img"))
         {
             var imageSrc = node
@@ -139,5 +142,7 @@ public class WordModuleExporter : ICanvasModuleExporter
 
             node.SetAttributeValue("src", $"data:image/jpeg;base64,{imageBase64}");
         }
+
+        return htmlDoc;
     }
 }
