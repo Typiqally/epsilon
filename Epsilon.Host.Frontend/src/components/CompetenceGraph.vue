@@ -2,6 +2,7 @@
   <ApexChart
     type="bar"
     height="350"
+    width="750"
     :options="chartOptions"
     :series="series"
   />

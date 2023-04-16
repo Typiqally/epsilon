@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import PerformanceDashboard from "@/views/PerformanceDashboard.vue";
-import Authorize from "@/views/Authorize.vue";
+import AuthorizeUser from "@/views/AuthorizeUser.vue";
 
 const routes = [
     {
@@ -11,7 +11,7 @@ const routes = [
     {
         path: '/auth',
         name: 'Authorize',
-        component: Authorize
+        component: AuthorizeUser
     },
 ]
 const router = createRouter({

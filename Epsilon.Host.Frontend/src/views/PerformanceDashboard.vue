@@ -3,13 +3,18 @@
     v-if="data"
     class="performance-dashboard"
   >
+    <EnrollmentTermButtons
+      @button-clicked="handleButtonClick"
+      :terms="data.terms"
+    />
     <CompetenceProfileComponent
       :domain="data.hboIDomain"
-      :data="data.professionalTaskOutcomes"
+      :data="filteredProfessionalTaskOutcomes"
     />
     <CompetenceProfileLegend
       :domain="data.hboIDomain"
     />
+    <div/>
     <CompetenceGraph
       :domain="data.hboIDomain"
       :data="data.decayingAveragesPerTask"
@@ -23,16 +28,26 @@
 </template>
 
 <script lang="ts" setup>
-import {Api, HttpResponse, CompetenceProfile} from "../logic/Api";
+import {Api, HttpResponse, CompetenceProfile, EnrollmentTerm  } from "../logic/Api";
 import CompetenceProfileComponent from "@/components/CompetenceProfile.vue";
 import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue";
 import CompetenceGraph from "@/components/CompetenceGraph.vue";
 import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue";
-import {onMounted, Ref, ref} from "vue";
+import {computed, onMounted, Ref, ref} from "vue";
 import RoundLoader from "@/components/RoundLoader.vue";
+import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue";
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined);
 const App = new Api();
+
+const selectedTerm = ref<EnrollmentTerm | null>(null)
+
+const filteredProfessionalTaskOutcomes = computed(() => {
+    if (!selectedTerm.value || !data.value){
+        return []
+    }
+    return data.value.professionalTaskOutcomes.filter(o => o.assessedAt < selectedTerm.value.end_at)
+})
 
 onMounted(() => {
     App.component.competenceProfileList()
@@ -40,6 +55,10 @@ onMounted(() => {
             data.value = r.data
         })
 })
+
+function handleButtonClick(data: { term: EnrollmentTerm}) {
+    selectedTerm.value = data.term
+}
 </script>
 
 <style scoped>
@@ -50,9 +69,10 @@ onMounted(() => {
 @media screen and (min-width: 580px) {
     .performance-dashboard {
         display: grid;
-        grid-template-columns: 5fr 1fr;
+        grid-template-columns: 1fr 5fr 1fr;
         gap: 4rem 0;
         align-items: center;
+        justify-items: center;
     }
 }
 </style>
