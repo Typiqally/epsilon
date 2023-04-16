@@ -1,7 +1,7 @@
 <template>
   <ApexChart
     type="bar"
-    height="320"
+    height="350"
     width="200"
     :options="chartOptions"
     :series="series"

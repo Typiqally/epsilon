@@ -65,7 +65,6 @@ function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
 <style>
 .competence-profile {
     border-collapse: collapse;
-    height: 250px;
 }
 
 .competence-profile-header {
@@ -88,6 +87,6 @@ function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
 .competence-profile-data {
     padding: 0.5rem;
     min-width: 5rem;
-    border: 0px solid #e6e6e6;
+    border: 0 solid #e6e6e6;
 }
 </style>
