@@ -42,7 +42,7 @@ const chartOptions = {
         type: 'bar',
         stacked: true,
         toolbar: {
-            show: false
+            show: true
         },
         zoom: {
             enabled: false

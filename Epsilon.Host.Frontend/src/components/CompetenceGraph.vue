@@ -38,7 +38,7 @@ const chartOptions = {
         height: 350,
         stacked: true,
         toolbar: {
-            show: false
+            show: true
         },
         zoom: {
             enabled: false
