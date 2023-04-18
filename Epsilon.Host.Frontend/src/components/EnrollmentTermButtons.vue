@@ -37,7 +37,15 @@ function emitTermSelectedEvent(term: EnrollmentTerm): void {
 }
 
 .btn:hover {
-    background: #723972;
+    background: #773b77;
+}
+
+.btn:active {
+    background: #322a56;
+}
+
+.btn:focus {
+    background: #322a56;
 }
 
 .enrollment-term-buttons {
