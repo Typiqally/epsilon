@@ -21,6 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install modules
-        run: cd Epsilon.Host.Frontend && npm install
+        run: cd Epsilon.Host.Frontend && pnpm install
       - name: Run ESLint
-        run: cd Epsilon.Host.Frontend && npm run lint
+        run: cd Epsilon.Host.Frontend && pnpm run lint
