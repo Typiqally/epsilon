@@ -2,6 +2,7 @@
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
+using Epsilon.Canvas.Abstractions.Service;
 using Epsilon.Export;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,8 @@ public class Startup : IHostedService
         IOptions<ExportOptions> exportSettings,
         ICanvasModuleCollectionFetcher collectionFetcher,
         IModuleExporterCollection exporterCollection,
-        IExportDataPackager exporterDataCollection)
+        IExportDataPackager exporterDataCollection
+    )
     {
         _logger = logger;
         _canvasSettings = canvasSettings.Value;

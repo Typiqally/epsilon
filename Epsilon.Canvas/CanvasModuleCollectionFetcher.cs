@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
+using Epsilon.Abstractions.Export;
 using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
-using Microsoft.Extensions.Logging;
 
 namespace Epsilon.Canvas;
 
@@ -12,7 +12,6 @@ public class CanvasModuleCollectionFetcher : ICanvasModuleCollectionFetcher
     private readonly IOutcomeHttpService _outcomeService;
 
     public CanvasModuleCollectionFetcher(
-        ILogger<CanvasModuleCollectionFetcher> logger,
         IModuleHttpService moduleService,
         IOutcomeHttpService outcomeService
     )

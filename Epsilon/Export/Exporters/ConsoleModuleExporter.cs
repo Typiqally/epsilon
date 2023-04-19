@@ -40,7 +40,9 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
                 }
             }
         }
-
+        
+        // await WriteLineAndLog(writer, $"Decaying Average: {}");
+        
         await writer.FlushAsync();
 
         return stream;

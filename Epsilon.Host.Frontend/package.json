@@ -1,0 +1,32 @@
+{
+  "name": "learningtool.webapp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "prestart": "node aspnetcore-https && node aspnetcore-vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint --ext .ts,vue --ignore-path .gitignore .",
+    "modelGeneration" : "npx swagger-typescript-api -p https://localhost:7084/swagger/v1/swagger.json  -o src/logic -n Api.ts"
+  },
+  "dependencies": {
+    "apexcharts": "^3.37.3",
+    "typescript": "^4.9.5",
+    "vue": "^3.2.45",
+    "vue-router": "^4.1.6",
+    "vue3-apexcharts": "^1.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.3",
+    "@typescript-eslint/eslint-plugin": "^5.55.0",
+    "@typescript-eslint/parser": "^5.55.0",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "@vue/eslint-config-typescript": "^11.0.2",
+    "eslint": "^8.36.0",
+    "eslint-plugin-vue": "^9.9.0",
+    "ts-node": "^10.9.1",
+    "vite": "^4.1.0"
+  }
+}
