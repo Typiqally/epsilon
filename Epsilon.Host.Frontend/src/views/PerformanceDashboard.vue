@@ -19,6 +19,10 @@
       :domain="data.hboIDomain"
       :data="data.decayingAveragesPerTask"
     />
+    <CompetenceGraph
+      :domain="data.hboIDomain"
+      :data="DecayingAverage.GetDecayingAverageTasks(data.hboIDomain, data.professionalTaskOutcomes)"
+    />
     <PersonalDevelopmentMatrix
       :domain="data.hboIDomain"
       :data="data.decayingAveragesPerSkill"
@@ -36,6 +40,7 @@ import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue
 import {computed, onMounted, Ref, ref} from "vue";
 import RoundLoader from "@/components/RoundLoader.vue";
 import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue";
+import {DecayingAverage} from "@/logic/DecayingAverage";
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined);
 const App = new Api();
