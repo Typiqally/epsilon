@@ -110,7 +110,7 @@ namespace Epsilon.Canvas.Tests
                 });
 
             var canvasModuleCollectionFetcher = new CanvasModuleCollectionFetcher(
-                Mock.Of<ILogger<CanvasModuleCollectionFetcher>>(), moduleServiceMock.Object, outcomeServiceMock.Object
+                moduleServiceMock.Object, outcomeServiceMock.Object
             );
 
             // Act
