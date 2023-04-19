@@ -1,14 +1,37 @@
-﻿using System.Text.Json;
-using Epsilon.Abstractions.Component;
+﻿
+using Epsilon.Abstractions.Component.Manager;
 using Epsilon.Abstractions.Model;
+using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.QueryResponse;
+using Epsilon.Canvas.Abstractions.Service;
 
-namespace Epsilon.Component.Converters;
+namespace Epsilon.Component.Managers;
 
-public class CompetenceProfileConverter : ICompetenceProfileConverter
+public class CompetenceProfileManager : ICompetenceProfileManager
 {
-    public CompetenceProfile ConvertToComponent(
+    private readonly IGraphQlHttpService _graphQlService;
+    private readonly IAccountHttpService _accountHttpService;
+    
+    public CompetenceProfileManager(IGraphQlHttpService graphQlService, IAccountHttpService accountHttpService)
+    {
+        _graphQlService = graphQlService;
+        _accountHttpService = accountHttpService;
+    }
+    
+    public async Task<CompetenceProfile> GetComponent(string studentId)
+    {
+        var outcomesQuery = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
+        
+        var outcomes = await _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(outcomesQuery);
+        var terms = await _accountHttpService.GetAllTerms(1);
+        
+        var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018(), terms);
+
+        return competenceProfile;
+    }
+    
+    private CompetenceProfile ConvertToComponent(
         GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes,
         IHboIDomain domain,
         IEnumerable<EnrollmentTerm> enrollmentTerms)
@@ -75,11 +98,6 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
             GetDecayingAverageTasks(domain, taskResults),
             GetDecayingAverageSkills(domain, professionalResults)
         );
-    }
-    
-    public string ConvertToJson(CompetenceProfile data)
-    {
-        return JsonSerializer.Serialize(data);
     }
     
     public Task<Stream> ConvertToWord(CompetenceProfile data)
