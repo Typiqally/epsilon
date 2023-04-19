@@ -1,40 +1,14 @@
-﻿using Epsilon.Abstractions.Component;
+﻿using System.Text.Json;
+using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 
 namespace Epsilon.Component.Converters;
 
 public class CompetenceProfileConverter : ICompetenceProfileConverter
 {
-    public IEnumerable<DecayingAveragePerLayer> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskResults)
-    {
-        return domain.ArchitectureLayers.Select(layer => new DecayingAveragePerLayer(layer.Id,
-            domain.Activities.Select(activity =>
-            {
-                var decayingAverage = taskResults
-                    .Where(task => task.ArchitectureLayer == layer.Id && task.Activity == activity.Id)
-                    .Aggregate<ProfessionalTaskResult, double>(0,
-                        (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
-
-                return new DecayingAveragePerActivity(activity.Id, decayingAverage);
-            })));
-    }
-
-    public IEnumerable<DecayingAveragePerSkill> GetDecayingAverageSkills(IHboIDomain domain, IEnumerable<ProfessionalSkillResult> skillResults)
-    {
-        return domain.ProfessionalSkills.Select(skill =>
-        {
-            var decayingAverage = skillResults.Where(outcome => outcome.Skill == skill.Id)
-                .Aggregate<ProfessionalSkillResult, double>(0,
-                    (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
-
-            return new DecayingAveragePerSkill(skill.Id, decayingAverage);
-        });
-    }
-
-    public CompetenceProfile ConvertFrom(
+    public CompetenceProfile ConvertToComponent(
         GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes,
         IHboIDomain domain,
         IEnumerable<EnrollmentTerm> enrollmentTerms)
@@ -101,5 +75,41 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
             GetDecayingAverageTasks(domain, taskResults),
             GetDecayingAverageSkills(domain, professionalResults)
         );
+    }
+    
+    public string ConvertToJson(CompetenceProfile data)
+    {
+        return JsonSerializer.Serialize(data);
+    }
+    
+    public Task<Stream> ConvertToWord(CompetenceProfile data)
+    {
+        throw new NotImplementedException();
+    }
+    
+    private IEnumerable<DecayingAveragePerLayer> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskResults)
+    {
+        return domain.ArchitectureLayers.Select(layer => new DecayingAveragePerLayer(layer.Id,
+            domain.Activities.Select(activity =>
+            {
+                var decayingAverage = taskResults
+                    .Where(task => task.ArchitectureLayer == layer.Id && task.Activity == activity.Id)
+                    .Aggregate<ProfessionalTaskResult, double>(0,
+                        (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
+
+                return new DecayingAveragePerActivity(activity.Id, decayingAverage);
+            })));
+    }
+
+    private IEnumerable<DecayingAveragePerSkill> GetDecayingAverageSkills(IHboIDomain domain, IEnumerable<ProfessionalSkillResult> skillResults)
+    {
+        return domain.ProfessionalSkills.Select(skill =>
+        {
+            var decayingAverage = skillResults.Where(outcome => outcome.Skill == skill.Id)
+                .Aggregate<ProfessionalSkillResult, double>(0,
+                    (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
+
+            return new DecayingAveragePerSkill(skill.Id, decayingAverage);
+        });
     }
 }
