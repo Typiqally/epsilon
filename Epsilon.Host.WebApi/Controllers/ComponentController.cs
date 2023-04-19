@@ -16,7 +16,12 @@ public class ComponentController : ControllerBase
     private readonly ICompetenceProfileConverter _competenceProfileConverter;
     private readonly IAccountHttpService _accountHttpService;
 
-    public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration, ICompetenceProfileConverter competenceProfileConverter, IAccountHttpService accountHttpService)
+    public ComponentController(
+        IGraphQlHttpService graphQlService, 
+        IConfiguration configuration, 
+        ICompetenceProfileConverter competenceProfileConverter, 
+        IAccountHttpService accountHttpService
+    )
     {
         _graphQlService = graphQlService;
         _configuration = configuration;
@@ -33,7 +38,7 @@ public class ComponentController : ControllerBase
 
         var terms = await _accountHttpService.GetAllTerms(1);
 
-        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, new HboIDomain2018(), terms);
+        var competenceProfile = _competenceProfileConverter.ConvertToComponent(queryResult, new HboIDomain2018(), terms);
         return competenceProfile;
     }
 }
