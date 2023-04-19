@@ -100,11 +100,6 @@ public class CompetenceProfileManager : ICompetenceProfileManager
         );
     }
     
-    public Task<Stream> ConvertToWord(CompetenceProfile data)
-    {
-        throw new NotImplementedException();
-    }
-    
     private IEnumerable<DecayingAveragePerLayer> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskResults)
     {
         return domain.ArchitectureLayers.Select(layer => new DecayingAveragePerLayer(layer.Id,
