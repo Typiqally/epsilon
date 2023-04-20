@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v2
         
       - name: Run .NET Code Analysis
-        uses: dotnet/code-analysis@v1
+        uses: dotnet/code-analysis@main
         id: code-analysis
         with:
           solution: Epsilon.sln
