@@ -1,7 +1,4 @@
 import {
-    DecayingAveragePerActivity,
-    DecayingAveragePerLayer,
-    DecayingAveragePerSkill,
     IHboIDomain,
     ProfessionalSkillResult,
     ProfessionalTaskResult
@@ -45,4 +42,20 @@ export class DecayingAverage {
             }
         }) as DecayingAveragePerSkill[]
     }
+}
+
+
+export interface DecayingAveragePerActivity {
+    activity?: number;
+    decayingAverage?: number;
+}
+
+export interface DecayingAveragePerLayer {
+    architectureLayer?: number;
+    layerActivities?: DecayingAveragePerActivity[] | null;
+}
+
+export interface DecayingAveragePerSkill {
+    skill?: number;
+    decayingAverage?: number;
 }
