@@ -1,8 +1,8 @@
-﻿namespace Epsilon.Abstractions.Model
+﻿namespace Epsilon.Abstractions.Model;
+
+public class ExportData
 {
-    public class ExportData
-    {
-        public string PersonaHtml { get; set; } = string.Empty;
-        public IEnumerable<CourseModule> CourseModules { get; set; } = Enumerable.Empty<CourseModule>();
-    }
+    public string PersonaHtml { get; set; } = string.Empty;
+
+    public IEnumerable<CourseModulePackage> CourseModules { get; set; } = Enumerable.Empty<CourseModulePackage>();
 }

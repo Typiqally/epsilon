@@ -9,7 +9,8 @@ public class AssignmentHttpService : HttpService, IAssignmentHttpService
 {
     private readonly IPaginatorHttpService _paginator;
 
-    public AssignmentHttpService(HttpClient client, IPaginatorHttpService paginator) : base(client)
+    public AssignmentHttpService(HttpClient client, IPaginatorHttpService paginator)
+        : base(client)
     {
         _paginator = paginator;
     }
@@ -19,13 +20,13 @@ public class AssignmentHttpService : HttpService, IAssignmentHttpService
         var uri = $"v1/courses/{courseId}/assignments";
         var query = $"?include[]={string.Join("&include[]=", include)}";
 
-        var pages = await _paginator.GetAllPages<IEnumerable<Assignment>>(HttpMethod.Get, uri + query);
+        var pages = await _paginator.GetAllPages<IEnumerable<Assignment>>(HttpMethod.Get, new Uri(uri + query));
         return pages.SelectMany(static p => p);
     }
 
     public async Task<Assignment?> GetById(int courseId, int id)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/assignments/{id}");
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/assignments/{id}");
         var response = await Client.SendAsync(request);
 
         return await response.Content.ReadFromJsonAsync<Assignment>();
