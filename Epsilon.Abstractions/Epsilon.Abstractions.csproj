@@ -20,4 +20,8 @@
         </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="DocumentFormat.OpenXml" Version="2.18.0" />
+    </ItemGroup>
+
 </Project>

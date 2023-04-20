@@ -1,7 +1,7 @@
 using Epsilon.Abstractions.Component;
-using Epsilon.Abstractions.Component.Manager;
+using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
-using Epsilon.Component.Managers;
+using Epsilon.Component;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +23,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCanvas(canvasConfiguration);
-builder.Services.AddScoped<ICompetenceProfileManager, CompetenceProfileManager>();
+builder.Services.AddScoped<IComponent<CompetenceProfile>, CompetenceProfileComponent>();
 
 var app = builder.Build();
 
