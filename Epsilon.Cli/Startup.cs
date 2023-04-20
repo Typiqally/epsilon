@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using Epsilon.Abstractions.Export;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions;
@@ -11,13 +12,13 @@ namespace Epsilon.Cli;
 
 public class Startup : IHostedService
 {
-    private readonly ILogger<Startup> _logger;
-    private readonly IHostApplicationLifetime _lifetime;
-    private readonly ExportOptions _exportOptions;
     private readonly CanvasSettings _canvasSettings;
     private readonly ICanvasModuleCollectionFetcher _collectionFetcher;
     private readonly IModuleExporterCollection _exporterCollection;
     private readonly IExportDataPackager _exporterDataCollection;
+    private readonly ExportOptions _exportOptions;
+    private readonly IHostApplicationLifetime _lifetime;
+    private readonly ILogger<Startup> _logger;
 
     public Startup(
         ILogger<Startup> logger,
@@ -26,7 +27,8 @@ public class Startup : IHostedService
         IOptions<ExportOptions> exportSettings,
         ICanvasModuleCollectionFetcher collectionFetcher,
         IModuleExporterCollection exporterCollection,
-        IExportDataPackager exporterDataCollection)
+        IExportDataPackager exporterDataCollection
+    )
     {
         _logger = logger;
         _canvasSettings = canvasSettings.Value;
@@ -59,6 +61,7 @@ public class Startup : IHostedService
         return results;
     }
 
+    [SuppressMessage("Performance", "CA1848: Use the LoggerMessage delegates", Justification = "https://github.com/dotnet/roslyn-analyzers/issues/6281")]
     private async Task ExecuteAsync()
     {
         var results = Validate(_canvasSettings).ToArray();
@@ -96,7 +99,7 @@ public class Startup : IHostedService
             stream.Position = 0; // Reset position to zero to prepare for copy
             await stream.CopyToAsync(fileStream);
         }
-        
+
         _lifetime.StopApplication();
     }
 }

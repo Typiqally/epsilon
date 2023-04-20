@@ -16,7 +16,9 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[]
     {
-        "CONSOLE", "LOGS", "TXT",
+        "CONSOLE",
+        "LOGS",
+        "TXT",
     };
 
     public string FileExtension => "txt";
@@ -50,6 +52,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     }
 
     [SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "Cleanest way right now")]
+    [SuppressMessage("Performance", "CA1848: Use the LoggerMessage delegates", Justification = "https://github.com/dotnet/roslyn-analyzers/issues/6281")]
     private async Task WriteLineAndLog(TextWriter writer, string line)
     {
         await writer.WriteLineAsync(line);

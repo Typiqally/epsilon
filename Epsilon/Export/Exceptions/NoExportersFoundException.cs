@@ -14,11 +14,13 @@ public class NoExportersFoundException : Exception
     {
     }
 
-    public NoExportersFoundException(string? message) : base(message)
+    public NoExportersFoundException(string? message)
+        : base(message)
     {
     }
 
-    public NoExportersFoundException(string? message, Exception? innerException) : base(message, innerException)
+    public NoExportersFoundException(string? message, Exception? innerException)
+        : base(message, innerException)
     {
     }
 

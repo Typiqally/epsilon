@@ -11,44 +11,40 @@ namespace Epsilon.Export.Exporters;
 
 public class WordModuleExporter : ICanvasModuleExporter
 {
-    private static readonly TableBorders s_defaultBorders = new(
-        new TopBorder
-        {
-            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
-        },
-        new BottomBorder
-        {
-            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
-        },
-        new LeftBorder
-        {
-            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
-        },
-        new RightBorder
-        {
-            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
-        },
-        new InsideHorizontalBorder
-        {
-            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6
-        },
-        new InsideVerticalBorder
-        {
-            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6
-        }
-    );
+    private static readonly TableBorders s_defaultBorders = new TableBorders(new TopBorder
+    {
+        Val = new EnumValue<BorderValues>(BorderValues.Single),
+        Size = 3,
+    }, new BottomBorder
+    {
+        Val = new EnumValue<BorderValues>(BorderValues.Single),
+        Size = 3,
+    }, new LeftBorder
+    {
+        Val = new EnumValue<BorderValues>(BorderValues.Single),
+        Size = 3,
+    }, new RightBorder
+    {
+        Val = new EnumValue<BorderValues>(BorderValues.Single),
+        Size = 3,
+    }, new InsideHorizontalBorder
+    {
+        Val = new EnumValue<BorderValues>(BorderValues.Single),
+        Size = 6,
+    }, new InsideVerticalBorder
+    {
+        Val = new EnumValue<BorderValues>(BorderValues.Single),
+        Size = 6,
+    });
 
-    private static readonly TableProperties s_defaultTableProperties = new(s_defaultBorders);
+    private static readonly TableProperties s_defaultTableProperties = new TableProperties(s_defaultBorders);
 
-    private static readonly TableRow s_defaultHeader = new(
-        CreateTextCell("KPI's"),
-        CreateTextCell("Assignments"),
-        CreateTextCell("Score")
-    );
+    private static readonly TableRow s_defaultHeader = new TableRow(CreateTextCell("KPI's"), CreateTextCell("Assignments"), CreateTextCell("Score"));
 
     public IEnumerable<string> Formats { get; } = new[]
     {
-        "word", "docx"
+        "word",
+        "docx",
     };
 
     public string FileExtension => "docx";
@@ -130,13 +126,16 @@ public class WordModuleExporter : ICanvasModuleExporter
         return stream;
     }
 
-    private static Paragraph CreateText(string text) => new(new Run(new Text(text)));
+    private static Paragraph CreateText(string text)
+    {
+        return new Paragraph(new Run(new Text(text)));
+    }
 
-    private static TableCell CreateTextCell(string text) => new(
-        CreateText(text),
-        new TableCellProperties(new TableCellWidth
+    private static TableCell CreateTextCell(string text)
+    {
+        return new TableCell(CreateText(text), new TableCellProperties(new TableCellWidth
         {
-            Type = TableWidthUnitValues.Auto
-        })
-    );
+            Type = TableWidthUnitValues.Auto,
+        }));
+    }
 }

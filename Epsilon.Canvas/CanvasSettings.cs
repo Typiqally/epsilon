@@ -5,7 +5,7 @@ namespace Epsilon.Canvas;
 public record CanvasSettings
 {
     [Required]
-    public Uri ApiUrl { get; set; } = new("https://fhict.instructure.com/api/");
+    public Uri ApiUrl { get; set; } = new Uri("https://fhict.instructure.com/api/");
 
     [Required]
     public int CourseId { get; set; }

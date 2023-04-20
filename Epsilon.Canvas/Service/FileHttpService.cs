@@ -1,10 +1,5 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using Epsilon.Abstractions.Http;
-using Epsilon.Canvas.Abstractions.Converter;
-using Epsilon.Canvas.Abstractions.Model;
+﻿using Epsilon.Abstractions.Http;
 using Epsilon.Canvas.Abstractions.Service;
-using HtmlAgilityPack;
 
 namespace Epsilon.Canvas.Service;
 

@@ -30,11 +30,8 @@ public class ModuleExporterCollection : IModuleExporterCollection
             }
         }
 
-        if (!foundExporters.Any())
-        {
-            throw new NoExportersFoundException(formatsArray);
-        }
-
-        return foundExporters;
+        return !foundExporters.Any()
+            ? throw new NoExportersFoundException(formatsArray)
+            : (IDictionary<string, ICanvasModuleExporter>)foundExporters;
     }
 }

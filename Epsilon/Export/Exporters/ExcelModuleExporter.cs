@@ -10,7 +10,12 @@ namespace Epsilon.Export.Exporters;
 
 public class ExcelModuleExporter : ICanvasModuleExporter
 {
-    public IEnumerable<string> Formats { get; } = new[] { "XLS", "XLSX", "EXCEL" };
+    public IEnumerable<string> Formats { get; } = new[]
+    {
+        "XLS",
+        "XLSX",
+        "EXCEL",
+    };
 
     public string FileExtension => "xlsx";
 
@@ -22,7 +27,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         workbookPart.Workbook = new Workbook();
 
         // Add Sheets to the Workbook.
-        spreadsheetDocument.WorkbookPart!.Workbook.AppendChild<Sheets>(new Sheets());
+        spreadsheetDocument.WorkbookPart!.Workbook.AppendChild(new Sheets());
 
         var cellValueBuilder = new StringBuilder();
         var cellValueOutComeResultsBuilder = new StringBuilder();
@@ -82,7 +87,13 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             sheetId = sheets.Elements<Sheet>().Select(static s => s.SheetId!.Value).Max() + 1;
         }
 
-        var sheet = new Sheet { Id = relationshipId, SheetId = sheetId, Name = modulePackage.Name };
+        var sheet = new Sheet
+        {
+            Id = relationshipId,
+            SheetId = sheetId,
+            Name = modulePackage.Name,
+        };
+
         sheets.Append(sheet);
 
         workbookPart.Workbook.Save();
@@ -98,7 +109,10 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         var row = sheetData.Elements<Row>().FirstOrDefault(r => r.RowIndex! == rowIndex);
         if (row == null)
         {
-            row = new Row { RowIndex = rowIndex };
+            row = new Row
+            {
+                RowIndex = rowIndex,
+            };
             sheetData.Append(row);
         }
 
@@ -106,10 +120,13 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         worksheet.Save();
     }
 
-    private static Cell CreateTextCell(string value, string columnName, uint rowIndex) => new()
+    private static Cell CreateTextCell(string value, string columnName, uint rowIndex)
     {
-        CellReference = columnName + rowIndex,
-        CellValue = new CellValue(value),
-        DataType = CellValues.String,
-    };
+        return new Cell
+        {
+            CellReference = columnName + rowIndex,
+            CellValue = new CellValue(value),
+            DataType = CellValues.String,
+        };
+    }
 }

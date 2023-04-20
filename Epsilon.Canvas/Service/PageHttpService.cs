@@ -18,7 +18,9 @@ public class PageHttpService : HttpService, IPageHttpService
         using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/{pageName}");
         using var response = await Client.SendAsync(request);
 
-        return response.StatusCode == HttpStatusCode.OK ? (await response.Content.ReadFromJsonAsync<Page>())?.Body : null;
+        return response.StatusCode == HttpStatusCode.OK
+            ? (await response.Content.ReadFromJsonAsync<Page>())?.Body
+            : null;
     }
 
     public async Task<IEnumerable<Page>?> GetAll(int courseId, IEnumerable<string> include)
@@ -26,11 +28,8 @@ public class PageHttpService : HttpService, IPageHttpService
         using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/pages");
         using var response = await Client.SendAsync(request);
 
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            return await response.Content.ReadFromJsonAsync<IEnumerable<Page>>();
-        }
-
-        return null;
+        return response.StatusCode == HttpStatusCode.OK
+            ? await response.Content.ReadFromJsonAsync<IEnumerable<Page>>()
+            : null;
     }
 }

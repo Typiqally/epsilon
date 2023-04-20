@@ -44,7 +44,7 @@ public class PaginatorHttpService : HttpService, IPaginatorHttpService
             var query = HttpUtility.ParseQueryString(new Uri(links.NextLink).Query);
             page = query["page"];
         }
-        while ((pages.Count * Limit) % Limit == 0);
+        while (pages.Count * Limit % Limit == 0);
 
         return pages;
     }

@@ -10,8 +10,8 @@ namespace Epsilon.Export;
 
 public class ExportDataPackager : IExportDataPackager
 {
-    private readonly IPageHttpService _pageService;
     private readonly CanvasSettings _canvasSettings;
+    private readonly IPageHttpService _pageService;
 
     public ExportDataPackager(
         IPageHttpService pageService,
@@ -65,7 +65,9 @@ public class ExportDataPackager : IExportDataPackager
 
                     moduleOutcomes.Add(new CourseOutcome
                     {
-                        Name = outcome.Title, Description = outcome.ShortDescription(), Assignments = assignments!,
+                        Name = outcome.Title,
+                        Description = outcome.ShortDescription(),
+                        Assignments = assignments,
                     });
                 }
             }

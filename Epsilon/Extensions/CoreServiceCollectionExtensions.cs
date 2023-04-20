@@ -1,7 +1,5 @@
 ﻿using Epsilon.Abstractions.Export;
 using Epsilon.Canvas;
-using Epsilon.Canvas.Abstractions.Service;
-using Epsilon.Canvas.Service;
 using Epsilon.Export;
 using Epsilon.Export.Exporters;
 using Microsoft.Extensions.Configuration;

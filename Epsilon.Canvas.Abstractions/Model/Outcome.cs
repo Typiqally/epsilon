@@ -17,7 +17,7 @@ public record Outcome(
         var startPos = description.IndexOf(" EN ", StringComparison.Ordinal) + " EN ".Length;
         var endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
 
-        return description.Substring(startPos, endPos - startPos);
+        return description[startPos..endPos];
     }
 
     private string RemoveHtml()

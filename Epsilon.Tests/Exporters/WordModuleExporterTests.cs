@@ -27,11 +27,15 @@ public class WordModuleExporterTests
                             {
                                 new CourseAssignment
                                 {
-                                    Name = "Assignment 1", Url = new Uri("https://assignment1.com/"), Score = "Good"
+                                    Name = "Assignment 1",
+                                    Url = new Uri("https://assignment1.com/"),
+                                    Score = "Good",
                                 },
                                 new CourseAssignment
                                 {
-                                    Name = "Assignment 2", Url = new Uri("https://assignment2.com/"), Score = "Outstanding",
+                                    Name = "Assignment 2",
+                                    Url = new Uri("https://assignment2.com/"),
+                                    Score = "Outstanding",
                                 },
                             },
                         },
@@ -46,7 +50,7 @@ public class WordModuleExporterTests
         await using var stream = await moduleExporter.Export(data, "word");
         using var document = WordprocessingDocument.Open(stream, false);
 
-        var content = document?.MainDocumentPart?.Document?.Body?.InnerText;
+        var content = document.MainDocumentPart?.Document.Body?.InnerText;
 
         // Assert
         Assert.Contains("Module 1", content, StringComparison.InvariantCulture);

@@ -1,9 +1,8 @@
-﻿namespace Epsilon.Abstractions.Model
-{
-    public class CourseModulePackage
-    {
-        public string Name { get; set; } = string.Empty;
+﻿namespace Epsilon.Abstractions.Model;
 
-        public IEnumerable<CourseOutcome> Outcomes { get; set; } = Enumerable.Empty<CourseOutcome>();
-    }
+public class CourseModulePackage
+{
+    public string Name { get; set; } = string.Empty;
+
+    public IEnumerable<CourseOutcome> Outcomes { get; set; } = Enumerable.Empty<CourseOutcome>();
 }
