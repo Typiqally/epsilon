@@ -1,4 +1,4 @@
-﻿using Epsilon.Canvas.Abstractions.Service;
+using Epsilon.Canvas.Abstractions.Service;
 using Epsilon.Canvas.Http;
 
 namespace Epsilon.Canvas.Service;
