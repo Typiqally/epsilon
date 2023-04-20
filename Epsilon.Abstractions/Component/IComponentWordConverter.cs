@@ -2,7 +2,6 @@
 
 namespace Epsilon.Abstractions.Component;
 
-public interface IComponentWordConverter<in TData>
+public interface IComponentWordConverter<in TComponent> : IComponentConverter<OpenXmlElement, TComponent>
 {
-    public Task<OpenXmlElement> Convert(TData data);
 }

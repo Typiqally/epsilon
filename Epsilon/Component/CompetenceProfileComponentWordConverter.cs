@@ -1,13 +1,28 @@
 ﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileComponentWordConverter : IComponentWordConverter<CompetenceProfile>
+public class CompetenceProfileComponentWordConverter : ComponentConverter<OpenXmlElement, CompetenceProfile>
 {
-    public Task<OpenXmlElement> Convert(CompetenceProfile competenceProfile)
+    public override Task<OpenXmlElement> Convert(CompetenceProfile component)
     {
-        throw new NotImplementedException();
+        // TODO: This is simply an example to show the capability of the component architecture
+        var body = new Body();
+
+        foreach (var enrollmentTerm in component.Terms)
+        {
+            body.AppendChild(
+                new Paragraph(
+                    new Run(
+                        new Text(enrollmentTerm.Name)
+                    )
+                )
+            );
+        }
+
+        return Task.FromResult<OpenXmlElement>(body);
     }
 }
