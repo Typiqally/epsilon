@@ -15,9 +15,9 @@ export class DecayingAverage {
                 layerActivities: domain.activities?.map((a) => {
                     let decayingAverage = 0
                     taskResults?.filter(t => t.architectureLayer === l.id && t.activity === a.id)
-                        .map((result) => {
+                        ?.map((result) => {
                             if (result.grade) {
-                                decayingAverage += 0 * .35 + result.grade * .65
+                                decayingAverage = decayingAverage * 0.35 + result.grade * 0.65
                             }
                         })
 
@@ -31,7 +31,18 @@ export class DecayingAverage {
     }
 
 
-    // static GetDecayingAverageSkills(domain: IHboIDomain, skillResults: ProfessionalSkillResult[]): DecayingAveragePerSkill[] {
-    //
-    // }
+    static GetDecayingAverageSkills(domain: IHboIDomain, skillResults: ProfessionalSkillResult[]): DecayingAveragePerSkill[] {
+        return domain?.professionalSkills?.map((s) => {
+            let decayingAverage = 0
+            skillResults?.filter(outcome => outcome.skill === s.id)?.map((result) => {
+                if (result.grade) {
+                    decayingAverage = decayingAverage * 0.35 + result.grade * 0.65
+                }
+            })
+            return {
+                skill: s.id,
+                decayingAverage: decayingAverage as number
+            }
+        }) as DecayingAveragePerSkill[]
+    }
 }

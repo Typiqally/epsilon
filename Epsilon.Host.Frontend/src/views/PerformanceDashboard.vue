@@ -17,15 +17,11 @@
     <div />
     <CompetenceGraph
       :domain="data.hboIDomain"
-      :data="data.decayingAveragesPerTask"
-    />
-    <CompetenceGraph
-      :domain="data.hboIDomain"
       :data="DecayingAverage.GetDecayingAverageTasks(data.hboIDomain, data.professionalTaskOutcomes)"
     />
     <PersonalDevelopmentMatrix
       :domain="data.hboIDomain"
-      :data="data.decayingAveragesPerSkill"
+      :data="DecayingAverage.GetDecayingAverageSkills(data.hboIDomain, data.professionalSkillOutcomes)"
     />
   </div>
   <RoundLoader v-else />
