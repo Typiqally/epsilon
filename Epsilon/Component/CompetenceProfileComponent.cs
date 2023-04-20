@@ -1,36 +1,43 @@
-﻿
-using Epsilon.Abstractions.Component.Manager;
+﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.QueryResponse;
 using Epsilon.Canvas.Abstractions.Service;
+using Microsoft.Extensions.Configuration;
 
-namespace Epsilon.Component.Managers;
+namespace Epsilon.Component;
 
-public class CompetenceProfileManager : ICompetenceProfileManager
+public class CompetenceProfileComponent : IComponent<CompetenceProfile>
 {
+    private readonly IConfiguration _configuration;
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IAccountHttpService _accountHttpService;
-    
-    public CompetenceProfileManager(IGraphQlHttpService graphQlService, IAccountHttpService accountHttpService)
+
+    public CompetenceProfileComponent(
+        IGraphQlHttpService graphQlService,
+        IAccountHttpService accountHttpService,
+        IConfiguration configuration
+    )
     {
         _graphQlService = graphQlService;
         _accountHttpService = accountHttpService;
+        _configuration = configuration;
     }
-    
-    public async Task<CompetenceProfile> GetComponent(string studentId)
+
+    public async Task<CompetenceProfile> Fetch()
     {
+        var studentId = _configuration["Canvas:StudentId"];
         var outcomesQuery = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
-        
+
         var outcomes = await _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(outcomesQuery);
         var terms = await _accountHttpService.GetAllTerms(1);
-        
+
         var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018(), terms);
 
         return competenceProfile;
     }
-    
+
     private CompetenceProfile ConvertToComponent(
         GetAllUserCoursesSubmissionOutcomes getAllUserCoursesSubmissionOutcomes,
         IHboIDomain domain,
@@ -99,7 +106,7 @@ public class CompetenceProfileManager : ICompetenceProfileManager
             GetDecayingAverageSkills(domain, professionalResults)
         );
     }
-    
+
     private IEnumerable<DecayingAveragePerLayer> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskResults)
     {
         return domain.ArchitectureLayers.Select(layer => new DecayingAveragePerLayer(layer.Id,

@@ -10,4 +10,8 @@
       <ProjectReference Include="..\Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="DocumentFormat.OpenXml" Version="2.18.0" />
+    </ItemGroup>
+
 </Project>
