@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileComponent : IComponent<CompetenceProfile>
+public class CompetenceProfileComponent : Component<CompetenceProfile>
 {
     private readonly IConfiguration _configuration;
     private readonly IGraphQlHttpService _graphQlService;
@@ -25,7 +25,7 @@ public class CompetenceProfileComponent : IComponent<CompetenceProfile>
         _configuration = configuration;
     }
 
-    public async Task<CompetenceProfile> Fetch()
+    public async override Task<CompetenceProfile> Fetch()
     {
         var studentId = _configuration["Canvas:StudentId"];
         var outcomesQuery = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
@@ -131,5 +131,10 @@ public class CompetenceProfileComponent : IComponent<CompetenceProfile>
 
             return new DecayingAveragePerSkill(skill.Id, decayingAverage);
         });
+    }
+
+    public Task<object> FetchObject()
+    {
+        throw new NotImplementedException();
     }
 }

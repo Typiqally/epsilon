@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml;
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
@@ -23,7 +24,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCanvas(canvasConfiguration);
+
+builder.Services.AddScoped<IComponent, CompetenceProfileComponent>();
 builder.Services.AddScoped<IComponent<CompetenceProfile>, CompetenceProfileComponent>();
+builder.Services.AddScoped<IComponentConverter<OpenXmlElement>, CompetenceProfileComponentWordConverter>();
+builder.Services.AddScoped<IComponentConverter<OpenXmlElement, CompetenceProfile>, CompetenceProfileComponentWordConverter>();
 
 var app = builder.Build();
 

@@ -1,114 +1,56 @@
-﻿using Epsilon.Abstractions.Model;
-using Epsilon.Export.Exporters;
-using Epsilon.Host.WebApi.Models;
-using Epsilon.Host.WebApi.Responses;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Epsilon.Abstractions.Component;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
 
 [ApiController]
-[Route("api/document/{documentId:int}/")]
+[Route("[controller]")]
 public class DocumentController : Controller
 {
-    private static int GetRandomNumber()
+    private readonly IEnumerable<IComponent> _components;
+    private readonly IEnumerable<IComponentConverter<OpenXmlElement>> _wordConverters;
+
+    public DocumentController(
+        IEnumerable<IComponent> components,
+        IEnumerable<IComponentConverter<OpenXmlElement>> wordConverters
+    )
     {
-        return new Random().Next(0, 10);
+        _components = components;
+        _wordConverters = wordConverters;
     }
 
-    [HttpGet("structure")]
-    public IActionResult GetDocumentStructure(int documentId)
-    {
-        return Ok(new GetDocumentStructureResponse
-        {
-            DocumentId = documentId,
-            ComponentIds = new[] { GetRandomNumber(), GetRandomNumber(), GetRandomNumber() }
-        });
-    }
-    
     [HttpGet("word")]
-    public async Task<IActionResult> GetWord(int documentId)
+    public async Task<IActionResult> DownloadWordDocument()
     {
-        var wordExporter = new WordModuleExporter();
-        var wordContentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-        var stream = await wordExporter.Export(new ExportData
+        // TODO: Move this logic to a separate class, don't put it in the controller like this
+        var stream = new MemoryStream();
+        using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
+
+        document.AddMainDocumentPart();
+        document.MainDocumentPart!.Document = new Document(new Body());
+
+        var documentPart = document.MainDocumentPart.Document;
+
+        foreach (var component in _components)
         {
-            CourseModules = new []
+            var componentData = await component.FetchObject();
+            var converter = _wordConverters.FirstOrDefault(c => c.Validate(componentData?.GetType()));
+
+            if (componentData != null && converter != null)
             {
-                new CourseModule
-                {
-                    Name = "Module 1",
-                    Outcomes = new List<CourseOutcome>
-                    {
-                        new CourseOutcome
-                        {
-                            Name = "Outcome 1",
-                            Description = "Description 1",
-                            Assignments = new List<CourseAssignment>
-                            {
-                                new CourseAssignment
-                                {
-                                    Name = "Assignment 1",
-                                    Url = "https://google.com/",
-                                    Score = "Outstanding"
-                                }
-                            }
-                        }
-                    }
-                }
+                var element = await converter.ConvertObject(componentData);
+                documentPart.Append(element);
             }
-        }, "word");
-        
-        // Reset position to zero to prepare for copy
+        }
+
+        document.Save();
+        document.Close();
+
         stream.Position = 0;
 
-        return File(stream, wordContentType, "CompetenceDocument.docx");
-    }
-    
-    [HttpGet("home-page")]
-    public IActionResult GetHomePage(int documentId)
-    {
-        return Ok(new GetDocumentHomePageResponse
-        {
-            DocumentId = documentId,
-            HomePage = new HomePage
-            {
-                Id = 2,
-                Type = "homepage",
-                Title = "Homepage",
-                Description = "The homepage of the website",
-                Config = new Dictionary<string, string>
-                {
-                    { "HomePageRecord", "Jelle" },
-                },
-                Data = new HomePageData
-                {
-                    SomeHomePageDataArray = new[] { "red", "green", "blue" }
-                }
-            }
-        });
-    }
-
-    [HttpGet("kpi-matrix")]
-    public IActionResult GetKpiMatrix(int documentId)
-    {
-        return Ok(new GetDocumentKpiMatrixResponse
-        {
-            DocumentId = documentId,
-            KpiMatrix = new KpiMatrix
-            {
-                Id = 1,
-                Type = "kpi-matrix",
-                Title = "KPI Matrix",
-                Description = "A matrix of KPIs",
-                Config = new Dictionary<string, string>
-                {
-                    { "KpiConfigRecord", "Sven" },
-                },
-                Data = new KpiMatrixData
-                {
-                    SomeKpiMatrixDataArray = new[] { "red", "green", "blue" }
-                }
-            },
-        });
+        return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "CompetenceDocument.docx");
     }
 }
