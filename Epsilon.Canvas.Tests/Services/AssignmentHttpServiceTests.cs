@@ -1,55 +1,52 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using Epsilon.Abstractions.Http;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
+using Epsilon.Canvas.Service;
 using Moq;
-using Moq.Protected;
 using Xunit;
 
-namespace Epsilon.Canvas.Service.Tests
+namespace Epsilon.Canvas.Tests.Services;
+
+public class AssignmentHttpServiceTests
 {
-    public class AssignmentHttpServiceTests
+    [Fact]
+    public async Task GivenCourseIdAndIncludeSubmissionAndRubricAssessment_WhenCanvasAssignmentsAreRetrieved_ThenAssignmentsAreReturned()
     {
-        private readonly HttpClient _httpClient;
-        private readonly Mock<IPaginatorHttpService> _paginatorHttpServiceMock;
-        private readonly AssignmentHttpService _assignmentHttpService;
-
-        public AssignmentHttpServiceTests()
+        // Arrange
+        const int courseId = 123;
+        var include = new[]
         {
-            _httpClient = new HttpClient();
-            _paginatorHttpServiceMock = new Mock<IPaginatorHttpService>();
-            _assignmentHttpService = new AssignmentHttpService(_httpClient, _paginatorHttpServiceMock.Object);
-        }
-
-        [Fact]
-        public async Task
-            GivenCourseIdAndIncludeSubmissionAndRubricAssessment_WhenCanvasAssignmentsAreRetrieved_ThenAssignmentsAreReturned()
+            "submission",
+            "rubric_assessment",
+        };
+        var assignments = new[]
         {
-            // Arrange
-            var courseId = 123;
-            var include = new[] {"submission", "rubric_assessment"};
-            var assignments = new[]
+            new Assignment(1, "Assignment 1", new Uri("https://example.com/1"), null),
+            new Assignment(2, "Assignment 2", new Uri("https://example.com/2"), new Submission(null, null, null, null)),
+            new Assignment(3, "Assignment 3", new Uri("https://example.com/3"), new Submission(null, null, new RubricAssessment(8.5, 1, Enumerable.Empty<RubricRating>()), null)
+            ),
+        };
+
+        var paginatorHttpServiceMock = new Mock<IPaginatorHttpService>();
+        paginatorHttpServiceMock.Setup(static x => x.GetAllPages<IEnumerable<Assignment>>(
+                HttpMethod.Get,
+                new Uri("v1/courses/{courseId}/assignments?include[]=submission&include[]=rubric_assessment")))
+            .ReturnsAsync(new[]
             {
-                new Assignment(1, "Assignment 1", new("https://example.com/1"), null),
-                new Assignment(2, "Assignment 2", new("https://example.com/2"), new Submission(null, null, null, null)),
-                new Assignment(3, "Assignment 3", new("https://example.com/3"),
-                    new Submission(null, null, new RubricAssessment(8.5, 1, Enumerable.Empty<RubricRating>()), null)),
-            };
-            _paginatorHttpServiceMock.Setup(x => x.GetAllPages<IEnumerable<Assignment>>(HttpMethod.Get,
-                    $"v1/courses/{courseId}/assignments?include[]=submission&include[]=rubric_assessment"))
-                .ReturnsAsync(new[] {assignments});
+                assignments,
+            });
 
-            // Act
-            var result = await _assignmentHttpService.GetAll(courseId, include);
+        using var httpClientMock = new HttpClient();
+        var assignmentHttpService = new AssignmentHttpService(httpClientMock, paginatorHttpServiceMock.Object);
 
-            // Assert
-            Assert.Equal(assignments, result);
-        }
+        // Act
+        var result = await assignmentHttpService.GetAll(courseId, include);
+
+        // Assert
+        Assert.Equal(assignments, result);
     }
 }

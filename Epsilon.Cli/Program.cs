@@ -25,20 +25,9 @@ IHostBuilder CreateHostBuilder(string[] args)
         });
 }
 
-try
-{
-    Log.Information("Starting up");
-    
-    await CreateHostBuilder(args)
-        .UseSerilog()
-        .Build()
-        .RunAsync();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "Application was unable to start due to fatal error");
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+Log.Information("Starting up");
+
+await CreateHostBuilder(args)
+    .UseSerilog()
+    .Build()
+    .RunAsync();
