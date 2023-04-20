@@ -8,32 +8,33 @@ namespace Epsilon.Canvas.Service;
 
 public class ModuleHttpService : HttpService, IModuleHttpService
 {
-    public ModuleHttpService(HttpClient client) : base(client)
+    public ModuleHttpService(HttpClient client)
+        : base(client)
     {
     }
 
-    public async Task<IEnumerable<Module>?> GetAll(int courseId, IEnumerable<string> include)
+    public async Task<IEnumerable<CourseModule>?> GetAll(int courseId, IEnumerable<string> include)
     {
         var url = new StringBuilder($"v1/courses/{courseId}/modules");
         var query = $"?include[]={string.Join("&include[]=", include)}";
 
-        var request = new HttpRequestMessage(HttpMethod.Get, url + query);
+        using var request = new HttpRequestMessage(HttpMethod.Get, url + query);
         var response = await Client.SendAsync(request);
 
-        return await response.Content.ReadFromJsonAsync<IEnumerable<Module>>();
+        return await response.Content.ReadFromJsonAsync<IEnumerable<CourseModule>>();
     }
 
-    public async Task<Module?> GetById(int courseId, int id)
+    public async Task<CourseModule?> GetById(int courseId, int id)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{id}");
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{id}");
         var response = await Client.SendAsync(request);
 
-        return await response.Content.ReadFromJsonAsync<Module>();
+        return await response.Content.ReadFromJsonAsync<CourseModule>();
     }
 
     public async Task<IEnumerable<ModuleItem>?> GetAllItems(int courseId, int moduleId, int limit = 100)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{moduleId}/items?per_page={limit}");
+        using var request = new HttpRequestMessage(HttpMethod.Get, $"v1/courses/{courseId}/modules/{moduleId}/items?per_page={limit}");
         var response = await Client.SendAsync(request);
 
         return await response.Content.ReadFromJsonAsync<IEnumerable<ModuleItem>>();

@@ -24,17 +24,14 @@ public class ModuleExporterCollection : IModuleExporterCollection
 
         foreach (var exporter in _exporters)
         {
-            foreach (var format in formatsArray.Where(f => exporter.Formats.Contains(f.ToLower())))
+            foreach (var format in formatsArray.Where(f => exporter.Formats.Contains(f.ToUpperInvariant())))
             {
                 foundExporters.Add(format, exporter);
             }
         }
 
-        if (!foundExporters.Any())
-        {
-            throw new NoExportersFoundException(formatsArray);
-        }
-
-        return foundExporters;
+        return !foundExporters.Any()
+            ? throw new NoExportersFoundException(formatsArray)
+            : (IDictionary<string, ICanvasModuleExporter>)foundExporters;
     }
 }

@@ -2,5 +2,5 @@ namespace Epsilon.Canvas.Abstractions.Service;
 
 public interface IFileHttpService
 {
-    Task<IEnumerable<byte>?> GetFileByteArray(string url);
+    Task<IEnumerable<byte>?> GetFileByteArray(Uri url);
 }

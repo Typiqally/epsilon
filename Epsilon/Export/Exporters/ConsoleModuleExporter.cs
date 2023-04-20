@@ -1,4 +1,5 @@
-﻿using Epsilon.Abstractions.Export;
+﻿using System.Diagnostics.CodeAnalysis;
+using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
 using Microsoft.Extensions.Logging;
 
@@ -13,15 +14,19 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
         _logger = logger;
     }
 
-    public IEnumerable<string> Formats { get; } = new[] {"console", "logs", "txt"};
+    public IEnumerable<string> Formats { get; } = new[]
+    {
+        "CONSOLE",
+        "LOGS",
+        "TXT",
+    };
 
     public string FileExtension => "txt";
-
 
     public async Task<Stream> Export(ExportData data, string format)
     {
         var stream = new MemoryStream();
-        var writer = new StreamWriter(stream);
+        await using var writer = new StreamWriter(stream);
 
         foreach (var module in data.CourseModules)
         {
@@ -30,7 +35,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
 
             foreach (var outcome in module.Outcomes)
             {
-                await WriteLineAndLog(writer, "");
+                await WriteLineAndLog(writer, string.Empty);
                 await WriteLineAndLog(writer, $"KPI: {outcome.Name}");
 
                 foreach (var assignment in outcome.Assignments)
@@ -46,6 +51,8 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
         return stream;
     }
 
+    [SuppressMessage("Usage", "CA2254:Template should be a static expression", Justification = "Cleanest way right now")]
+    [SuppressMessage("Performance", "CA1848: Use the LoggerMessage delegates", Justification = "https://github.com/dotnet/roslyn-analyzers/issues/6281")]
     private async Task WriteLineAndLog(TextWriter writer, string line)
     {
         await writer.WriteLineAsync(line);

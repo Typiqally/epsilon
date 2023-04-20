@@ -1,3 +1,3 @@
 namespace Epsilon.Canvas.Abstractions.Model;
 
-public record ModuleOutcomeResultCollection(Module Module, OutcomeResultCollection Collection);
+public record ModuleOutcomeResultCollection(CourseModule CourseModule, OutcomeResultCollection Collection);
