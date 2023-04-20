@@ -10,8 +10,9 @@
 
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts";
-import {DecayingAveragePerLayer, IHboIDomain} from "../logic/Api";
+import {IHboIDomain} from "../logic/Api";
 import {onMounted} from "vue";
+import {DecayingAveragePerLayer} from "/@/logic/DecayingAverage";
 
 const series: Array<{ name: string, color: string, data: Array<string | number> | undefined }> = []
 const chartOptions = {

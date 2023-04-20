@@ -17,7 +17,7 @@
     <div />
     <CompetenceGraph
       :domain="data.hboIDomain"
-      :data="DecayingAverage.GetDecayingAverageTasks(data.hboIDomain, data.professionalTaskOutcomes)"
+      :data="DecayingAverage.GetDecayingAverageTasks(data.hboIDomain, filteredProfessionalTaskOutcomes)"
     />
     <PersonalDevelopmentMatrix
       :domain="data.hboIDomain"
@@ -51,8 +51,7 @@ const filteredProfessionalTaskOutcomes = computed(() => {
     if (!selectedTerm.value) {
         return data.value?.professionalTaskOutcomes
     }
-
-    return data.value.professionalTaskOutcomes.filter(o => o.assessedAt < selectedTerm.value.end_at)
+    return data.value.professionalTaskOutcomes?.filter(o => o.assessedAt < selectedTerm.value.end_at)
 })
 
 onMounted(() => {

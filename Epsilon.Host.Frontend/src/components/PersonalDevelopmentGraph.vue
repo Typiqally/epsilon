@@ -10,8 +10,9 @@
 
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts";
-import {DecayingAveragePerSkill, IHboIDomain} from "../logic/Api";
+import {IHboIDomain} from "/@/logic/Api";
 import {onMounted} from "vue";
+import {DecayingAveragePerSkill} from "/@/logic/DecayingAverage";
 
 const props = defineProps<{
     domain: IHboIDomain
