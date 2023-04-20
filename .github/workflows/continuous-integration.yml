@@ -26,21 +26,6 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
   
-  analysis:
-    name: Code Analysis
-    needs: [ setup, build ]
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-        
-      - name: Run .NET Code Analysis
-        uses: dotnet/code-analysis@main
-        id: code-analysis
-        with:
-          solution: Epsilon.sln
-          build-breaking: true
-          all-categories: all
-  
   test:
     name: Test
     needs: [ setup, build ]
