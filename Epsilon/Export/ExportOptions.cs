@@ -1,4 +1,6 @@
-﻿namespace Epsilon.Export;
+﻿using System.Globalization;
+
+namespace Epsilon.Export;
 
 public class ExportOptions
 {
@@ -9,5 +11,5 @@ public class ExportOptions
     public string? Modules { get; set; }
 
     public string FormattedOutputName => OutputName
-        .Replace("{DateTime}", DateTime.Now.ToString("ddMMyyyyHHmmss"));
+        .Replace("{DateTime}", DateTime.Now.ToString("ddMMyyyyHHmmss", CultureInfo.InvariantCulture), StringComparison.InvariantCulture);
 }

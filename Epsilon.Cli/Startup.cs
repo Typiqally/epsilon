@@ -49,58 +49,6 @@ public class Startup : IHostedService
         return Task.CompletedTask;
     }
 
-    private async Task ExecuteAsync()
-    {
-        try
-        {
-            var results = Validate(_canvasSettings).ToArray();
-            if (results.Any())
-            {
-                foreach (var validationResult in results)
-                {
-                    _logger.LogError("Error: {Message}", validationResult.ErrorMessage);
-                }
-
-                _lifetime.StopApplication();
-                return;
-            }
-
-            var modules = _exportOptions.Modules?.Split(",");
-            _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId,
-                _canvasSettings.ApiUrl);
-            _logger.LogInformation("Downloading results, this may take a few seconds...");
-            var items = _collectionFetcher.GetAll(_canvasSettings.CourseId, modules);
-            var formattedItems = await _exporterDataCollection.GetExportData(items);
-
-            var formats = _exportOptions.Formats.Split(",");
-            var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
-
-            _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
-
-            foreach (var (format, exporter) in exporters)
-            {
-                _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
-
-                var stream = await exporter.Export(formattedItems, format);
-
-                await using var fileStream =
-                    new FileStream($"{_exportOptions.FormattedOutputName}.{exporter.FileExtension}", FileMode.Create,
-                        FileAccess.Write);
-
-                stream.Position = 0; // Reset position to zero to prepare for copy
-                await stream.CopyToAsync(fileStream);
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occured:");
-        }
-        finally
-        {
-            _lifetime.StopApplication();
-        }
-    }
-
     private static IEnumerable<ValidationResult> Validate(object model)
     {
         var results = new List<ValidationResult>();
@@ -109,5 +57,46 @@ public class Startup : IHostedService
         Validator.TryValidateObject(model, context, results, true);
 
         return results;
+    }
+
+    private async Task ExecuteAsync()
+    {
+        var results = Validate(_canvasSettings).ToArray();
+        if (results.Any())
+        {
+            foreach (var validationResult in results)
+            {
+                _logger.LogError("Error: {Message}", validationResult.ErrorMessage);
+            }
+
+            _lifetime.StopApplication();
+            return;
+        }
+
+        var modules = _exportOptions.Modules?.Split(",");
+        _logger.LogInformation("Targeting Canvas course: {CourseId}, at {Url}", _canvasSettings.CourseId, _canvasSettings.ApiUrl);
+        _logger.LogInformation("Downloading results, this may take a few seconds...");
+        var items = _collectionFetcher.GetAll(_canvasSettings.CourseId, modules);
+        var formattedItems = await _exporterDataCollection.GetExportData(items);
+
+        var formats = _exportOptions.Formats.Split(",");
+        var exporters = _exporterCollection.DetermineExporters(formats).ToArray();
+
+        _logger.LogInformation("Attempting to use following formats: {Formats}", string.Join(", ", formats));
+
+        foreach (var (format, exporter) in exporters)
+        {
+            _logger.LogInformation("Exporting to {Format} using {Exporter}...", format, exporter.GetType().Name);
+
+            var stream = await exporter.Export(formattedItems, format);
+
+            await using var fileStream =
+                new FileStream($"{_exportOptions.FormattedOutputName}.{exporter.FileExtension}", FileMode.Create, FileAccess.Write);
+
+            stream.Position = 0; // Reset position to zero to prepare for copy
+            await stream.CopyToAsync(fileStream);
+        }
+        
+        _lifetime.StopApplication();
     }
 }

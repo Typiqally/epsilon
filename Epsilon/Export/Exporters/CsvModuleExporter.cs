@@ -6,16 +6,16 @@ namespace Epsilon.Export.Exporters;
 
 public class CsvModuleExporter : ICanvasModuleExporter
 {
-    public IEnumerable<string> Formats { get; } = new[] {"csv"};
+    public IEnumerable<string> Formats { get; } = new[] { "CSV" };
 
     public string FileExtension => "csv";
 
     public async Task<Stream> Export(ExportData data, string format)
     {
         var stream = new MemoryStream();
-        var writer = new StreamWriter(stream);
+        await using var writer = new StreamWriter(stream);
 
-        var dt = CreateDataTable(data.CourseModules);
+        using var dt = CreateDataTable(data.CourseModules);
         WriteHeader(writer, dt);
         WriteRows(writer, dt);
 
@@ -24,7 +24,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
         return stream;
     }
 
-    private static DataTable CreateDataTable(IEnumerable<CourseModule> data)
+    private static DataTable CreateDataTable(IEnumerable<CourseModulePackage> data)
     {
         var dataTable = new DataTable();
 
@@ -70,7 +70,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
                 var value = dr[dtColumn.Ordinal].ToString();
                 if (value != null)
                 {
-                    if (value.Contains(';'))
+                    if (value.Contains(';', StringComparison.InvariantCulture))
                     {
                         value = $"\"{value}\"";
                         writer.Write(value);

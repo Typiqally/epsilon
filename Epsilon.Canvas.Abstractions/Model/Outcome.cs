@@ -11,8 +11,9 @@ public record Outcome(
 {
     public string ShortDescription()
     {
-        string description = RemoveHtml();
-        //Function gives only the short English description back of the outcome. 
+        var description = RemoveHtml();
+
+        // Function gives only the short English description back of the outcome.
         var startPos = description.IndexOf(" EN ", StringComparison.Ordinal) + " EN ".Length;
         var endPos = description.IndexOf(" NL ", StringComparison.Ordinal);
 

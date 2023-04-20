@@ -9,7 +9,8 @@ public class SubmissionHttpService : HttpService, ISubmissionHttpService
 {
     private readonly IPaginatorHttpService _paginator;
 
-    public SubmissionHttpService(HttpClient client, IPaginatorHttpService paginator) : base(client)
+    public SubmissionHttpService(HttpClient client, IPaginatorHttpService paginator)
+        : base(client)
     {
         _paginator = paginator;
     }
@@ -19,7 +20,7 @@ public class SubmissionHttpService : HttpService, ISubmissionHttpService
         var url = new StringBuilder($"v1/courses/{courseId}/students/submissions");
         var query = $"?include[]={string.Join("&include[]=", include)}";
 
-        var responses = await _paginator.GetAllPages<IEnumerable<Submission>>(HttpMethod.Get, url + query);
+        var responses = await _paginator.GetAllPages<IEnumerable<Submission>>(HttpMethod.Get, new Uri(url + query));
         return responses.SelectMany(static r => r);
     }
 }

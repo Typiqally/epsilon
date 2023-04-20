@@ -24,7 +24,7 @@ public class ModuleExporterCollection : IModuleExporterCollection
 
         foreach (var exporter in _exporters)
         {
-            foreach (var format in formatsArray.Where(f => exporter.Formats.Contains(f.ToLower())))
+            foreach (var format in formatsArray.Where(f => exporter.Formats.Contains(f.ToUpperInvariant())))
             {
                 foundExporters.Add(format, exporter);
             }

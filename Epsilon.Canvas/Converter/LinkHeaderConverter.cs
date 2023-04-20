@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using Epsilon.Canvas.Abstractions.Converter;
 using Epsilon.Canvas.Abstractions.Model;
 
@@ -31,21 +32,21 @@ public class LinkHeaderConverter : ILinkHeaderConverter
 
             if (relMatch.Success && linkMatch.Success)
             {
-                var relation = relMatch.Value.ToLower();
+                var relation = relMatch.Value.ToUpperInvariant();
                 var link = linkMatch.Value;
 
                 switch (relation)
                 {
-                    case "first":
+                    case "FIRST":
                         linkHeader.FirstLink = link;
                         break;
-                    case "prev":
+                    case "PREV":
                         linkHeader.PrevLink = link;
                         break;
-                    case "next":
+                    case "NEXT":
                         linkHeader.NextLink = link;
                         break;
-                    case "last":
+                    case "LAST":
                         linkHeader.LastLink = link;
                         break;
                 }

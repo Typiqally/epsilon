@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -9,11 +10,11 @@ namespace Epsilon.Export.Exporters;
 
 public class ExcelModuleExporter : ICanvasModuleExporter
 {
-    public IEnumerable<string> Formats { get; } = new[] {"xls", "xlsx", "excel"};
+    public IEnumerable<string> Formats { get; } = new[] { "XLS", "XLSX", "EXCEL" };
 
     public string FileExtension => "xlsx";
 
-    public async Task<Stream> Export(ExportData data, string format)
+    public Task<Stream> Export(ExportData data, string format)
     {
         var stream = new MemoryStream();
         using var spreadsheetDocument = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook);
@@ -43,7 +44,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             {
                 foreach (var assignment in outcome.Assignments)
                 {
-                    cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
+                    cellValueBuilder.AppendLine(CultureInfo.InvariantCulture, $"{assignment.Name} {assignment.Url}");
                     cellValueOutComeResultsBuilder.AppendLine(assignment.Score);
                 }
 
@@ -62,11 +63,11 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             }
         }
 
-        return stream;
+        return Task.FromResult<Stream>(stream);
     }
 
     // Given a WorkbookPart, inserts a new worksheet.
-    private static WorksheetPart CreateWorksheet(CourseModule module, WorkbookPart workbookPart)
+    private static WorksheetPart CreateWorksheet(CourseModulePackage modulePackage, WorkbookPart workbookPart)
     {
         var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
         worksheetPart.Worksheet = new Worksheet(new SheetData());
@@ -81,7 +82,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
             sheetId = sheets.Elements<Sheet>().Select(static s => s.SheetId!.Value).Max() + 1;
         }
 
-        var sheet = new Sheet {Id = relationshipId, SheetId = sheetId, Name = module.Name};
+        var sheet = new Sheet { Id = relationshipId, SheetId = sheetId, Name = modulePackage.Name };
         sheets.Append(sheet);
 
         workbookPart.Workbook.Save();
@@ -97,7 +98,7 @@ public class ExcelModuleExporter : ICanvasModuleExporter
         var row = sheetData.Elements<Row>().FirstOrDefault(r => r.RowIndex! == rowIndex);
         if (row == null)
         {
-            row = new Row {RowIndex = rowIndex};
+            row = new Row { RowIndex = rowIndex };
             sheetData.Append(row);
         }
 

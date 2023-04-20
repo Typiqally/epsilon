@@ -1,10 +1,10 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Service;
 using HtmlAgilityPack;
 
 namespace Epsilon.Export.Exporters;
@@ -12,12 +12,30 @@ namespace Epsilon.Export.Exporters;
 public class WordModuleExporter : ICanvasModuleExporter
 {
     private static readonly TableBorders s_defaultBorders = new(
-        new TopBorder {Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3},
-        new BottomBorder {Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3},
-        new LeftBorder {Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3},
-        new RightBorder {Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3},
-        new InsideHorizontalBorder {Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6},
-        new InsideVerticalBorder {Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6}
+        new TopBorder
+        {
+            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
+        },
+        new BottomBorder
+        {
+            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
+        },
+        new LeftBorder
+        {
+            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
+        },
+        new RightBorder
+        {
+            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3
+        },
+        new InsideHorizontalBorder
+        {
+            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6
+        },
+        new InsideVerticalBorder
+        {
+            Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6
+        }
     );
 
     private static readonly TableProperties s_defaultTableProperties = new(s_defaultBorders);
@@ -28,19 +46,12 @@ public class WordModuleExporter : ICanvasModuleExporter
         CreateTextCell("Score")
     );
 
-    private readonly IFileHttpService _fileService;
-    public IEnumerable<string> Formats { get; } = new[] {"word", "docx"};
+    public IEnumerable<string> Formats { get; } = new[]
+    {
+        "word", "docx"
+    };
+
     public string FileExtension => "docx";
-
-    public WordModuleExporter(IFileHttpService fileService)
-    {
-        _fileService = fileService;
-    }
-
-    public WordModuleExporter()
-    {
-        throw new NotImplementedException();
-    }
 
     public async Task<Stream> Export(ExportData data, string format)
     {
@@ -54,26 +65,30 @@ public class WordModuleExporter : ICanvasModuleExporter
         var cellValueBuilder = new StringBuilder();
         var cellValueOutComeResultsBuilder = new StringBuilder();
 
-        var altChunkId = "HomePage";
+        const string altChunkId = "HomePage";
 
-        var personaHTML = new HtmlDocument();
-        personaHTML.LoadHtml(data.PersonaHtml);
-
+        var personaHtml = new HtmlDocument();
+        personaHtml.LoadHtml(data.PersonaHtml);
 
         using var ms = new MemoryStream(new UTF8Encoding(true).GetPreamble()
-            .Concat(Encoding.UTF8.GetBytes($"<html>{personaHTML.Text}</html>")).ToArray());
+            .Concat(Encoding.UTF8.GetBytes($"<html>{personaHtml.Text}</html>")).ToArray());
 
         var formatImportPart =
             document.MainDocumentPart.AddAlternativeFormatImportPart(
                 AlternativeFormatImportPartType.Html, altChunkId);
 
         formatImportPart.FeedData(ms);
-        AltChunk altChunk = new AltChunk();
-        altChunk.Id = altChunkId;
+        var altChunk = new AltChunk
+        {
+            Id = altChunkId,
+        };
 
         body?.Append(altChunk);
-        ms.DisposeAsync();
-        body?.Append(new Paragraph(new Run(new Break() {Type = BreakValues.Page})));
+        await ms.DisposeAsync();
+        body?.Append(new Paragraph(new Run(new Break
+        {
+            Type = BreakValues.Page,
+        })));
 
         foreach (var module in data.CourseModules)
         {
@@ -88,7 +103,7 @@ public class WordModuleExporter : ICanvasModuleExporter
             {
                 foreach (var assignment in kpi.Assignments)
                 {
-                    cellValueBuilder.AppendLine($"{assignment.Name} {assignment.Url}");
+                    cellValueBuilder.AppendLine(CultureInfo.InvariantCulture, $"{assignment.Name} {assignment.Url}");
                     cellValueOutComeResultsBuilder.AppendLine(assignment.Score);
                 }
 
@@ -119,25 +134,9 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     private static TableCell CreateTextCell(string text) => new(
         CreateText(text),
-        new TableCellProperties(new TableCellWidth {Type = TableWidthUnitValues.Auto})
-    );
-
-    private async Task ReplaceImageSrcWithBase64String(HtmlDocument htmlDoc)
-    {
-        foreach (var node in htmlDoc.DocumentNode.SelectNodes("//img"))
+        new TableCellProperties(new TableCellWidth
         {
-            var imageSrc = node
-                .SelectNodes("//img")
-                .First()
-                .Attributes["src"].Value;
-
-            if (imageSrc == null)
-                throw new ArgumentNullException(nameof(imageSrc));
-
-            var imageBytes = await _fileService.GetFileByteArray(imageSrc);
-            var imageBase64 = Convert.ToBase64String(imageBytes.ToArray());
-
-            node.SetAttributeValue("src", $"data:image/jpeg;base64,{imageBase64}");
-        }
-    }
+            Type = TableWidthUnitValues.Auto
+        })
+    );
 }

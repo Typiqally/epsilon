@@ -13,16 +13,13 @@ public class ExportDataPackager : IExportDataPackager
     private readonly IPageHttpService _pageService;
     private readonly CanvasSettings _canvasSettings;
 
-    public ExportDataPackager(IPageHttpService pageService,
-        IOptions<CanvasSettings> canvasSettings)
+    public ExportDataPackager(
+        IPageHttpService pageService,
+        IOptions<CanvasSettings> canvasSettings
+    )
     {
         _pageService = pageService;
         _canvasSettings = canvasSettings.Value;
-    }
-
-    public ExportDataPackager()
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<ExportData> GetExportData(IAsyncEnumerable<ModuleOutcomeResultCollection> data)
@@ -30,11 +27,14 @@ public class ExportDataPackager : IExportDataPackager
         var courseId = _canvasSettings.CourseId;
         var personaHtml = await _pageService.GetPageByName(courseId, "front_page");
 
-        var output = new List<CourseModule>();
+        var output = new List<CourseModulePackage>();
 
-        await foreach (var item in data.Where(m => m.Collection.OutcomeResults.Any()))
+        await foreach (var item in data.Where(static m => m.Collection.OutcomeResults.Any()))
         {
-            var module = new CourseModule {Name = item.Module.Name};
+            var module = new CourseModulePackage
+            {
+                Name = item.CourseModule.Name,
+            };
             var links = item.Collection.Links;
 
             Debug.Assert(links != null, nameof(links) + " != null");
@@ -56,7 +56,7 @@ public class ExportDataPackager : IExportDataPackager
                         .Select(assignmentId => new CourseAssignment
                         {
                             Name = alignments[assignmentId!].Name,
-                            Url = alignments[assignmentId!].Url.ToString(),
+                            Url = alignments[assignmentId!].Url,
                             Score = item.Collection.OutcomeResults
                                 .First(o => o.Link.Outcome == outcomeId && o.Link.Assignment == assignmentId)
                                 .Grade() ?? "N/A",
@@ -65,9 +65,7 @@ public class ExportDataPackager : IExportDataPackager
 
                     moduleOutcomes.Add(new CourseOutcome
                     {
-                        Name = outcome.Title,
-                        Description = outcome.ShortDescription(),
-                        Assignments = assignments!,
+                        Name = outcome.Title, Description = outcome.ShortDescription(), Assignments = assignments!,
                     });
                 }
             }
@@ -77,6 +75,10 @@ public class ExportDataPackager : IExportDataPackager
             output.Add(module);
         }
 
-        return new ExportData {CourseModules = output, PersonaHtml = personaHtml};
+        return new ExportData
+        {
+            CourseModules = output,
+            PersonaHtml = personaHtml,
+        };
     }
 }
