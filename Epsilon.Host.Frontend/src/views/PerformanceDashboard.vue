@@ -1,44 +1,40 @@
 <template>
-  <div
-    v-if="data"
-    class="performance-dashboard"
-  >
-    <EnrollmentTermButtons
-      :terms="data.terms"
-      @on-term-selected="setTermFilter"
-    />
-    <CompetenceProfileComponent
-      :domain="data.hboIDomain"
-      :data="filteredProfessionalTaskOutcomes"
-    />
-    <CompetenceProfileLegend
-      :domain="data.hboIDomain"
-    />
-    <div/>
-    <CompetenceGraph
-      :domain="data.hboIDomain"
-      :data="data.decayingAveragesPerTask"
-    />
-    <PersonalDevelopmentMatrix
-      :domain="data.hboIDomain"
-      :data="data.decayingAveragesPerSkill"
-    />
-  </div>
-  <RoundLoader v-else/>
+    <div v-if="data" class="performance-dashboard">
+        <EnrollmentTermButtons
+            :terms="data.terms"
+            @on-term-selected="setTermFilter" />
+        <CompetenceProfileComponent
+            :domain="data.hboIDomain"
+            :data="filteredProfessionalTaskOutcomes" />
+        <CompetenceProfileLegend :domain="data.hboIDomain" />
+        <div />
+        <CompetenceGraph
+            :domain="data.hboIDomain"
+            :data="data.decayingAveragesPerTask" />
+        <PersonalDevelopmentMatrix
+            :domain="data.hboIDomain"
+            :data="data.decayingAveragesPerSkill" />
+    </div>
+    <RoundLoader v-else />
 </template>
 
 <script lang="ts" setup>
-import {Api, HttpResponse, CompetenceProfile, EnrollmentTerm} from "../logic/Api";
-import CompetenceProfileComponent from "@/components/CompetenceProfile.vue";
-import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue";
-import CompetenceGraph from "@/components/CompetenceGraph.vue";
-import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue";
-import {computed, onMounted, Ref, ref} from "vue";
-import RoundLoader from "@/components/RoundLoader.vue";
-import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue";
+import {
+    Api,
+    HttpResponse,
+    CompetenceProfile,
+    EnrollmentTerm,
+} from "../logic/Api"
+import CompetenceProfileComponent from "@/components/CompetenceProfile.vue"
+import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
+import CompetenceGraph from "@/components/CompetenceGraph.vue"
+import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue"
+import { computed, onMounted, Ref, ref } from "vue"
+import RoundLoader from "@/components/RoundLoader.vue"
+import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
 
-const data: Ref<CompetenceProfile | undefined> = ref(undefined);
-const App = new Api();
+const data: Ref<CompetenceProfile | undefined> = ref(undefined)
+const App = new Api()
 
 const selectedTerm = ref<EnrollmentTerm | null>(null)
 
@@ -51,11 +47,14 @@ const filteredProfessionalTaskOutcomes = computed(() => {
         return data.value?.professionalTaskOutcomes
     }
 
-    return data.value.professionalTaskOutcomes.filter(o => o.assessedAt < selectedTerm.value.end_at)
+    return data.value.professionalTaskOutcomes.filter(
+        (o) => o.assessedAt < selectedTerm.value.end_at
+    )
 })
 
 onMounted(() => {
-    App.component.competenceProfileList()
+    App.component
+        .competenceProfileList()
         .then((r: HttpResponse<CompetenceProfile>) => {
             data.value = r.data
         })

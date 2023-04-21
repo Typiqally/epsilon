@@ -1,79 +1,78 @@
 <template>
-  <ApexChart
-    type="bar"
-    height="350"
-    width="200"
-    :options="chartOptions"
-    :series="series"
-  />
+    <ApexChart
+        type="bar"
+        height="350"
+        width="200"
+        :options="chartOptions"
+        :series="series" />
 </template>
 
 <script lang="ts" setup>
-import ApexChart from "vue3-apexcharts";
-import {DecayingAveragePerSkill, IHboIDomain} from "../logic/Api";
-import {onMounted} from "vue";
+import ApexChart from "vue3-apexcharts"
+import { DecayingAveragePerSkill, IHboIDomain } from "../logic/Api"
+import { onMounted } from "vue"
 
 const props = defineProps<{
     domain: IHboIDomain
     data: DecayingAveragePerSkill[]
 }>()
 
-const series: Array<{ name: string, data: Array<number | string> }> = []
+const series: Array<{ name: string; data: Array<number | string> }> = []
 const chartOptions = {
     annotations: {
         yaxis: [
             {
                 y: 3,
-                borderColor: 'red',
+                borderColor: "red",
                 strokeDashArray: 0,
                 label: {
-                    borderColor: 'red',
+                    borderColor: "red",
                     style: {
-                        color: '#fff',
-                        background: 'red'
+                        color: "#fff",
+                        background: "red",
                     },
-                    text: 'Mastery'
-                }
-            }
-        ]
+                    text: "Mastery",
+                },
+            },
+        ],
     },
     colors: ["#A8D08D"],
     chart: {
-        type: 'bar',
+        type: "bar",
         stacked: true,
         toolbar: {
-            show: true
+            show: true,
         },
         zoom: {
-            enabled: false
-        }
+            enabled: false,
+        },
     },
     dataLabels: {
-        enabled: false
+        enabled: false,
     },
     plotOptions: {
         bar: {
             horizontal: false,
             borderRadius: 4,
-            dataLabels: {}
+            dataLabels: {},
         },
     },
     xaxis: {
-        type: 'string',
+        type: "string",
         categories: [],
     },
     yaxis: {
         show: false,
     },
     legend: {
-        position: 'bottom'
+        position: "bottom",
     },
     fill: {
-        opacity: 1
+        opacity: 1,
     },
     tooltip: {
-        enabled: true
-    }
+        enabled: true,
+    },
 }
 
 onMounted(() => {
@@ -81,7 +80,7 @@ onMounted(() => {
     const professionalSkills = props.domain.professionalSkills
 
     if (professionalSkills != null) {
-        professionalSkills.forEach(s => {
+        professionalSkills.forEach((s) => {
             chartOptions.xaxis.categories.push(s.shortName as never)
         })
     }
@@ -89,7 +88,10 @@ onMounted(() => {
     // Add data
     series.push({
         name: "Decaying Average",
-        data: props.data.map(decayingAverage => decayingAverage.decayingAverage?.toFixed(2) as string),
+        data: props.data.map(
+            (decayingAverage) =>
+                decayingAverage.decayingAverage?.toFixed(2) as string
+        ),
     })
 })
 </script>

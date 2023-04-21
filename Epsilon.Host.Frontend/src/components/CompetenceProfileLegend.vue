@@ -1,23 +1,17 @@
 <template>
-  <table class="competence-profile-legend">
-    <tr
-      v-for="level of props.domain.masteryLevels as MasteryLevel[]"
-      :key="level.id"
-      class="competence-profile-legend-row"
-    >
-      <td
-        class="kpi-color"
-        :style="{ backgroundColor: level.color}"
-      />
-      <th class="kpi-text">
-        Level {{ level.level }}
-      </th>
-    </tr>
-  </table>
+    <table class="competence-profile-legend">
+        <tr
+            v-for="level of props.domain.masteryLevels as MasteryLevel[]"
+            :key="level.id"
+            class="competence-profile-legend-row">
+            <td class="kpi-color" :style="{ backgroundColor: level.color }" />
+            <th class="kpi-text">Level {{ level.level }}</th>
+        </tr>
+    </table>
 </template>
 
 <script lang="ts" setup>
-import {IHboIDomain, MasteryLevel} from "../logic/Api";
+import { IHboIDomain, MasteryLevel } from "../logic/Api"
 
 const props = defineProps<{
     domain: IHboIDomain
