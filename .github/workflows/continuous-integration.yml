@@ -2,8 +2,8 @@
 on: [ pull_request ]
 
 jobs:
-  build:
-    name: Building .NET
+  build-backend:
+    name: Build .NET solution
     runs-on: ubuntu-20.04
     
     steps:
@@ -15,15 +15,50 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
-  lint:
-    name: ESLint frontend
-    runs-on: ubuntu-latest
+
+  setup-frontend:
+    name: Setup frontend
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: Epsilon.Host.Frontend
     steps:
       - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2
+      - uses: actions/setup-node@v3
         with:
-          version: 6.0.2
+          node-version: 16
+          cache: 'pnpm'
       - name: Install modules
-        run: cd Epsilon.Host.Frontend && pnpm install
-      - name: Run ESLint
-        run: cd Epsilon.Host.Frontend && pnpm run lint
+        run: pnpm install
+  
+  build-frontend:
+    name: Lint frontend
+    needs: [ setup-frontend ]
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: Epsilon.Host.Frontend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+      - name: Build
+        run: pnpm build
+  
+  lint-frontend:
+    name: Lint frontend
+    needs: [ setup-frontend ]
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: Epsilon.Host.Frontend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+      - name: Perform linting
+        run: pnpm lint
