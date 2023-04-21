@@ -1,4 +1,5 @@
 using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
@@ -12,6 +13,7 @@ public class ComponentController : ControllerBase
     public ComponentController(IConfiguration configuration, IComponentFetcher<CompetenceProfile> competenceProfileManager)
     {
         _competenceProfileManager = competenceProfileManager;
+        _kpiMatrixManager = kpiMatrixManager;
     }
 
     [HttpGet("competence_profile")]
@@ -20,5 +22,13 @@ public class ComponentController : ControllerBase
         var competenceProfile = await _competenceProfileManager.Fetch();
 
         return competenceProfile;
+    }
+    
+    [HttpGet("kpi_matrix")]
+    public async Task<ActionResult<KpiMatrix>> GetKpiMatrix()
+    {
+        var kpiMatrix = await _kpiMatrixManager.Fetch();
+        
+        return kpiMatrix;
     }
 }

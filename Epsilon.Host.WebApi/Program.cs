@@ -1,4 +1,5 @@
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Epsilon.Abstractions.Component;
 using Epsilon.Canvas;
 using Epsilon.Component;
@@ -27,6 +28,7 @@ builder.Services.AddCanvas(canvasConfiguration);
 builder.Services.AddScoped<IWordDocumentBuilder, WordDocumentBuilder>();
 
 builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
+
 
 var app = builder.Build();
 
