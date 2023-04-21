@@ -4,16 +4,16 @@
             :terms="data.terms"
             @on-term-selected="setTermFilter" />
         <CompetenceProfileComponent
-            :domain="data.hboIDomain"
-            :data="filteredProfessionalTaskOutcomes" />
+            :data="filteredProfessionalTaskOutcomes"
+            :domain="data.hboIDomain" />
         <CompetenceProfileLegend :domain="data.hboIDomain" />
         <div />
         <CompetenceGraph
-            :domain="data.hboIDomain"
-            :data="data.decayingAveragesPerTask" />
+            :data="data.decayingAveragesPerTask"
+            :domain="data.hboIDomain" />
         <PersonalDevelopmentMatrix
-            :domain="data.hboIDomain"
-            :data="data.decayingAveragesPerSkill" />
+            :data="data.decayingAveragesPerSkill"
+            :domain="data.hboIDomain" />
     </div>
     <RoundLoader v-else />
 </template>
@@ -21,9 +21,9 @@
 <script lang="ts" setup>
 import {
     Api,
-    HttpResponse,
     CompetenceProfile,
     EnrollmentTerm,
+    HttpResponse,
 } from "../logic/Api"
 import CompetenceProfileComponent from "@/components/CompetenceProfile.vue"
 import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
