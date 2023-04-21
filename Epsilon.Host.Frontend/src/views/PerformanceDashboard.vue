@@ -1,58 +1,82 @@
 <template>
-    <div class="performance-dashboard" v-if="data">
-      <KpiTable :domain="data.hboIDomain" :data="data.professionalTaskOutcomes"></KpiTable>
-      <KpiLegend />
-      <KpiMatrix :domain="data.hboIDomain"></KpiMatrix>
-        <PersonalDevelopmentMatrix :domain="data.hboIDomain" :data="data.professionalSkillOutcomes"></PersonalDevelopmentMatrix>
+    <div v-if="data" class="performance-dashboard">
+        <EnrollmentTermButtons
+            :terms="data.terms"
+            @on-term-selected="setTermFilter" />
+        <CompetenceProfileComponent
+            :domain="data.hboIDomain"
+            :data="filteredProfessionalTaskOutcomes" />
+        <CompetenceProfileLegend :domain="data.hboIDomain" />
+        <div />
+        <CompetenceGraph
+            :domain="data.hboIDomain"
+            :data="data.decayingAveragesPerTask" />
+        <PersonalDevelopmentMatrix
+            :domain="data.hboIDomain"
+            :data="data.decayingAveragesPerSkill" />
     </div>
+    <RoundLoader v-else />
 </template>
 
 <script lang="ts" setup>
-import {Api, HttpResponse, CompetenceProfile} from "@/logic/Api";
-import KpiMatrix from "@/components/Competance/KpiMatrix.vue";
-import KpiTable from "@/components/Competance/KpiTable.vue";
-import PersonalDevelopmentMatrix from "@/components/Competance/PersonalDevelopmentMatrix.vue";
-import KpiLegend from "@/components/KpiLegend/KpiLegend.vue";
-import {onMounted, ref} from "vue";
-const data= ref(undefined);
-const App = new Api();
+import {
+    Api,
+    HttpResponse,
+    CompetenceProfile,
+    EnrollmentTerm,
+} from "../logic/Api"
+import CompetenceProfileComponent from "@/components/CompetenceProfile.vue"
+import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
+import CompetenceGraph from "@/components/CompetenceGraph.vue"
+import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue"
+import { computed, onMounted, Ref, ref } from "vue"
+import RoundLoader from "@/components/RoundLoader.vue"
+import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
+
+const data: Ref<CompetenceProfile | undefined> = ref(undefined)
+const App = new Api()
+
+const selectedTerm = ref<EnrollmentTerm | null>(null)
+
+const filteredProfessionalTaskOutcomes = computed(() => {
+    if (!data.value) {
+        return []
+    }
+
+    if (!selectedTerm.value) {
+        return data.value?.professionalTaskOutcomes
+    }
+
+    return data.value.professionalTaskOutcomes.filter(
+        (o) => o.assessedAt < selectedTerm.value.end_at
+    )
+})
 
 onMounted(() => {
-    App.component.competenceProfileList()
-        .then((r:HttpResponse<any>) => {
-            data.value = r.data as CompetenceProfile
+    App.component
+        .competenceProfileList()
+        .then((r: HttpResponse<CompetenceProfile>) => {
+            data.value = r.data
         })
-
-    //App.component.competenceProfileList()
-    // .then(response => {
-    //     if (response.ok) {
-    //         return response.json()
-    //     }
-    //
-    //     return Promise.reject(response);
-    // })
-    // .then(data => {
-    //     console.log(data)
-    // })
-    // .catch(error => {
-    //     if (error.status == 401) {
-    //         router.push('/auth')
-    //     }
-    // })
 })
+
+function setTermFilter(term: EnrollmentTerm): void {
+    selectedTerm.value = term
+}
 </script>
 
 <style scoped>
-  .performance-dashboard {
+.performance-dashboard {
     grid-template-columns: 1fr;
-  }
+}
 
-  @media screen and (min-width: 580px) {
+@media screen and (min-width: 580px) {
     .performance-dashboard {
-      display: grid;
-      grid-template-columns: 5fr 1fr;
-      gap: 0 2rem;
-      align-items: center;
+        display: grid;
+        grid-template-columns: 1fr 5fr 1fr;
+        gap: 4rem 0;
+        align-items: center;
+        justify-items: center;
     }
-  }
+}
 </style>

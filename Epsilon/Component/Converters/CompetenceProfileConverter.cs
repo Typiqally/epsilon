@@ -91,7 +91,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                            || professionalResults.Any(skillOutcome =>
                                skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt))
             .Distinct()
-            .OrderBy(static term => term.StartAt);
+            .OrderByDescending(static term => term.StartAt);
 
         return new CompetenceProfile(
             domain,
