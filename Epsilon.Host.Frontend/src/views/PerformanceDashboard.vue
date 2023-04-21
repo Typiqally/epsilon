@@ -14,7 +14,7 @@
     <CompetenceProfileLegend
       :domain="data.hboIDomain"
     />
-    <div />
+    <div/>
     <CompetenceGraph
       :domain="data.hboIDomain"
       :data="data.decayingAveragesPerTask"
@@ -24,7 +24,7 @@
       :data="data.decayingAveragesPerSkill"
     />
   </div>
-  <RoundLoader v-else />
+  <RoundLoader v-else/>
 </template>
 
 <script lang="ts" setup>
