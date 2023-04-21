@@ -1,29 +1,27 @@
 <template>
-  <div class="enrollment-term-buttons">
-    <button
-      v-for="term of props.terms"
-      :key="term"
-      class="btn"
-      @click="emitTermSelectedEvent(term)"
-    >
-      {{ term.name }}
-    </button>
-  </div>
+    <div class="enrollment-term-buttons">
+        <button
+            v-for="term of props.terms"
+            :key="term"
+            class="btn"
+            @click="emitTermSelectedEvent(term)">
+            {{ term.name }}
+        </button>
+    </div>
 </template>
 
 <script lang="ts" setup>
-import {EnrollmentTerm} from "../logic/Api";
+import { EnrollmentTerm } from "../logic/Api"
 
 const props = defineProps<{
     terms: EnrollmentTerm[]
 }>()
 
-const emit = defineEmits(['onTermSelected'])
+const emit = defineEmits(["onTermSelected"])
 
 function emitTermSelectedEvent(term: EnrollmentTerm): void {
-    emit('onTermSelected', term)
+    emit("onTermSelected", term)
 }
-
 </script>
 
 <style scoped>
@@ -37,7 +35,15 @@ function emitTermSelectedEvent(term: EnrollmentTerm): void {
 }
 
 .btn:hover {
-    background: #723972;
+    background: #773b77;
+}
+
+.btn:active {
+    background: #322a56;
+}
+
+.btn:focus {
+    background: #322a56;
 }
 
 .enrollment-term-buttons {
@@ -46,5 +52,4 @@ function emitTermSelectedEvent(term: EnrollmentTerm): void {
     justify-content: center;
     width: fit-content;
 }
-
 </style>
