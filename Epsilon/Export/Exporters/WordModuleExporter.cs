@@ -5,36 +5,38 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
+using Epsilon.Canvas.Abstractions.Service;
 using HtmlAgilityPack;
 
 namespace Epsilon.Export.Exporters;
 
 public class WordModuleExporter : ICanvasModuleExporter
 {
+    private readonly IFileHttpService _fileService;
+
+    public WordModuleExporter(IFileHttpService fileService)
+    {
+        _fileService = fileService;
+    }
+
     private static readonly TableBorders s_defaultBorders = new TableBorders(new TopBorder
     {
-        Val = new EnumValue<BorderValues>(BorderValues.Single),
-        Size = 3,
+        Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3,
     }, new BottomBorder
     {
-        Val = new EnumValue<BorderValues>(BorderValues.Single),
-        Size = 3,
+        Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3,
     }, new LeftBorder
     {
-        Val = new EnumValue<BorderValues>(BorderValues.Single),
-        Size = 3,
+        Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3,
     }, new RightBorder
     {
-        Val = new EnumValue<BorderValues>(BorderValues.Single),
-        Size = 3,
+        Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 3,
     }, new InsideHorizontalBorder
     {
-        Val = new EnumValue<BorderValues>(BorderValues.Single),
-        Size = 6,
+        Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6,
     }, new InsideVerticalBorder
     {
-        Val = new EnumValue<BorderValues>(BorderValues.Single),
-        Size = 6,
+        Val = new EnumValue<BorderValues>(BorderValues.Single), Size = 6,
     });
 
     private static readonly TableProperties s_defaultTableProperties = new TableProperties(s_defaultBorders);
@@ -63,8 +65,7 @@ public class WordModuleExporter : ICanvasModuleExporter
 
         const string altChunkId = "HomePage";
 
-        var personaHtml = new HtmlDocument();
-        personaHtml.LoadHtml(data.PersonaHtml);
+        var personaHtml = await GetPersonaHtmlDocument(_fileService, data.PersonaHtml);
 
         using var ms = new MemoryStream(new UTF8Encoding(true).GetPreamble()
             .Concat(Encoding.UTF8.GetBytes($"<html>{personaHtml.Text}</html>")).ToArray());
@@ -137,5 +138,33 @@ public class WordModuleExporter : ICanvasModuleExporter
         {
             Type = TableWidthUnitValues.Auto,
         }));
+    }
+
+    private static async Task<HtmlDocument> GetPersonaHtmlDocument(IFileHttpService fileService, string htmlString)
+    {
+        var htmlDoc = new HtmlDocument();
+        htmlDoc.LoadHtml(htmlString);
+        if (htmlDoc.DocumentNode.SelectNodes("//img") == null)
+        {
+            return null;
+        }
+
+        foreach (var node in htmlDoc.DocumentNode.SelectNodes("//img"))
+        {
+            var imageSrc = node
+                .SelectNodes("//img")
+                .First()
+                .Attributes["src"].Value;
+
+            if (imageSrc != null)
+            {
+                var imageBytes = await fileService.GetFileByteArray(new Uri(imageSrc));
+                var imageBase64 = Convert.ToBase64String(imageBytes.ToArray());
+
+                node.SetAttributeValue("src", $"data:image/jpeg;base64,{imageBase64}");
+            }
+        }
+
+        return htmlDoc;
     }
 }
