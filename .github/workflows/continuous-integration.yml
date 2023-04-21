@@ -2,36 +2,58 @@
 on: [ pull_request ]
 
 jobs:
-  setup:
-    name: Setup
+  build-backend:
+    name: Build .NET solution
     runs-on: ubuntu-20.04
+    
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v1.7.2
+      - uses: actions/setup-dotnet@v1.7.2
         with:
           dotnet-version: '6.0.x'
-  
-  build:
-    name: Build
-    needs: [ setup ]
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-
       - name: Restore dependencies
         run: dotnet restore
-
       - name: Build
         run: dotnet build --no-restore
   
-  test:
-    name: Test
-    needs: [ setup, build ]
+  build-frontend:
+    name: Build frontend
     runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: Epsilon.Host.Frontend
     steps:
       - uses: actions/checkout@v2
-
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+          cache-dependency-path: 'Epsilon.Host.Frontend/pnpm-lock.yaml'
+      - name: Install modules
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+  
+  lint-frontend:
+    name: Lint frontend
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: Epsilon.Host.Frontend
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'pnpm'
+          cache-dependency-path: 'Epsilon.Host.Frontend/pnpm-lock.yaml'
+      - name: Install modules
+        run: pnpm install
+      - name: Perform linting
+        run: pnpm lint
