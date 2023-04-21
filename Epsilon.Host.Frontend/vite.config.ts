@@ -5,6 +5,8 @@ import { readFileSync } from "fs"
 
 export default ({ mode }: { mode: string }): UserConfigExport => {
     process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
+    const certificate = process.env.VITE_SSL_CRT_FILE
+    const key = process.env.VITE_SSL_KEY_FILE
 
     return defineConfig({
         resolve: {
@@ -14,8 +16,8 @@ export default ({ mode }: { mode: string }): UserConfigExport => {
         },
         server: {
             https: {
-                cert: readFileSync(process.env.VITE_SSL_CRT_FILE),
-                key: readFileSync(process.env.VITE_SSL_KEY_FILE),
+                cert: certificate ? readFileSync(certificate) : undefined,
+                key: key ? readFileSync(key) : undefined,
             },
         },
         plugins: [vue()],
