@@ -15,9 +15,9 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
-
-  setup-frontend:
-    name: Setup frontend
+  
+  build-frontend:
+    name: Build frontend
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -34,30 +34,11 @@ jobs:
           cache-dependency-path: 'Epsilon.Host.Frontend/pnpm-lock.yaml'
       - name: Install modules
         run: pnpm install
-  
-  build-frontend:
-    name: Lint frontend
-    needs: [ setup-frontend ]
-    runs-on: ubuntu-20.04
-    defaults:
-      run:
-        working-directory: Epsilon.Host.Frontend
-    steps:
-      - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 7
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-          cache: 'pnpm'
-          cache-dependency-path: 'Epsilon.Host.Frontend/pnpm-lock.yaml'
       - name: Build
         run: pnpm build
   
   lint-frontend:
     name: Lint frontend
-    needs: [ setup-frontend ]
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -72,5 +53,7 @@ jobs:
           node-version: 16
           cache: 'pnpm'
           cache-dependency-path: 'Epsilon.Host.Frontend/pnpm-lock.yaml'
+      - name: Install modules
+        run: pnpm install
       - name: Perform linting
         run: pnpm lint
