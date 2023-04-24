@@ -1,6 +1,7 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
 using Epsilon.Component;
 
