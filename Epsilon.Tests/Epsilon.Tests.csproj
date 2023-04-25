@@ -33,4 +33,8 @@
         <ProjectReference Include="..\Epsilon\Epsilon.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Exporters\"/>
+    </ItemGroup>
+
 </Project>
