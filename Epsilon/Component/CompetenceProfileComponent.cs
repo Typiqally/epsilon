@@ -132,9 +132,4 @@ public class CompetenceProfileComponent : Component<CompetenceProfile>
             return new DecayingAveragePerSkill(skill.Id, decayingAverage);
         });
     }
-
-    public Task<object> FetchObject()
-    {
-        throw new NotImplementedException();
-    }
 }
