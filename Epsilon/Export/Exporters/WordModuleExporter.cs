@@ -45,8 +45,8 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[]
     {
-        "word",
-        "docx",
+        "WORD",
+        "DOCX",
     };
 
     public string FileExtension => "docx";
