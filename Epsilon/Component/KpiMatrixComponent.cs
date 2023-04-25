@@ -60,29 +60,49 @@ public class KpiMatrixComponent : Component<KpiMatrixProfile>
 
         foreach (var node in getUserKpiMatrixOutcomes.Data?.Course.SubmissionsConnection?.Nodes)
         {
-            // Check if the node has a module
             var moduleName = node.Assignment.Modules.FirstOrDefault()?.Name;
             if (moduleName == null) continue;
 
-            // Group the assignment outcomes by outcome title
             var outcomeGroups = node.RubricAssessmentsConnection.Nodes
                 .Where(n => n?.AssessmentRatings != null)
                 .SelectMany(n => n.AssessmentRatings)
                 .Where(r => r.Outcome != null)
                 .GroupBy(r => r.Outcome.Title);
 
-            var outcomes = outcomeGroups.Select(g => g.Key);
-            var assignments = outcomeGroups.Select(g =>
-                new KpiMatrixAssignment(node.Assignment.Name, g.Select(assessmentRating =>
-                    new KpiMatrixOutcome(assessmentRating.Outcome.Title,
-                        GetGradeStatus(assessmentRating.Points, assessmentRating.Outcome.MasteryPoints)))
-                ));
+            var existingOutcomes = new HashSet<string>();
+            var outcomes = new List<string>();
+            var assignments = new List<KpiMatrixAssignment>();
 
-            // Find the module in the list of modules or create a new one
+            foreach (var outcomeGroup in outcomeGroups)
+            {
+                var outcomeTitle = outcomeGroup.Key;
+                if (existingOutcomes.Contains(outcomeTitle)) continue;
+
+                existingOutcomes.Add(outcomeTitle);
+                outcomes.Add(outcomeTitle);
+
+                var outcomeAssessments = outcomeGroup.Select(assessmentRating =>
+                    new KpiMatrixOutcome(assessmentRating.Outcome.Title,
+                        GetGradeStatus(assessmentRating.Points, assessmentRating.Outcome.MasteryPoints)));
+
+                var assignment = assignments.FirstOrDefault(a => a.Name == node.Assignment.Name);
+                if (assignment == null)
+                {
+                    assignments.Add(new KpiMatrixAssignment(node.Assignment.Name, outcomeAssessments));
+                }
+                else
+                {
+                    assignments.Remove(assignment);
+                    var combinedOutcomes = assignment.Outcomes.Concat(outcomeAssessments).ToList();
+                    assignments.Add(new KpiMatrixAssignment(node.Assignment.Name, combinedOutcomes));
+                }
+
+            }
+
             var module = modules.FirstOrDefault(m => m.Name == moduleName);
             if (module == null)
             {
-                module = new KpiMatrixModule(moduleName, new KpiMatrix(outcomes, assignments));
+                module = new KpiMatrixModule(moduleName, new KpiMatrix(outcomes.Distinct(), assignments));
                 modules.Add(module);
             }
             else
@@ -90,13 +110,13 @@ public class KpiMatrixComponent : Component<KpiMatrixProfile>
                 var moduleIndex = modules.IndexOf(module);
                 if (moduleIndex == -1)
                 {
-                    modules.Add(new KpiMatrixModule(moduleName, new KpiMatrix(outcomes, assignments)));
+                    modules.Add(new KpiMatrixModule(moduleName, new KpiMatrix(outcomes.Distinct(), assignments)));
                 }
                 else
                 {
                     var existingModule = modules[moduleIndex];
                     var newAssignments = existingModule.KpiMatrix.Assignments.Concat(assignments);
-                    var newOutcomes = existingModule.KpiMatrix.Outcomes.Concat(outcomes);
+                    var newOutcomes = existingModule.KpiMatrix.Outcomes.Concat(outcomes).Distinct();
                     var newModule = new KpiMatrixModule(moduleName, new KpiMatrix(newOutcomes, newAssignments));
                     modules[moduleIndex] = newModule;
                 }
