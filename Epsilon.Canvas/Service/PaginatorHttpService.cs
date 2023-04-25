@@ -22,10 +22,15 @@ public class PaginatorHttpService : HttpService, IPaginatorHttpService
         var pages = new List<TResult>();
         var page = "1";
 
+        var uriString = uri.OriginalString;
+        uriString += !uriString.Contains('?', StringComparison.InvariantCulture)
+            ? "?"
+            : "&";
+
         do
         {
             var offset = pages.Count * Limit;
-            using var request = new HttpRequestMessage(method, $"{uri}per_page={Limit}&offset={offset}&page={page}");
+            using var request = new HttpRequestMessage(method, $"{uriString}per_page={Limit}&offset={offset}&page={page}");
             var response = await Client.SendAsync(request);
             var value = await response.Content.ReadFromJsonAsync<TResult>();
 

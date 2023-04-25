@@ -45,8 +45,8 @@ public class WordModuleExporter : ICanvasModuleExporter
 
     public IEnumerable<string> Formats { get; } = new[]
     {
-        "word",
-        "docx",
+        "WORD",
+        "DOCX",
     };
 
     public string FileExtension => "docx";
@@ -54,7 +54,7 @@ public class WordModuleExporter : ICanvasModuleExporter
     public async Task<Stream> Export(ExportData data, string format)
     {
         var stream = new MemoryStream();
-        using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
+        var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
         document.MainDocumentPart!.Document = new Document(new Body());
@@ -67,25 +67,22 @@ public class WordModuleExporter : ICanvasModuleExporter
 
         var personaHtml = await GetPersonaHtmlDocument(_fileService, data.PersonaHtml);
 
-        using var ms = new MemoryStream(new UTF8Encoding(true).GetPreamble()
-            .Concat(Encoding.UTF8.GetBytes($"<html>{personaHtml.Text}</html>")).ToArray());
+        using var personaHtmlStream = new MemoryStream(Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes($"<html>{personaHtml.Text}</html>")).ToArray());
+        var formatImportPart = document.MainDocumentPart.AddAlternativeFormatImportPart(AlternativeFormatImportPartType.Html, altChunkId);
 
-        var formatImportPart =
-            document.MainDocumentPart.AddAlternativeFormatImportPart(
-                AlternativeFormatImportPartType.Html, altChunkId);
-
-        formatImportPart.FeedData(ms);
+        formatImportPart.FeedData(personaHtmlStream);
         var altChunk = new AltChunk
         {
             Id = altChunkId,
         };
 
         body?.Append(altChunk);
-        await ms.DisposeAsync();
         body?.Append(new Paragraph(new Run(new Break
         {
             Type = BreakValues.Page,
         })));
+
+        await personaHtmlStream.DisposeAsync();
 
         foreach (var module in data.CourseModules)
         {
@@ -146,7 +143,7 @@ public class WordModuleExporter : ICanvasModuleExporter
         htmlDoc.LoadHtml(htmlString);
         if (htmlDoc.DocumentNode.SelectNodes("//img") == null)
         {
-            return null;
+            return htmlDoc;
         }
 
         foreach (var node in htmlDoc.DocumentNode.SelectNodes("//img"))

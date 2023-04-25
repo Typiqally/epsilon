@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text;
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
 
@@ -16,7 +17,7 @@ public class CsvModuleExporter : ICanvasModuleExporter
     public async Task<Stream> Export(ExportData data, string format)
     {
         var stream = new MemoryStream();
-        await using var writer = new StreamWriter(stream);
+        await using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
 
         using var dt = CreateDataTable(data.CourseModules);
         WriteHeader(writer, dt);
