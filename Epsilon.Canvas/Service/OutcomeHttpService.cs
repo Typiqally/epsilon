@@ -1,5 +1,4 @@
 using System.Net.Http.Json;
-using System.Text;
 using Epsilon.Abstractions.Http;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
@@ -26,10 +25,10 @@ public class OutcomeHttpService : HttpService, IOutcomeHttpService
 
     public async Task<OutcomeResultCollection?> GetResults(int courseId, IEnumerable<string> include)
     {
-        var url = new StringBuilder($"v1/courses/{courseId}/outcome_results");
-        var query = $"?include[]={string.Join("&include[]=", include)}";
+        var url = $"v1/courses/{courseId}/outcome_results?include[]={string.Join("&include[]=", include)}";
+        var requestUri = new Uri(url, UriKind.Relative);
 
-        var responses = await _paginator.GetAllPages<OutcomeResultCollection>(HttpMethod.Get, new Uri(url + query));
+        var responses = await _paginator.GetAllPages<OutcomeResultCollection>(HttpMethod.Get, requestUri);
         var responsesArray = responses.ToArray();
 
         return new OutcomeResultCollection(
