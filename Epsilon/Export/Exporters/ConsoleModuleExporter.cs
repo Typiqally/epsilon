@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Epsilon.Abstractions.Export;
 using Epsilon.Abstractions.Model;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,7 @@ public class ConsoleModuleExporter : ICanvasModuleExporter
     public async Task<Stream> Export(ExportData data, string format)
     {
         var stream = new MemoryStream();
-        await using var writer = new StreamWriter(stream);
+        await using var writer = new StreamWriter(stream, Encoding.UTF8, 1024, true);
 
         foreach (var module in data.CourseModules)
         {
