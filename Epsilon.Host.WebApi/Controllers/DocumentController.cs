@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using Epsilon.Abstractions.Component;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,19 +9,39 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class DocumentController : Controller
 {
-    private readonly IWordDownloader _wordDownloader;
+    private readonly IWordDocumentGenerator _wordDocumentGenerator;
+    private readonly IEnumerable<IComponent> _components;
+    private readonly IEnumerable<IComponentConverter<OpenXmlElement>> _wordConverters;
 
     public DocumentController(
-        IWordDownloader wordDownloader
+        IWordDocumentGenerator wordDocumentGenerator,
+        IEnumerable<IComponent> components,
+        IEnumerable<IComponentConverter<OpenXmlElement>> wordConverters
     )
     {
-        _wordDownloader = wordDownloader;
+        _wordDocumentGenerator = wordDocumentGenerator;
+        _components = components;
+        _wordConverters = wordConverters;
     }
 
     [HttpGet("word")]
     public async Task<IActionResult> DownloadWordDocument()
     {
-        var fileStream = await _wordDownloader.Download();
-        return File(fileStream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "CompetenceDocument.docx");
+        var stream = new MemoryStream();
+        using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
+
+        document.AddMainDocumentPart();
+        document.MainDocumentPart!.Document = await _wordDocumentGenerator.Generate(_components, _wordConverters);
+
+        document.Save();
+        document.Close();
+
+        stream.Position = 0;
+
+        return File(
+            stream,
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "CompetenceDocument.docx"
+        );
     }
 }
