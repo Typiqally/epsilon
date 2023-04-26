@@ -9,10 +9,20 @@
         <CompetenceProfileLegend :domain="data.hboIDomain" />
         <div />
         <CompetenceGraph
-            :data="data.decayingAveragesPerTask"
+            :data="
+                DecayingAverage.GetDecayingAverageTasks(
+                    data.hboIDomain,
+                    filteredProfessionalTaskOutcomes
+                )
+            "
             :domain="data.hboIDomain" />
         <PersonalDevelopmentMatrix
-            :data="data.decayingAveragesPerSkill"
+            :data="
+                DecayingAverage.GetDecayingAverageSkills(
+                    data.hboIDomain,
+                    data.professionalSkillOutcomes
+                )
+            "
             :domain="data.hboIDomain" />
     </div>
     <RoundLoader v-else />
@@ -32,6 +42,7 @@ import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue
 import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
 import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
+import { DecayingAverage } from "@/logic/DecayingAverage"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
@@ -48,9 +59,23 @@ const filteredProfessionalTaskOutcomes = computed(() => {
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < selectedTerm.value.end_at
+        (o) => o.assessedAt < selectedTerm.value.end_at,
     )
 })
+
+// const filteredProfessionalSkillOutcomes = computed(() => {
+//     if (!data.value) {
+//         return []
+//     }
+//
+//     if (!selectedTerm.value) {
+//         return data.value?.professionalTaskOutcomes
+//     }
+//
+//     return data.value?.professionalTaskOutcomes?.filter(
+//         (o) => o.assessedAt < selectedTerm?.value?.end_at,
+//     )
+// })
 
 onMounted(() => {
     App.component

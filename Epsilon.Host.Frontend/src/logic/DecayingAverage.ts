@@ -7,38 +7,46 @@ import {
 export class DecayingAverage {
     static GetDecayingAverageTasks(
         domain: IHboIDomain | undefined,
-        taskResults: ProfessionalTaskResult[] | undefined
+        taskResults: ProfessionalTaskResult[] | undefined | null
     ): DecayingAveragePerLayer[] {
         return domain?.architectureLayers?.map((l) => {
             return {
                 architectureLayer: l.id,
                 layerActivities: domain.activities?.map((a) => {
-                    let decayingAverage = 0
-                    taskResults
-                        ?.filter(
-                            (t) =>
-                                t.architectureLayer === l.id &&
-                                t.activity === a.id
+                    let totalScoreActivity = 0
+                    let totalScoreArchitectureActivity = 0
+                    if (taskResults) {
+                        const acOutcomes = taskResults.filter(
+                            (t) => t.activity === a.id
                         )
-                        ?.map((result) => {
+                        acOutcomes?.map((result) => {
                             if (result.grade) {
-                                decayingAverage =
-                                    decayingAverage * 0.35 + result.grade * 0.65
+                                totalScoreActivity += result.grade
                             }
                         })
-
-                    return {
-                        activity: a.id,
-                        decayingAverage: decayingAverage,
-                    } as DecayingAveragePerActivity
+                        acOutcomes
+                            .filter((t) => t.architectureLayer === l.id)
+                            .map((result) => {
+                                console.log(result.grade)
+                                totalScoreArchitectureActivity += result?.grade
+                            })
+                        console.log(acOutcomes)
+                        return {
+                            activity: a.id,
+                            decayingAverage:
+                                ((totalScoreActivity / acOutcomes.length) *
+                                    totalScoreArchitectureActivity) /
+                                totalScoreActivity,
+                        } as DecayingAveragePerActivity
+                    }
                 }),
             }
         }) as DecayingAveragePerLayer[]
     }
 
     static GetDecayingAverageSkills(
-        domain: IHboIDomain,
-        skillResults: ProfessionalSkillResult[]
+        domain: IHboIDomain | undefined,
+        skillResults: ProfessionalSkillResult[] | undefined | null
     ): DecayingAveragePerSkill[] {
         return domain?.professionalSkills?.map((s) => {
             let decayingAverage = 0

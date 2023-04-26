@@ -21,7 +21,7 @@ const chartOptions = {
     annotations: {
         yaxis: [
             {
-                y: 9,
+                y: 3,
                 borderColor: "red",
                 strokeDashArray: 0,
                 label: {
@@ -94,7 +94,7 @@ onMounted(() => {
     const layers = props.domain.architectureLayers
 
     if (layers != null) {
-        props.data.forEach((layerDecayingAverage) => {
+        props.data?.forEach((layerDecayingAverage) => {
             const layer = layers.find(
                 (layer) => layer.id == layerDecayingAverage.architectureLayer
             )
@@ -104,10 +104,7 @@ onMounted(() => {
                     name: layer.name as string,
                     color: layer.color as string,
                     data: layerDecayingAverage.layerActivities?.map(
-                        (decayingAverage) =>
-                            decayingAverage.decayingAverage?.toFixed(
-                                2
-                            ) as string
+                        (decayingAverage) => decayingAverage.decayingAverage
                     ),
                 })
             }

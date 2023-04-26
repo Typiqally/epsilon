@@ -88,9 +88,8 @@ onMounted(() => {
     // Add data
     series.push({
         name: "Decaying Average",
-        data: props.data.map(
-            (decayingAverage) =>
-                decayingAverage.decayingAverage?.toFixed(2) as string
+        data: props.data?.map(
+            (decayingAverage) => decayingAverage.decayingAverage as number
         ),
     })
 })
