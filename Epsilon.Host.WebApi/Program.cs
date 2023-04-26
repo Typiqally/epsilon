@@ -29,7 +29,7 @@ builder.Services.AddScoped<IComponent, CompetenceProfileComponent>();
 builder.Services.AddScoped<IComponent<CompetenceProfile>, CompetenceProfileComponent>();
 builder.Services.AddScoped<IComponentConverter<OpenXmlElement>, CompetenceProfileComponentWordConverter>();
 builder.Services.AddScoped<IComponentConverter<OpenXmlElement, CompetenceProfile>, CompetenceProfileComponentWordConverter>();
-builder.Services.AddScoped<IWordDownloader, WordDownloader>();
+builder.Services.AddScoped<IWordDocumentGenerator, WordDocumentGenerator>();
 
 var app = builder.Build();
 
