@@ -6,13 +6,21 @@ namespace Epsilon.Canvas.Service;
 
 public class GraphQlHttpService : HttpService, IGraphQlHttpService
 {
-    public GraphQlHttpService(HttpClient client) : base(client)
-    { }
+    public GraphQlHttpService(HttpClient client)
+        : base(client)
+    {
+    }
 
     public async Task<T?> Query<T>(string query)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/graphql") {
-            Content = new FormUrlEncodedContent(new Dictionary<string, string>() {{"query", query}})
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/graphql")
+        {
+            Content = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                {
+                    "query", query
+                },
+            }),
         };
 
         var response = await Client.SendAsync(request);

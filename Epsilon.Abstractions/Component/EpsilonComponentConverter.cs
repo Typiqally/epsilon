@@ -1,6 +1,6 @@
 namespace Epsilon.Abstractions.Component;
 
-public abstract class ComponentConverter<TData, TComponent> : IComponentConverter<TData, TComponent> where TComponent : class
+public abstract class EpsilonComponentConverter<TData, TComponent> : IEpsilonComponentConverter<TData, TComponent> where TComponent : class
 {
     public bool Validate(Type? type) => type == typeof(TComponent);
 

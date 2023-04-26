@@ -10,13 +10,13 @@ namespace Epsilon.Host.WebApi.Controllers;
 public class DocumentController : Controller
 {
     private readonly IWordDocumentGenerator _wordDocumentGenerator;
-    private readonly IEnumerable<IComponent> _components;
-    private readonly IEnumerable<IComponentConverter<OpenXmlElement>> _wordConverters;
+    private readonly IEnumerable<IEpsilonComponent> _components;
+    private readonly IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> _wordConverters;
 
     public DocumentController(
         IWordDocumentGenerator wordDocumentGenerator,
-        IEnumerable<IComponent> components,
-        IEnumerable<IComponentConverter<OpenXmlElement>> wordConverters
+        IEnumerable<IEpsilonComponent> components,
+        IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> wordConverters
     )
     {
         _wordDocumentGenerator = wordDocumentGenerator;

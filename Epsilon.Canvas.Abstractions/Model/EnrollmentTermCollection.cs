@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Epsilon.Canvas.Abstractions.Model;
 

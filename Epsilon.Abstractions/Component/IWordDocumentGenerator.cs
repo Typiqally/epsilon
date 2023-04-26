@@ -5,5 +5,5 @@ namespace Epsilon.Abstractions.Component;
 
 public interface IWordDocumentGenerator
 {
-    public Task<Document> Generate(IEnumerable<IComponent> components, IEnumerable<IComponentConverter<OpenXmlElement>> wordConverters);
+    public Task<Document> Generate(IEnumerable<IComponent> components, IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> wordConverters);
 }

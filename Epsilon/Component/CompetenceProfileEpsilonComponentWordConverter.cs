@@ -5,7 +5,7 @@ using Epsilon.Abstractions.Model;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileComponentWordConverter : ComponentConverter<OpenXmlElement, CompetenceProfile>
+public class CompetenceProfileEpsilonComponentWordConverter : EpsilonComponentConverter<OpenXmlElement, CompetenceProfile>
 {
     public override Task<OpenXmlElement> Convert(CompetenceProfile component)
     {

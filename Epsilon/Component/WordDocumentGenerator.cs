@@ -6,7 +6,7 @@ namespace Epsilon.Component;
 
 public class WordDocumentGenerator : IWordDocumentGenerator
 {
-    public async Task<Document> Generate(IEnumerable<IComponent> components, IEnumerable<IComponentConverter<OpenXmlElement>> wordConverters)
+    public async Task<Document> Generate(IEnumerable<IEpsilonComponent> components, IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> wordConverters)
     {
         var document = new Document(new Body());
 

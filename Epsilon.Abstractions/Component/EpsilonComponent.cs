@@ -1,6 +1,6 @@
 namespace Epsilon.Abstractions.Component;
 
-public abstract class Component<T> : IComponent<T>
+public abstract class EpsilonComponent<T> : IEpsilonComponent<T>
 {
     public async Task<object?> FetchObject()
     {

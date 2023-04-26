@@ -1,11 +1,11 @@
 ﻿namespace Epsilon.Abstractions.Component;
 
-public interface IComponent
+public interface IEpsilonComponent
 {
     public Task<object?> FetchObject();
 }
 
-public interface IComponent<TResponse> : IComponent
+public interface IEpsilonComponent<TResponse> : IEpsilonComponent
 {
     public Task<TResponse> Fetch();
 }
