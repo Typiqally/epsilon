@@ -18,38 +18,49 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
         foreach (var course in getAllUserCoursesSubmissionOutcomes.Data.Courses)
         {
-            foreach (var submissionsConnection in course.SubmissionsConnection.Nodes.Where(static s => s.PostedAt != null))
+            foreach (var submissionsConnection in course.SubmissionsConnection.Nodes.Where(static s =>
+                         s.PostedAt != null))
             {
                 var submission = submissionsConnection.SubmissionsHistories.Nodes
                     .Where(static h => h.RubricAssessments.Nodes.Any())
+                    .OrderByDescending(h => h.SubmittedAt)
                     .MaxBy(static h => h.Attempt);
 
                 if (submission != null)
                 {
                     var rubricAssessments = submission.RubricAssessments.Nodes;
 
-                    foreach (var assessmentRating in rubricAssessments.SelectMany(static rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar => ar is { Points: not null, Criterion.MasteryPoints: not null, Criterion.Outcome: not null } && ar.Points >= ar.Criterion.MasteryPoints)))
+                    foreach (var assessmentRating in rubricAssessments.SelectMany(static rubricAssessment =>
+                                 rubricAssessment.AssessmentRatings.Where(static ar =>
+                                     ar is
+                                     {
+                                         Points: not null, Criterion.MasteryPoints: not null,
+                                         Criterion.Outcome: not null
+                                     } && ar.Points >= ar.Criterion.MasteryPoints)))
                     {
-                        if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))
+                        if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id,
+                                out var professionalTask))
                         {
                             taskResults.Add(
                                 new ProfessionalTaskResult(
+                                    assessmentRating.Criterion.Outcome.Id,
                                     professionalTask.Layer,
                                     professionalTask.Activity,
                                     professionalTask.MasteryLevel,
                                     assessmentRating.Points!.Value,
-                                    submissionsConnection.PostedAt!.Value
+                                    submission.SubmittedAt!.Value
                                 )
                             );
                         }
-                        else if (FhictConstants.ProfessionalSkills.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalSkill))
+                        else if (FhictConstants.ProfessionalSkills.TryGetValue(assessmentRating.Criterion.Outcome.Id,
+                                     out var professionalSkill))
                         {
                             professionalResults.Add(
                                 new ProfessionalSkillResult(
                                     professionalSkill.Skill,
                                     professionalSkill.MasteryLevel,
                                     assessmentRating.Points!.Value,
-                                    submissionsConnection.PostedAt!.Value
+                                    submission.SubmittedAt!.Value
                                 )
                             );
                         }
@@ -67,11 +78,63 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
             .Distinct()
             .OrderByDescending(static term => term.StartAt);
 
+        ;
+
         return new CompetenceProfile(
             domain,
             taskResults,
             professionalResults,
-            filteredTerms
+            filteredTerms,
+            CalculateDecayingAverageScore(taskResults, domain)
         );
+    }
+
+    private List<DecayingAverage> CalculateDecayingAverageScore(List<ProfessionalTaskResult> results, IHboIDomain domain)
+    {
+        // if (results.Count > 0)
+        // {
+        //     var totalCount = 0.0;
+        //     results.ForEach(r => totalCount =+ r.Grade);
+        //     return ((totalCount / results.Count) * .35) + recentScore *.65;
+        // }
+        //
+        // return 0;
+        var listDecayingAverage = new List<DecayingAverage>();
+        
+        foreach (var outcome in FhictConstants.ProfessionalTasks)
+        {
+            var filterd  = results
+                .FindAll(r => r.Outcome == outcome.Key);
+            if (filterd.Count > 0)
+            {
+                var totalCount = 0.0;
+                var recentOutcome = filterd.First();
+                var pastOutcomes = filterd.GetRange(1, filterd.Count - 1);
+                var endScore = 0.0;
+                if (pastOutcomes.Count > 0)
+                {
+                    pastOutcomes.ForEach(r =>
+                    {
+                        totalCount = r.Grade + totalCount;
+                    });
+                    var pastScore = Math.Round(totalCount / pastOutcomes.Count, 2) * .35;
+                    endScore = pastScore + (recentOutcome.Grade * .65);
+                }
+                else
+                {
+                    endScore = recentOutcome.Grade;
+                }
+
+                listDecayingAverage.Add(new DecayingAverage(
+                    endScore,
+                    outcome.Value.Layer,
+                    outcome.Value.Activity
+                ));
+                    
+
+            }
+        }
+
+        return listDecayingAverage;
     }
 }

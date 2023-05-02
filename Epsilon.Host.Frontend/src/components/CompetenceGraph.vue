@@ -9,8 +9,9 @@
 
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts"
-import { DecayingAveragePerLayer, IHboIDomain } from "../logic/Api"
+import { IHboIDomain } from "../logic/Api"
 import { onMounted } from "vue"
+import { DecayingAveragePerLayer } from "/@/logic/DecayingAverageLogic"
 
 const series: Array<{
     name: string

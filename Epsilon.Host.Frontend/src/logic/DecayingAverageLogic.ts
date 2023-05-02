@@ -1,13 +1,13 @@
 import {
+    DecayingAverage,
     IHboIDomain,
     ProfessionalSkillResult,
-    ProfessionalTaskResult,
 } from "/@/logic/Api"
 
-export class DecayingAverage {
+export class DecayingAverageLogic {
     static GetDecayingAverageTasks(
         domain: IHboIDomain | undefined,
-        taskResults: ProfessionalTaskResult[] | undefined | null
+        taskResults: DecayingAverage[] | undefined | null,
     ): DecayingAveragePerLayer[] {
         return domain?.architectureLayers?.map((l) => {
             return {
@@ -20,15 +20,17 @@ export class DecayingAverage {
                             (t) => t.activity === a.id
                         )
                         acOutcomes?.map((result) => {
-                            if (result.grade) {
-                                totalScoreActivity += result.grade
+                            if (result.score) {
+                                totalScoreActivity += result.score
                             }
                         })
                         acOutcomes
                             .filter((t) => t.architectureLayer === l.id)
                             .map((result) => {
-                                console.log(result.grade)
-                                totalScoreArchitectureActivity += result?.grade
+                                console.log(result.score)
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-ignore
+                                totalScoreArchitectureActivity += result?.score
                             })
                         console.log(acOutcomes)
                         return {
@@ -46,7 +48,7 @@ export class DecayingAverage {
 
     static GetDecayingAverageSkills(
         domain: IHboIDomain | undefined,
-        skillResults: ProfessionalSkillResult[] | undefined | null
+        skillResults: ProfessionalSkillResult[] | undefined | null,
     ): DecayingAveragePerSkill[] {
         return domain?.professionalSkills?.map((s) => {
             let decayingAverage = 0
