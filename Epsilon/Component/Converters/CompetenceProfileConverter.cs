@@ -85,25 +85,18 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
             taskResults,
             professionalResults,
             filteredTerms,
-            CalculateDecayingAverageScore(taskResults, domain)
+            CalculateDecayingAverageScore(taskResults, FhictConstants.ProfessionalTasks)
         );
     }
 
-    private List<DecayingAverage> CalculateDecayingAverageScore(List<ProfessionalTaskResult> results, IHboIDomain domain)
+    private List<DecayingAverage> CalculateDecayingAverageScore(List<ProfessionalTaskResult> results,
+        IDictionary<int, ProfessionalTask> outcomes)
     {
-        // if (results.Count > 0)
-        // {
-        //     var totalCount = 0.0;
-        //     results.ForEach(r => totalCount =+ r.Grade);
-        //     return ((totalCount / results.Count) * .35) + recentScore *.65;
-        // }
-        //
-        // return 0;
         var listDecayingAverage = new List<DecayingAverage>();
-        
-        foreach (var outcome in FhictConstants.ProfessionalTasks)
+
+        foreach (var outcome in outcomes)
         {
-            var filterd  = results
+            var filterd = results
                 .FindAll(r => r.Outcome == outcome.Key);
             if (filterd.Count > 0)
             {
@@ -113,10 +106,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                 var endScore = 0.0;
                 if (pastOutcomes.Count > 0)
                 {
-                    pastOutcomes.ForEach(r =>
-                    {
-                        totalCount = r.Grade + totalCount;
-                    });
+                    pastOutcomes.ForEach(r => { totalCount = r.Grade + totalCount; });
                     var pastScore = Math.Round(totalCount / pastOutcomes.Count, 2) * .35;
                     endScore = pastScore + (recentOutcome.Grade * .65);
                 }
@@ -130,8 +120,6 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                     outcome.Value.Layer,
                     outcome.Value.Activity
                 ));
-                    
-
             }
         }
 
