@@ -74,26 +74,34 @@ export interface ProfessionalSkill {
 
 export interface ProfessionalSkillResult {
     /** @format int32 */
-    skill?: number
-    /** @format int32 */
-    masteryLevel?: number
+    outcomeId?: number
     /** @format double */
     grade?: number
     /** @format date-time */
     assessedAt?: string
+    /** @format int32 */
+    outcome?: number
+    /** @format int32 */
+    skill?: number
+    /** @format int32 */
+    masteryLevel?: number
 }
 
 export interface ProfessionalTaskResult {
+    /** @format int32 */
+    outcomeId?: number
+    /** @format double */
+    grade?: number
+    /** @format date-time */
+    assessedAt?: string
+    /** @format int32 */
+    outcome?: number
     /** @format int32 */
     architectureLayer?: number
     /** @format int32 */
     activity?: number
     /** @format int32 */
     masteryLevel?: number
-    /** @format double */
-    grade?: number
-    /** @format date-time */
-    assessedAt?: string
 }
 
 export type QueryParamsType = Record<string | number, any>
@@ -142,11 +150,11 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-    public baseUrl: string = "https://localhost:7084";
-    private securityData: SecurityDataType | null = null;
-    private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
-    private abortControllers = new Map<CancelToken, AbortController>();
-    private customFetch = (...fetchParams: Parameters<typeof fetch>) => fetch(...fetchParams);
+    public baseUrl: string = "https://localhost:7084"
+    private securityData: SecurityDataType | null = null
+    private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]
+    private abortControllers = new Map<CancelToken, AbortController>()
+    private customFetch = (...fetchParams: Parameters<typeof fetch>) => fetch(...fetchParams)
 
     private baseApiParams: RequestParams = {
         credentials: "same-origin",

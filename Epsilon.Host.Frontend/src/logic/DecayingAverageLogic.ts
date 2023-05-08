@@ -7,7 +7,7 @@ import {
 export class DecayingAverageLogic {
     static GetDecayingAverageTasks(
         domain: IHboIDomain | undefined,
-        taskResults: DecayingAverage[] | undefined | null,
+        taskResults: DecayingAverage[] | undefined | null
     ): DecayingAveragePerLayer[] {
         return domain?.architectureLayers?.map((l) => {
             return {
@@ -48,7 +48,7 @@ export class DecayingAverageLogic {
 
     static GetDecayingAverageSkills(
         domain: IHboIDomain | undefined,
-        skillResults: ProfessionalSkillResult[] | undefined | null,
+        skillResults: ProfessionalSkillResult[] | undefined | null
     ): DecayingAveragePerSkill[] {
         return domain?.professionalSkills?.map((s) => {
             let decayingAverage = 0

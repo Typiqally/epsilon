@@ -57,6 +57,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                         {
                             professionalResults.Add(
                                 new ProfessionalSkillResult(
+                                    assessmentRating.Criterion.Outcome.Id,
                                     professionalSkill.Skill,
                                     professionalSkill.MasteryLevel,
                                     assessmentRating.Points!.Value,
@@ -89,20 +90,22 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         );
     }
 
-    private List<DecayingAverage> CalculateDecayingAverageScore(List<ProfessionalTaskResult> results,
+    private static IEnumerable<DecayingAverage> CalculateDecayingAverageScore(
+        IEnumerable<CompetenceOutcomeResult> results,
         IDictionary<int, ProfessionalTask> outcomes)
     {
         var listDecayingAverage = new List<DecayingAverage>();
 
         foreach (var outcome in outcomes)
         {
-            var filterd = results
-                .FindAll(r => r.Outcome == outcome.Key);
-            if (filterd.Count > 0)
+            var filtered = results.ToList()
+                .FindAll(r => r.OutcomeId == outcome.Key);
+
+            if (filtered.Count > 0)
             {
                 var totalCount = 0.0;
-                var recentOutcome = filterd.First();
-                var pastOutcomes = filterd.GetRange(1, filterd.Count - 1);
+                var recentOutcome = filtered.First();
+                var pastOutcomes = filtered.GetRange(1, filtered.Count - 1);
                 var endScore = 0.0;
                 if (pastOutcomes.Count > 0)
                 {
