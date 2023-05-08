@@ -14,7 +14,7 @@ import { onMounted } from "vue"
 import {
     DecayingAverageLogic,
     DecayingAveragePerLayer,
-} from "/@/logic/DecayingAverageLogic"
+} from "../logic/DecayingAverageLogic"
 
 const series: Array<{
     name: string
@@ -99,7 +99,9 @@ onMounted(() => {
         series.push({
             name: ar.name,
             color: ar.color,
-            data: layer.layerActivities.map((ac) => ac.decayingAverage),
+            data: layer.layerActivities.map((ac) =>
+                ac.decayingAverage.toFixed(3)
+            ),
         })
     })
 })

@@ -80,6 +80,12 @@ export class DecayingAverageLogic {
         }) as DecayingAveragePerLayer[]
     }
 
+    /**
+     * Explanation of process can be found here: https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Outcomes/ta-p/75#decaying_average
+     * @param results
+     * @constructor
+     * @private
+     */
     private static GetDecayingAverageFromOneOutcomeType(
         results: ProfessionalTaskResult[]
     ): number {
@@ -92,8 +98,12 @@ export class DecayingAverageLogic {
                 pastResults.forEach(
                     (r) => (totalGradeScore += r.grade ? r.grade : 0)
                 )
+
                 totalGradeScore =
-                    (totalGradeScore / pastResults.length) * 0.35 +
+                    parseFloat(
+                        (totalGradeScore / pastResults.length).toFixed(2)
+                    ) *
+                        0.35 +
                     recentResult.grade * 0.65
             } else {
                 totalGradeScore = recentResult.grade
