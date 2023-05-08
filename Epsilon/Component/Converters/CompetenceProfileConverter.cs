@@ -85,47 +85,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
             domain,
             taskResults,
             professionalResults,
-            filteredTerms,
-            CalculateDecayingAverageScore(taskResults, FhictConstants.ProfessionalTasks)
+            filteredTerms
         );
-    }
-
-    private static IEnumerable<DecayingAverage> CalculateDecayingAverageScore(
-        IEnumerable<CompetenceOutcomeResult> results,
-        IDictionary<int, ProfessionalTask> outcomes)
-    {
-        var listDecayingAverage = new List<DecayingAverage>();
-
-        foreach (var outcome in outcomes)
-        {
-            var filtered = results.ToList()
-                .FindAll(r => r.OutcomeId == outcome.Key);
-
-            if (filtered.Count > 0)
-            {
-                var totalCount = 0.0;
-                var recentOutcome = filtered.First();
-                var pastOutcomes = filtered.GetRange(1, filtered.Count - 1);
-                var endScore = 0.0;
-                if (pastOutcomes.Count > 0)
-                {
-                    pastOutcomes.ForEach(r => { totalCount = r.Grade + totalCount; });
-                    var pastScore = Math.Round(totalCount / pastOutcomes.Count, 2) * .35;
-                    endScore = pastScore + (recentOutcome.Grade * .65);
-                }
-                else
-                {
-                    endScore = recentOutcome.Grade;
-                }
-
-                listDecayingAverage.Add(new DecayingAverage(
-                    endScore,
-                    outcome.Value.Layer,
-                    outcome.Value.Activity
-                ));
-            }
-        }
-
-        return listDecayingAverage;
     }
 }
