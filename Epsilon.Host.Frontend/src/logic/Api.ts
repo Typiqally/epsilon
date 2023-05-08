@@ -80,8 +80,6 @@ export interface ProfessionalSkillResult {
     /** @format date-time */
     assessedAt?: string
     /** @format int32 */
-    outcome?: number
-    /** @format int32 */
     skill?: number
     /** @format int32 */
     masteryLevel?: number
@@ -94,8 +92,6 @@ export interface ProfessionalTaskResult {
     grade?: number
     /** @format date-time */
     assessedAt?: string
-    /** @format int32 */
-    outcome?: number
     /** @format int32 */
     architectureLayer?: number
     /** @format int32 */

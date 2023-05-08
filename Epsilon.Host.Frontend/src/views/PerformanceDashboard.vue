@@ -9,12 +9,7 @@
         <CompetenceProfileLegend :domain="data.hboIDomain" />
         <div />
         <CompetenceGraph
-            :data="
-                DecayingAverageLogic.GetDecayingAverageTasks(
-                    data.hboIDomain,
-                    data.decayingAverages
-                )
-            "
+            :data="filteredProfessionalTaskOutcomes"
             :domain="data.hboIDomain" />
     </div>
     <RoundLoader v-else />
