@@ -28,7 +28,6 @@ import CompetenceGraph from "@/components/CompetenceGraph.vue"
 import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
 import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
-import { DecayingAverageLogic } from "@/logic/DecayingAverageLogic"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
