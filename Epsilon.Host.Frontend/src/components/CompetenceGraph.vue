@@ -11,7 +11,8 @@
 import ApexChart from "vue3-apexcharts"
 import { IHboIDomain, ProfessionalTaskResult } from "../logic/Api"
 import { onMounted } from "vue"
-import { DecayingAveragePerActivity, DecayingAveragePerLayer } from "/@/logic/DecayingAverageLogic"
+import { DecayingAverageLogic } from "@/logic/DecayingAverageLogic"
+import { DecayingAveragePerLayer } from "/@/logic/DecayingAverageLogic"
 
 const series: Array<{
     name: string
@@ -82,78 +83,22 @@ const props = defineProps<{
 }>()
 
 onMounted(() => {
-    // Setup categories
-    const activities = props.domain.activities
-    const DecayingAverage: Record<string, DecayingAveragePerLayer> = {}
-
-    if (activities != null) {
-        activities.forEach((s) => {
+    if (props.domain.activities != null) {
+        props.domain.activities.forEach((s) => {
             chartOptions.xaxis.categories.push(s.name as never)
         })
     }
 
-    props.domain.architectureLayers?.forEach((l) => {
-        if (l.id !== undefined) {
-            DecayingAverage[l?.id] = {
-                architectureLayer: l.id,
-                layerActivities: [] as DecayingAveragePerActivity[],
-            }
-        }
-    })
-
-    const resultsByOutcome = groupBy(
+    DecayingAverageLogic.GetAverageDevelopmentScores(
         props.data,
-        (r: ProfessionalTaskResult) => r.outcomeId,
-    )
-
-    for (const outcomeId in resultsByOutcome) {
-        const resultByOutcome = resultsByOutcome[outcomeId]
-        let totalGradeScore = 0.0
-
-        const recentResult = resultByOutcome.at(0)
-        const pastResults = resultByOutcome.slice(1, resultByOutcome.length - 1)
-        if (pastResults.length > 0) {
-            pastResults.forEach((r) => (totalGradeScore += r.grade))
-            totalGradeScore =
-                (totalGradeScore / pastResults.length) * 0.35 +
-                recentResult.grade * 0.65
-        } else {
-            totalGradeScore = recentResult.grade
-        }
-
-        DecayingAverage[recentResult.architectureLayer].layerActivities.push({
-            activity: recentResult.activity,
-            decayingAverage: totalGradeScore,
-        })
-    }
-
-    for (const decayingAverageKey in DecayingAverage) {
+        props.domain
+    ).map((layer: DecayingAveragePerLayer) => {
+        const ar = props.domain.architectureLayers?.at(layer.architectureLayer)
         series.push({
-            name: props.domain.architectureLayers?.at(decayingAverageKey).name,
-            color: props.domain.architectureLayers?.at(decayingAverageKey).color,
-            data: countBasedOnActivities(DecayingAverage[decayingAverageKey].layerActivities),
+            name: ar.name,
+            color: ar.color,
+            data: layer.layerActivities.map((ac) => ac.decayingAverage),
         })
-    }
+    })
 })
-
-function countBasedOnActivities(layerActivities: DecayingAveragePerActivity[]) {
-    const list = []
-    for (let i = 0; i <= 4; i++) {
-        let score = 0
-        const selectedActivities = layerActivities.filter((ac) => ac.activity === i)
-        selectedActivities.map((ac) => (score += ac.decayingAverage))
-        list.push(score)
-    }
-    console.log(list)
-    return list
-}
-
-function groupBy<T>(arr: T[], fn: (item: T) => any): Record<string, T[]> {
-    return arr.reduce<Record<string, T[]>>((prev, curr) => {
-        const groupKey = fn(curr)
-        const group = prev[groupKey] || []
-        group.push(curr)
-        return { ...prev, [groupKey]: group }
-    }, {})
-}
 </script>
