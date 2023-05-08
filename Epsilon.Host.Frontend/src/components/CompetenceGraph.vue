@@ -10,13 +10,13 @@
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts"
 import { IHboIDomain, ProfessionalTaskResult } from "../logic/Api"
-import { onMounted } from "vue"
+import { onMounted, watch } from "vue"
 import {
     DecayingAverageLogic,
     DecayingAveragePerLayer,
 } from "../logic/DecayingAverageLogic"
 
-const series: Array<{
+let series: Array<{
     name: string
     color: string
     data: Array<string | number> | undefined
@@ -84,7 +84,9 @@ const props = defineProps<{
     data: ProfessionalTaskResult[]
 }>()
 
-onMounted(() => {
+function loadChartData(): void {
+    series = []
+    chartOptions.xaxis.categories = []
     if (props.domain.activities != null) {
         props.domain.activities.forEach((s) => {
             chartOptions.xaxis.categories.push(s.name as never)
@@ -104,5 +106,11 @@ onMounted(() => {
             ),
         })
     })
+}
+
+onMounted(() => {
+    loadChartData()
 })
+
+watch(() => loadChartData())
 </script>
