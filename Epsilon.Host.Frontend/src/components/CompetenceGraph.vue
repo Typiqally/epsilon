@@ -11,8 +11,10 @@
 import ApexChart from "vue3-apexcharts"
 import { IHboIDomain, ProfessionalTaskResult } from "../logic/Api"
 import { onMounted } from "vue"
-import { DecayingAverageLogic } from "@/logic/DecayingAverageLogic"
-import { DecayingAveragePerLayer } from "/@/logic/DecayingAverageLogic"
+import {
+    DecayingAverageLogic,
+    DecayingAveragePerLayer,
+} from "/@/logic/DecayingAverageLogic"
 
 const series: Array<{
     name: string
