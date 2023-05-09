@@ -25,13 +25,13 @@ namespace Epsilon.Component
 
                 // Set table properties for formatting.
                 table.AppendChild(new TableProperties(
-                    new TableWidth() { Width = "100%", Type = TableWidthUnitValues.Pct }));
+                    new TableWidth() { Width = "0", Type = TableWidthUnitValues.Auto }));
 
                 // Calculate the header row height based on the longest assignment name.
                 int headerRowHeight = 0;
                 if (module.KpiMatrix.Assignments.Any())
                 {
-                    headerRowHeight = module.KpiMatrix.Assignments.Max(a => a.Name.Length) * 50;
+                    headerRowHeight = module.KpiMatrix.Assignments.Max(a => a.Name.Length) * 111;
                 }
 
                 // Create the table header row.
@@ -40,11 +40,11 @@ namespace Epsilon.Component
                     { Val = (UInt32Value)(uint)headerRowHeight }));
 
                 // Empty top-left cell.
-                headerRow.AppendChild(CreateTableCellWithBorders(new Paragraph(new Run(new Text("")))));
+                headerRow.AppendChild(CreateTableCellWithBorders("2500",new Paragraph(new Run(new Text("")))));
                 
                 foreach (var assignment in module.KpiMatrix.Assignments)
                 {
-                    var cell = CreateTableCellWithBorders();
+                    var cell = CreateTableCellWithBorders("100");
                     cell.FirstChild.Append(new TextDirection() { Val = TextDirectionValues.BottomToTopLeftToRight });
 
                     cell.Append(new Paragraph(new Run(new Text(assignment.Name))));
@@ -54,18 +54,18 @@ namespace Epsilon.Component
                 table.AppendChild(headerRow);
 
                 // Add the outcome rows.
-                foreach (var outcome in module.KpiMatrix.Outcomes)
+                foreach (var outcome in module.KpiMatrix.Outcomes.OrderBy(o => o.Id))
                 {
                     var row = new TableRow();
 
                     // Add the outcome title cell.
-                    row.AppendChild(CreateTableCellWithBorders(new Paragraph(new Run(new Text(outcome)))));
+                    row.AppendChild(CreateTableCellWithBorders("2500",new Paragraph(new Run(new Text(outcome.Title)))));
 
                     // Add the assignment cells.
                     foreach (var assignment in module.KpiMatrix.Assignments)
                     {
-                        var outcomeAssignment = assignment.Outcomes.FirstOrDefault(o => o.Title == outcome);
-                        var cell = CreateTableCellWithBorders();
+                        var outcomeAssignment = assignment.Outcomes.FirstOrDefault(o => o.Title == outcome.Title);
+                        var cell = CreateTableCellWithBorders("100");
 
                         // Set cell color based on GradeStatus.
                         if (outcomeAssignment != null)
@@ -89,12 +89,14 @@ namespace Epsilon.Component
                 }
 
                 body.AppendChild(table);
+                body.AppendChild(new Paragraph(new Run(new Break() { Type = BreakValues.Page })));
+                
             }
 
             return Task.FromResult<OpenXmlElement>(body);
         }
 
-        private TableCell CreateTableCellWithBorders(params OpenXmlElement[] elements)
+        private TableCell CreateTableCellWithBorders(string? width, params OpenXmlElement[] elements)
         {
             var cell = new TableCell();
             var cellProperties = new TableCellProperties();
@@ -111,9 +113,13 @@ namespace Epsilon.Component
                     cell.Append(element);
                 }
             }
-
+            
+            if (width != null)
+            {
+                cellProperties.Append(new TableCellWidth { Type = TableWidthUnitValues.Dxa, Width = width });
+            }
             cellProperties.Append(borders);
-            cell.PrependChild(cellProperties); // Move the PrependChild here
+            cell.PrependChild(cellProperties);
 
             return cell;
         }
