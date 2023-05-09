@@ -1,8 +1,8 @@
-namespace Epsilon.Abstractions.Model;
+namespace Epsilon.Canvas.Abstractions.Model;
 
 public enum GradeStatus
 {
     Approved,
     Insufficient,
-    NotGraded
+    NotGraded,
 }
