@@ -1,6 +1,7 @@
+using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
 
-namespace Epsilon.Abstractions.Model;
+namespace Epsilon.Abstractions.Component;
 
 public record CompetenceProfile(
     IHboIDomain HboIDomain,
@@ -9,4 +10,4 @@ public record CompetenceProfile(
     IEnumerable<EnrollmentTerm> Terms,
     IEnumerable<DecayingAveragePerLayer> DecayingAveragesPerTask,
     IEnumerable<DecayingAveragePerSkill> DecayingAveragesPerSkill
-);
+) : IEpsilonComponent;

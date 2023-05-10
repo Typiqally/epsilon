@@ -9,17 +9,17 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class DocumentController : Controller
 {
-    private readonly IWordDocumentGenerator _wordDocumentGenerator;
-    private readonly IEnumerable<IEpsilonComponent> _components;
+    private readonly IWordDocumentBuilder _wordDocumentBuilder;
+    private readonly IEnumerable<IEpsilonComponentFetcher> _components;
     private readonly IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> _wordConverters;
 
     public DocumentController(
-        IWordDocumentGenerator wordDocumentGenerator,
-        IEnumerable<IEpsilonComponent> components,
+        IWordDocumentBuilder wordDocumentBuilder,
+        IEnumerable<IEpsilonComponentFetcher> components,
         IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> wordConverters
     )
     {
-        _wordDocumentGenerator = wordDocumentGenerator;
+        _wordDocumentBuilder = wordDocumentBuilder;
         _components = components;
         _wordConverters = wordConverters;
     }
@@ -31,7 +31,7 @@ public class DocumentController : Controller
         using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
-        document.MainDocumentPart!.Document = await _wordDocumentGenerator.Generate(_components, _wordConverters);
+        document.MainDocumentPart!.Document = await _wordDocumentBuilder.Build(_components, _wordConverters);
 
         document.Save();
         document.Close();

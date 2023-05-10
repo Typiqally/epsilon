@@ -1,11 +1,10 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Component;
-using Epsilon.Abstractions.Model;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileEpsilonComponentWordConverter : EpsilonComponentConverter<OpenXmlElement, CompetenceProfile>
+public class CompetenceProfileComponentWordConverter : EpsilonComponentConverter<OpenXmlElement, CompetenceProfile>
 {
     public override Task<OpenXmlElement> Convert(CompetenceProfile component)
     {

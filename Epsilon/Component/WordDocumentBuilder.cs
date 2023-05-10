@@ -4,16 +4,17 @@ using Epsilon.Abstractions.Component;
 
 namespace Epsilon.Component;
 
-public class WordDocumentGenerator : IWordDocumentGenerator
+public class WordDocumentBuilder : IWordDocumentBuilder
 {
-    public async Task<Document> Generate(IEnumerable<IEpsilonComponent> components, IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> wordConverters)
+    public async Task<Document> Build(IEnumerable<IEpsilonComponentFetcher> fetchers, IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> converters)
     {
         var document = new Document(new Body());
+        var convertersArray = converters.ToArray();
 
-        foreach (var component in components)
+        foreach (var component in fetchers)
         {
             var componentData = await component.FetchObject();
-            var converter = wordConverters.FirstOrDefault(c => c.Validate(componentData?.GetType()));
+            var converter = convertersArray.FirstOrDefault(c => c.Validate(componentData?.GetType()));
 
             if (componentData != null && converter != null)
             {

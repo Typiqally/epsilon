@@ -1,6 +1,5 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
-using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.Service;
@@ -8,13 +7,43 @@ using Microsoft.Extensions.Configuration;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileEpsilonComponent : EpsilonComponent<CompetenceProfile>
+public class CompetenceProfileComponentFetcher : EpsilonComponentFetcher<CompetenceProfile>
 {
+    private const string GetAllUserCoursesSubmissionOutcomes = @"
+        query MyQuery {
+          allCourses {
+            submissionsConnection(studentIds: $studentIds) {
+              nodes {
+                submissionHistoriesConnection {
+                  nodes {
+                    rubricAssessmentsConnection {
+                      nodes {
+                        assessmentRatings {
+                          criterion {
+                            outcome {
+                              _id
+                            }
+                            masteryPoints
+                          }
+                          points
+                        }
+                      }
+                    }
+                    attempt
+                  }
+                }
+                postedAt
+              }
+            }
+          }
+        }
+    ";
+
     private readonly IConfiguration _configuration;
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IAccountHttpService _accountHttpService;
 
-    public CompetenceProfileEpsilonComponent(
+    public CompetenceProfileComponentFetcher(
         IGraphQlHttpService graphQlService,
         IAccountHttpService accountHttpService,
         IConfiguration configuration
@@ -28,7 +57,7 @@ public class CompetenceProfileEpsilonComponent : EpsilonComponent<CompetenceProf
     public override async Task<CompetenceProfile> Fetch()
     {
         var studentId = _configuration["Canvas:StudentId"];
-        var outcomesQuery = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCulture);
+        var outcomesQuery = GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCulture);
 
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
         var terms = await _accountHttpService.GetAllTerms(1);

@@ -1,5 +1,4 @@
 using Epsilon.Abstractions.Component;
-using Epsilon.Abstractions.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
@@ -8,9 +7,9 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class ComponentController : ControllerBase
 {
-    private readonly IEpsilonComponent<CompetenceProfile> _competenceProfileManager;
+    private readonly IEpsilonComponentFetcher<CompetenceProfile> _competenceProfileManager;
 
-    public ComponentController(IConfiguration configuration, IEpsilonComponent<CompetenceProfile> competenceProfileManager)
+    public ComponentController(IConfiguration configuration, IEpsilonComponentFetcher<CompetenceProfile> competenceProfileManager)
     {
         _competenceProfileManager = competenceProfileManager;
     }
