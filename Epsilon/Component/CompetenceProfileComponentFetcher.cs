@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileComponentFetcher : EpsilonComponentFetcher<CompetenceProfile>
+public class CompetenceProfileComponentFetcher : ComponentFetcher<CompetenceProfile>
 {
     private const string GetAllUserCoursesSubmissionOutcomes = @"
         query MyQuery {

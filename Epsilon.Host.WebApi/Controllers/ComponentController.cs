@@ -7,9 +7,9 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class ComponentController : ControllerBase
 {
-    private readonly IEpsilonComponentFetcher<CompetenceProfile> _competenceProfileManager;
+    private readonly IComponentFetcher<CompetenceProfile> _competenceProfileManager;
 
-    public ComponentController(IConfiguration configuration, IEpsilonComponentFetcher<CompetenceProfile> competenceProfileManager)
+    public ComponentController(IConfiguration configuration, IComponentFetcher<CompetenceProfile> competenceProfileManager)
     {
         _competenceProfileManager = competenceProfileManager;
     }

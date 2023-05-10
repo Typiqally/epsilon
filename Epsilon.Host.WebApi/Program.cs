@@ -24,9 +24,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCanvas(canvasConfiguration);
 
-builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
-builder.Services.AddComponentConverter<CompetenceProfile, OpenXmlElement, CompetenceProfileComponentWordConverter>();
 builder.Services.AddScoped<IWordDocumentBuilder, WordDocumentBuilder>();
+
+builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
 
 var app = builder.Build();
 

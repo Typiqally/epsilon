@@ -10,28 +10,36 @@ namespace Epsilon.Host.WebApi.Controllers;
 public class DocumentController : Controller
 {
     private readonly IWordDocumentBuilder _wordDocumentBuilder;
-    private readonly IEnumerable<IEpsilonComponentFetcher> _components;
-    private readonly IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> _wordConverters;
+    private readonly IEnumerable<IComponentFetcher> _componentFetchers;
 
     public DocumentController(
         IWordDocumentBuilder wordDocumentBuilder,
-        IEnumerable<IEpsilonComponentFetcher> components,
-        IEnumerable<IEpsilonComponentConverter<OpenXmlElement>> wordConverters
+        IEnumerable<IComponentFetcher> componentFetchers
     )
     {
         _wordDocumentBuilder = wordDocumentBuilder;
-        _components = components;
-        _wordConverters = wordConverters;
+        _componentFetchers = componentFetchers;
     }
 
     [HttpGet("word")]
     public async Task<IActionResult> DownloadWordDocument()
     {
         var stream = new MemoryStream();
+
+        var components = new List<IEpsilonWordComponent>();
+        foreach (var componentFetcher in _componentFetchers)
+        {
+           var component = await componentFetcher.FetchUnknown();
+           if (component is IEpsilonWordComponent wordComponent)
+           {
+               components.Add(wordComponent);
+           }
+        }
+        
         using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
-        document.MainDocumentPart!.Document = await _wordDocumentBuilder.Build(_components, _wordConverters);
+        document.MainDocumentPart!.Document = _wordDocumentBuilder.Build(components);
 
         document.Save();
         document.Close();
