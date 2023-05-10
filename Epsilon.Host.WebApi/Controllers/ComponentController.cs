@@ -1,4 +1,5 @@
 using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
@@ -7,18 +8,23 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class ComponentController : ControllerBase
 {
-    private readonly IComponentFetcher<CompetenceProfile> _competenceProfileManager;
+    private readonly ICompetenceComponentService _competenceComponentService;
 
-    public ComponentController(IConfiguration configuration, IComponentFetcher<CompetenceProfile> competenceProfileManager)
+    public ComponentController(ICompetenceComponentService competenceComponentService)
     {
-        _competenceProfileManager = competenceProfileManager;
+        _competenceComponentService = competenceComponentService;
     }
 
-    [HttpGet("competence_profile")]
-    public async Task<ActionResult<CompetenceProfile>> GetCompetenceProfile()
+    [HttpGet("{componentName}")]
+    [Produces(typeof(CompetenceProfile))]
+    public async Task<ActionResult<IEpsilonComponent>> GetCompetenceProfile(string componentName)
     {
-        var competenceProfile = await _competenceProfileManager.Fetch();
+        var component = await _competenceComponentService.GetComponent(componentName);
+        if (component == null)
+        {
+            return NotFound();
+        }
 
-        return competenceProfile;
+        return Ok(component);
     }
 }

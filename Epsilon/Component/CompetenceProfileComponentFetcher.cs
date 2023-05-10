@@ -54,6 +54,8 @@ public class CompetenceProfileComponentFetcher : ComponentFetcher<CompetenceProf
         _configuration = configuration;
     }
 
+    public override string ComponentName => "competence_profile";
+
     public override async Task<CompetenceProfile> Fetch()
     {
         var studentId = _configuration["Canvas:StudentId"];

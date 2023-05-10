@@ -2,6 +2,8 @@
 
 public interface IComponentFetcher
 {
+    public string ComponentName { get; }
+    
     public Task<IEpsilonComponent> FetchUnknown();
 }
 
