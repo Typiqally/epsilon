@@ -24,10 +24,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCanvas(canvasConfiguration);
 
-builder.Services.AddScoped<IEpsilonComponentFetcher, CompetenceProfileComponentFetcher>();
-builder.Services.AddScoped<IEpsilonComponentFetcher<CompetenceProfile>, CompetenceProfileComponentFetcher>();
-builder.Services.AddScoped<IEpsilonComponentConverter<OpenXmlElement>, CompetenceProfileComponentWordConverter>();
-builder.Services.AddScoped<IEpsilonComponentConverter<OpenXmlElement, CompetenceProfile>, CompetenceProfileComponentWordConverter>();
+builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
+builder.Services.AddComponentConverter<CompetenceProfile, OpenXmlElement, CompetenceProfileComponentWordConverter>();
 builder.Services.AddScoped<IWordDocumentBuilder, WordDocumentBuilder>();
 
 var app = builder.Build();
