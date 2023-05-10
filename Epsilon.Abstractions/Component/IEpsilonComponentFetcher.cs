@@ -5,7 +5,7 @@ public interface IEpsilonComponentFetcher
     public Task<object?> FetchObject();
 }
 
-public interface IEpsilonComponentFetcher<TResponse> : IEpsilonComponentFetcher
+public interface IEpsilonComponentFetcher<TComponent> : IEpsilonComponentFetcher
 {
-    public Task<TResponse> Fetch();
+    public Task<TComponent> Fetch();
 }
