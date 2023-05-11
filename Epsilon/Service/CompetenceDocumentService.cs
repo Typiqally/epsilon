@@ -27,7 +27,7 @@ public class CompetenceDocumentService : ICompetenceDocumentService
         using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
-        document.MainDocumentPart!.Document = _wordDocumentBuilder.Build(components);
+        document.MainDocumentPart!.Document = _wordDocumentBuilder.Build(document.MainDocumentPart, components);
 
         document.Save();
         document.Close();

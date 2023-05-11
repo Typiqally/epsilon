@@ -30,6 +30,7 @@ builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentServi
 builder.Services.AddScoped<IWordDocumentBuilder, WordDocumentBuilder>();
 
 builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileCompetenceComponentFetcher>();
+builder.Services.AddComponentFetcher<PersonaPage, PersonaPageComponentFetcher>();
 
 var app = builder.Build();
 

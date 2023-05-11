@@ -1,4 +1,5 @@
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
@@ -15,7 +16,7 @@ public record CompetenceProfile(
     IEnumerable<DecayingAveragePerSkill> DecayingAveragesPerSkill
 ) : ICompetenceWordComponent
 {
-    public OpenXmlElement ToWord()
+    public OpenXmlElement ToWord(MainDocumentPart mainDocumentPart)
     {
         // TODO: This is simply an example to show the capability of the component architecture
         var body = new Body();
