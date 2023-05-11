@@ -15,6 +15,9 @@ export class DecayingAverageLogic {
             return {
                 decayingAverage: this.GetDecayingAverageFromOneOutcomeType(j),
                 skill: j.at(0)?.skill,
+                masteryLevel: j
+                    .sort((a) => a.masteryLevel as never as number)
+                    .at(0)?.masteryLevel,
             }
         })
 
@@ -29,6 +32,9 @@ export class DecayingAverageLogic {
             return {
                 decayingAverage: score / filteredResults.length,
                 skill: s.id,
+                masteryLevel: filteredResults
+                    .sort((a) => a.masteryLevel as never as number)
+                    .at(0)?.masteryLevel,
             } as DecayingAveragePerSkill
         }) as DecayingAveragePerSkill[]
     }
@@ -172,4 +178,5 @@ export interface DecayingAveragePerLayer {
 export interface DecayingAveragePerSkill {
     skill: number
     decayingAverage: number
+    masteryLevel: number
 }
