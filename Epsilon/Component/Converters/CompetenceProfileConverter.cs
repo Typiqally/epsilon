@@ -83,8 +83,8 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
         return new CompetenceProfile(
             domain,
-            taskResults,
-            professionalResults,
+            taskResults.OrderByDescending(task => task.AssessedAt),
+            professionalResults.OrderByDescending(skill => skill.AssessedAt),
             filteredTerms
         );
     }

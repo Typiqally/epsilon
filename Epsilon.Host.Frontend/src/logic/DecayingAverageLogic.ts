@@ -129,19 +129,15 @@ export class DecayingAverageLogic {
     ): number {
         let totalGradeScore = 0.0
 
-        const recentResult = results.at(0)
+        const recentResult = results.reverse().pop()
         if (recentResult && recentResult.grade) {
-            const pastResults = results.slice(1, results.length - 1)
-            if (pastResults.length > 0) {
-                pastResults.forEach(
+            if (results.length > 0) {
+                results.forEach(
                     (r) => (totalGradeScore += r.grade ? r.grade : 0)
                 )
 
                 totalGradeScore =
-                    parseFloat(
-                        (totalGradeScore / pastResults.length).toFixed(2)
-                    ) *
-                        0.35 +
+                    (totalGradeScore / results.length) * 0.35 +
                     recentResult.grade * 0.65
             } else {
                 totalGradeScore = recentResult.grade
