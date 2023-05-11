@@ -10,7 +10,7 @@ export class DecayingAverageLogic {
         domain: IHboIDomain
     ): DecayingAveragePerSkill[] {
         const listOfResults = Object.entries(
-            this.groupBy(taskResults, (r) => r.outcomeId)
+            this.groupBy(taskResults, (r) => r.outcomeId as unknown as string)
         ).map(([, j]) => {
             return {
                 decayingAverage: this.GetDecayingAverageFromOneOutcomeType(j),
@@ -98,7 +98,7 @@ export class DecayingAverageLogic {
                         taskResults.filter(
                             (layer) => layer.architectureLayer === l.id
                         ),
-                        (r) => r.outcomeId
+                        (r) => r.outcomeId as unknown as string
                     )
                 ).map(([i, j]) => {
                     return {
@@ -147,7 +147,7 @@ export class DecayingAverageLogic {
 
     private static groupBy<T>(
         arr: T[],
-        fn: (item: T) => any
+        fn: (item: T) => number | string
     ): Record<string, T[]> {
         return arr.reduce<Record<string, T[]>>((prev, curr) => {
             const groupKey = fn(curr)
