@@ -10,8 +10,8 @@ public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
 {
     private const string GetUserKpiMatrixOutcomes = @"
         query GetUserKpiMatrixOutcomes {
-          course(id: $courseId) {
-            submissionsConnection {
+          allCourses {
+            submissionsConnection(studentIds: $studentIds) {
               nodes {
                 assignment {
                   name
@@ -51,9 +51,8 @@ public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
 
     public override async Task<KpiMatrixCollection> Fetch()
     {
-        var courseId = _configuration["Canvas:CourseId"];
-
-        var outcomesQuery = GetUserKpiMatrixOutcomes.Replace("$courseId", $"{courseId}", StringComparison.InvariantCultureIgnoreCase);
+        var studentId = _configuration["Canvas:StudentId"];
+        var outcomesQuery = GetUserKpiMatrixOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCultureIgnoreCase);
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
 
         return ConvertToComponent(outcomes);
@@ -120,15 +119,15 @@ public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
                         GetGradeStatus(assessmentRating.Points, assessmentRating.Outcome.MasteryPoints)));
 
                 var assignment = assignments.FirstOrDefault(a => a.Name == node.Assignment.Name);
-                var outcomeAssementList = outcomeAssessments.ToList();
+                var outcomeAssessmentsList = outcomeAssessments.ToList();
                 if (assignment == null)
                 {
-                    assignments.Add(new KpiMatrixAssignment(node.Assignment.Name, outcomeAssementList));
+                    assignments.Add(new KpiMatrixAssignment(node.Assignment.Name, outcomeAssessmentsList));
                 }
                 else
                 {
                     assignments.Remove(assignment);
-                    var combinedOutcomes = assignment.Outcomes.Concat(outcomeAssementList).ToList();
+                    var combinedOutcomes = assignment.Outcomes.Concat(outcomeAssessmentsList).ToList();
                     assignments.Add(new KpiMatrixAssignment(node.Assignment.Name, combinedOutcomes));
                 }
             }
