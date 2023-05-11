@@ -5,6 +5,7 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
+[CompetenceComponentName("competence_profile")]
 public record CompetenceProfile(
     IHboIDomain HboIDomain,
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
@@ -12,7 +13,7 @@ public record CompetenceProfile(
     IEnumerable<EnrollmentTerm> Terms,
     IEnumerable<DecayingAveragePerLayer> DecayingAveragesPerTask,
     IEnumerable<DecayingAveragePerSkill> DecayingAveragesPerSkill
-) : IEpsilonWordComponent
+) : ICompetenceWordComponent
 {
     public OpenXmlElement ToWord()
     {

@@ -29,7 +29,7 @@ builder.Services.AddScoped<ICompetenceDocumentService, CompetenceDocumentService
 builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentService>();
 builder.Services.AddScoped<IWordDocumentBuilder, WordDocumentBuilder>();
 
-builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
+builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileCompetenceComponentFetcher>();
 
 var app = builder.Build();
 

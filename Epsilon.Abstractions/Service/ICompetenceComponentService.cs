@@ -4,11 +4,11 @@ namespace Epsilon.Abstractions.Service;
 
 public interface ICompetenceComponentService
 {
-    IAsyncEnumerable<IEpsilonComponent> GetComponents();
+    IAsyncEnumerable<ICompetenceComponent> GetComponents();
 
-    IAsyncEnumerable<TComponent> GetComponents<TComponent>() where TComponent : IEpsilonComponent;
+    IAsyncEnumerable<TComponent> GetComponents<TComponent>() where TComponent : ICompetenceComponent;
 
-    Task<IEpsilonComponent?> GetComponent(string name);
+    Task<ICompetenceComponent?> GetComponent(string name);
 
-    Task<TComponent?> GetComponent<TComponent>(string name) where TComponent : class, IEpsilonComponent;
+    Task<TComponent?> GetComponent<TComponent>(string name) where TComponent : class, ICompetenceComponent;
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 
@@ -5,14 +6,14 @@ namespace Epsilon.Service;
 
 public class CompetenceComponentService : ICompetenceComponentService
 {
-    private readonly IEnumerable<IComponentFetcher> _componentFetchers;
+    private readonly IEnumerable<ICompetenceComponentFetcher> _componentFetchers;
 
-    public CompetenceComponentService(IEnumerable<IComponentFetcher> componentFetchers)
+    public CompetenceComponentService(IEnumerable<ICompetenceComponentFetcher> componentFetchers)
     {
         _componentFetchers = componentFetchers;
     }
 
-    public async IAsyncEnumerable<IEpsilonComponent> GetComponents()
+    public async IAsyncEnumerable<ICompetenceComponent> GetComponents()
     {
         foreach (var componentFetcher in _componentFetchers)
         {
@@ -20,7 +21,7 @@ public class CompetenceComponentService : ICompetenceComponentService
         }
     }
 
-    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>() where TComponent : IEpsilonComponent
+    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>() where TComponent : ICompetenceComponent
     {
         await foreach (var component in GetComponents())
         {
@@ -31,13 +32,23 @@ public class CompetenceComponentService : ICompetenceComponentService
         }
     }
 
-    public async Task<IEpsilonComponent?> GetComponent(string name)
+    public async Task<ICompetenceComponent?> GetComponent(string name)
     {
-        var fetcher = _componentFetchers.SingleOrDefault(f => f.ComponentName == name);
+        var fetcher = _componentFetchers.SingleOrDefault(f =>
+        {
+            var componentType = f.GetType().BaseType?.GetGenericArguments()[0];
+            if (componentType != null)
+            {
+                var componentNameAttribute = componentType.GetCustomAttribute<CompetenceComponentNameAttribute>(false);
+                return componentNameAttribute?.Name == name;
+            }
+
+            return false;
+        });
         return fetcher == null ? null : await fetcher.FetchUnknown();
     }
 
-    public async Task<TComponent?> GetComponent<TComponent>(string name) where TComponent : class, IEpsilonComponent
+    public async Task<TComponent?> GetComponent<TComponent>(string name) where TComponent : class, ICompetenceComponent
     {
         return await GetComponent(name) as TComponent;
     }

@@ -2,7 +2,7 @@ using DocumentFormat.OpenXml;
 
 namespace Epsilon.Abstractions.Component;
 
-public interface IEpsilonWordComponent : IEpsilonComponent
+public interface ICompetenceWordComponent : ICompetenceComponent
 {
     public OpenXmlElement ToWord();
 }

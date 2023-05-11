@@ -5,7 +5,7 @@ namespace Epsilon.Component;
 
 public class WordDocumentBuilder : IWordDocumentBuilder
 {
-    public Document Build(IEnumerable<IEpsilonWordComponent> components)
+    public Document Build(IEnumerable<ICompetenceWordComponent> components)
     {
         var document = new Document(new Body());
 

@@ -17,7 +17,7 @@ public class ComponentController : ControllerBase
 
     [HttpGet("{componentName}")]
     [Produces(typeof(CompetenceProfile))]
-    public async Task<ActionResult<IEpsilonComponent>> GetCompetenceProfile(string componentName)
+    public async Task<ActionResult<ICompetenceComponent>> GetCompetenceProfile(string componentName)
     {
         var component = await _competenceComponentService.GetComponent(componentName);
         if (component == null)
