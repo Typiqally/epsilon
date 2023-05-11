@@ -1,33 +1,39 @@
-import { IHboIDomain, ProfessionalTaskResult } from "/@/logic/Api"
+import {
+    IHboIDomain,
+    ProfessionalSkillResult,
+    ProfessionalTaskResult,
+} from "/@/logic/Api"
 
 export class DecayingAverageLogic {
-    private static GetDecayingAverageForAllOutcomes(
-        taskResults: ProfessionalTaskResult[],
+    public static GetAverageSkillOutcomeScores(
+        taskResults: ProfessionalSkillResult[],
         domain: IHboIDomain
-    ): DecayingAveragePerLayer[] {
-        return domain.architectureLayers?.map((l) => {
+    ): DecayingAveragePerSkill[] {
+        const listOfResults = Object.entries(
+            this.groupBy(taskResults, (r) => r.outcomeId)
+        ).map(([, j]) => {
             return {
-                architectureLayer: l.id,
-                layerActivities: Object.entries(
-                    this.groupBy(
-                        taskResults.filter(
-                            (layer) => layer.architectureLayer === l.id
-                        ),
-                        (r) => r.outcomeId
-                    )
-                ).map(([i, j]) => {
-                    return {
-                        outcome: i,
-                        activity: j.at(0)?.activity,
-                        decayingAverage:
-                            this.GetDecayingAverageFromOneOutcomeType(j),
-                    }
-                }) as unknown as DecayingAveragePerActivity[],
+                decayingAverage: this.GetDecayingAverageFromOneOutcomeType(j),
+                skill: j.at(0)?.skill,
             }
-        }) as DecayingAveragePerLayer[]
+        })
+
+        return domain.professionalSkills?.map((s) => {
+            let score = 0.0
+            const filteredResults = listOfResults.filter(
+                (r) => r.skill === s.id
+            )
+            filteredResults.map((result) => {
+                score += result.decayingAverage
+            })
+            return {
+                decayingAverage: score / filteredResults.length,
+                skill: s.id,
+            } as DecayingAveragePerSkill
+        }) as DecayingAveragePerSkill[]
     }
 
-    static GetAverageDevelopmentScores(
+    public static GetAverageTaskOutcomeScores(
         taskResults: ProfessionalTaskResult[],
         domain: IHboIDomain
     ): DecayingAveragePerLayer[] {
@@ -80,6 +86,32 @@ export class DecayingAverageLogic {
         }) as DecayingAveragePerLayer[]
     }
 
+    private static GetDecayingAverageForAllOutcomes(
+        taskResults: ProfessionalTaskResult[],
+        domain: IHboIDomain
+    ): DecayingAveragePerLayer[] {
+        return domain.architectureLayers?.map((l) => {
+            return {
+                architectureLayer: l.id,
+                layerActivities: Object.entries(
+                    this.groupBy(
+                        taskResults.filter(
+                            (layer) => layer.architectureLayer === l.id
+                        ),
+                        (r) => r.outcomeId
+                    )
+                ).map(([i, j]) => {
+                    return {
+                        outcome: i,
+                        activity: j.at(0)?.activity,
+                        decayingAverage:
+                            this.GetDecayingAverageFromOneOutcomeType(j),
+                    }
+                }) as unknown as DecayingAveragePerActivity[],
+            }
+        }) as DecayingAveragePerLayer[]
+    }
+
     /**
      * Explanation of process can be found here: https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Outcomes/ta-p/75#decaying_average
      * @param results
@@ -87,7 +119,7 @@ export class DecayingAverageLogic {
      * @private
      */
     private static GetDecayingAverageFromOneOutcomeType(
-        results: ProfessionalTaskResult[]
+        results: ProfessionalTaskResult[] | ProfessionalSkillResult[]
     ): number {
         let totalGradeScore = 0.0
 
@@ -135,4 +167,9 @@ export interface DecayingAveragePerActivity {
 export interface DecayingAveragePerLayer {
     architectureLayer: number
     layerActivities: DecayingAveragePerActivity[]
+}
+
+export interface DecayingAveragePerSkill {
+    skill: number
+    decayingAverage: number
 }

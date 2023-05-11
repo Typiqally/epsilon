@@ -11,6 +11,9 @@
         <CompetenceGraph
             :data="filteredProfessionalTaskOutcomes"
             :domain="data.hboIDomain" />
+        <PersonalDevelopmentGraph
+            :data="filteredProfessionalSkillOutcomes"
+            :domain="data?.hboIDomain"></PersonalDevelopmentGraph>
     </div>
     <RoundLoader v-else />
 </template>
@@ -28,6 +31,7 @@ import CompetenceGraph from "@/components/CompetenceGraph.vue"
 import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
 import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
+import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
@@ -35,32 +39,32 @@ const App = new Api()
 const selectedTerm = ref<EnrollmentTerm | null>(null)
 
 const filteredProfessionalTaskOutcomes = computed(() => {
-    if (!data.value) {
+    if (!data.value?.professionalTaskOutcomes) {
         return []
     }
 
-    if (!selectedTerm.value) {
+    if (!selectedTerm.value?.end_at) {
         return data.value?.professionalTaskOutcomes
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < selectedTerm.value.end_at
+        (o) => o.assessedAt < selectedTerm.value?.end_at
     )
 })
 
-// const filteredProfessionalSkillOutcomes = computed(() => {
-//     if (!data.value) {
-//         return []
-//     }
-//
-//     if (!selectedTerm.value) {
-//         return data.value?.professionalTaskOutcomes
-//     }
-//
-//     return data.value?.professionalTaskOutcomes?.filter(
-//         (o) => o.assessedAt < selectedTerm?.value?.end_at,
-//     )
-// })
+const filteredProfessionalSkillOutcomes = computed(() => {
+    if (!data.value?.professionalSkillOutcomes) {
+        return []
+    }
+
+    if (!selectedTerm.value?.end_at) {
+        return data.value?.professionalSkillOutcomes
+    }
+
+    return data.value?.professionalSkillOutcomes?.filter(
+        (o) => o.assessedAt < selectedTerm.value?.end_at
+    )
+})
 
 onMounted(() => {
     App.component

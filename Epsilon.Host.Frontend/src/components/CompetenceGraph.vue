@@ -93,14 +93,14 @@ function loadChartData(): void {
         })
     }
 
-    DecayingAverageLogic.GetAverageDevelopmentScores(
+    DecayingAverageLogic.GetAverageTaskOutcomeScores(
         props.data,
         props.domain
     ).map((layer: DecayingAveragePerLayer) => {
         const ar = props.domain.architectureLayers?.at(layer.architectureLayer)
         series.push({
-            name: ar.name,
-            color: ar.color,
+            name: ar?.name,
+            color: ar?.color,
             data: layer.layerActivities.map((ac) =>
                 ac.decayingAverage.toFixed(3)
             ),
