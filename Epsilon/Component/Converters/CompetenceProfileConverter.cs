@@ -35,11 +35,10 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                                      ar is
                                      {
                                          Points: not null, Criterion.MasteryPoints: not null,
-                                         Criterion.Outcome: not null
+                                         Criterion.Outcome: not null,
                                      } && ar.Points >= ar.Criterion.MasteryPoints)))
                     {
-                        if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id,
-                                out var professionalTask))
+                        if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))
                         {
                             taskResults.Add(
                                 new ProfessionalTaskResult(
@@ -52,8 +51,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
                                 )
                             );
                         }
-                        else if (FhictConstants.ProfessionalSkills.TryGetValue(assessmentRating.Criterion.Outcome.Id,
-                                     out var professionalSkill))
+                        else if (FhictConstants.ProfessionalSkills.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalSkill))
                         {
                             professionalResults.Add(
                                 new ProfessionalSkillResult(
@@ -73,18 +71,16 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
         var filteredTerms = enrollmentTerms
             .Where(static term => term is { StartAt: not null, EndAt: not null })
             .Where(term => taskResults.Any(taskOutcome =>
-                               taskOutcome.AssessedAt >= term.StartAt && taskOutcome.AssessedAt <= term.EndAt)
+                               taskOutcome.SubmittedAt >= term.StartAt && taskOutcome.SubmittedAt <= term.EndAt)
                            || professionalResults.Any(skillOutcome =>
-                               skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt))
+                               skillOutcome.SubmittedAt > term.StartAt && skillOutcome.SubmittedAt < term.EndAt))
             .Distinct()
             .OrderByDescending(static term => term.StartAt);
 
-        ;
-
         return new CompetenceProfile(
             domain,
-            taskResults.OrderByDescending(task => task.AssessedAt),
-            professionalResults.OrderByDescending(skill => skill.AssessedAt),
+            taskResults.OrderByDescending(task => task.SubmittedAt),
+            professionalResults.OrderByDescending(skill => skill.SubmittedAt),
             filteredTerms
         );
     }
