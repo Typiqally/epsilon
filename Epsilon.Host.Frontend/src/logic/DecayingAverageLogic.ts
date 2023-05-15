@@ -4,7 +4,30 @@ import {
     ProfessionalTaskResult,
 } from "/@/logic/Api"
 
+export interface DecayingAveragePerActivity {
+    outcome: number
+    activity: number
+    decayingAverage: number
+}
+
+export interface DecayingAveragePerLayer {
+    architectureLayer: number
+    layerActivities: DecayingAveragePerActivity[]
+}
+
+export interface DecayingAveragePerSkill {
+    skill: number
+    decayingAverage: number
+    masteryLevel: number
+}
+
 export class DecayingAverageLogic {
+    /**
+     * Calculate the averages for each skill type
+     * @param taskResults
+     * @param domain
+     * @constructor
+     */
     public static GetAverageSkillOutcomeScores(
         taskResults: ProfessionalSkillResult[],
         domain: IHboIDomain
@@ -18,7 +41,7 @@ export class DecayingAverageLogic {
                 masteryLevel: j
                     .sort((a) => a.masteryLevel as never as number)
                     .at(0)?.masteryLevel,
-            }
+            } as DecayingAveragePerSkill
         })
 
         return domain.professionalSkills?.map((s) => {
@@ -39,6 +62,12 @@ export class DecayingAverageLogic {
         }) as DecayingAveragePerSkill[]
     }
 
+    /**
+     * Calculate the averages for each task type divided in architecture layers.
+     * @param taskResults
+     * @param domain
+     * @constructor
+     */
     public static GetAverageTaskOutcomeScores(
         taskResults: ProfessionalTaskResult[],
         domain: IHboIDomain
@@ -92,6 +121,13 @@ export class DecayingAverageLogic {
         }) as DecayingAveragePerLayer[]
     }
 
+    /**
+     * Calculate average of given tasks divided in architectural layers
+     * @param taskResults
+     * @param domain
+     * @constructor
+     * @private
+     */
     private static GetDecayingAverageForAllOutcomes(
         taskResults: ProfessionalTaskResult[],
         domain: IHboIDomain
@@ -101,12 +137,14 @@ export class DecayingAverageLogic {
                 architectureLayer: l.id,
                 layerActivities: Object.entries(
                     this.groupBy(
+                        //Ensure that given results are only relined on the architecture that is currently being used.
                         taskResults.filter(
                             (layer) => layer.architectureLayer === l.id
                         ),
                         (r) => r.outcomeId as unknown as string
                     )
                 ).map(([i, j]) => {
+                    //From all selected outcomes calculate the decaying average, Give outcome id and activity layer.
                     return {
                         outcome: i,
                         activity: j.at(0)?.activity,
@@ -119,7 +157,8 @@ export class DecayingAverageLogic {
     }
 
     /**
-     * Explanation of process can be found here: https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Outcomes/ta-p/75#decaying_average
+     * Calculate decaying average described by Canvas: https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Outcomes/ta-p/75#decaying_average
+     * !IMPORTANT, The list of results will always have to be a list of the same outcome id. Not a list of equal activity and architecture layer.
      * @param results
      * @constructor
      * @private
@@ -135,7 +174,6 @@ export class DecayingAverageLogic {
                 results.forEach(
                     (r) => (totalGradeScore += r.grade ? r.grade : 0)
                 )
-
                 totalGradeScore =
                     (totalGradeScore / results.length) * 0.35 +
                     recentResult.grade * 0.65
@@ -158,21 +196,4 @@ export class DecayingAverageLogic {
             return { ...prev, [groupKey]: group }
         }, {})
     }
-}
-
-export interface DecayingAveragePerActivity {
-    outcome: number
-    activity: number
-    decayingAverage: number
-}
-
-export interface DecayingAveragePerLayer {
-    architectureLayer: number
-    layerActivities: DecayingAveragePerActivity[]
-}
-
-export interface DecayingAveragePerSkill {
-    skill: number
-    decayingAverage: number
-    masteryLevel: number
 }
