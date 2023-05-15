@@ -1,0 +1,10 @@
+﻿version: "3.8"
+
+services:
+  api:
+    container_name: Epsilon.API
+    build:
+      context: .
+      dockerfile: ./Epsilon.Host.WebApi/Dockerfile
+    ports:
+      - 7084:443
