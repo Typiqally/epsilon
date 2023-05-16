@@ -1,4 +1,5 @@
 using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Component.KpiMatrixComponent;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
