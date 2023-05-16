@@ -2,7 +2,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Canvas.Abstractions.Model;
 
-namespace Epsilon.Abstractions.Component;
+namespace Epsilon.Abstractions.Component.KpiMatrixComponent;
 
 public record KpiMatrixCollection(IEnumerable<KpiMatrixModule> KpiMatrixModules) : IEpsilonWordComponent
 {
@@ -48,7 +48,7 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixModule> KpiMatrixModules)
                 var cell = CreateTableCellWithBorders("100");
                 cell.FirstChild.Append(new TextDirection
                 {
-                    Val = TextDirectionValues.BottomToTopLeftToRight,
+                    Val = TextDirectionValues.TopToBottomRightToLeft,
                 });
 
                 cell.Append(new Paragraph(new Run(new Text(assignment.Name))));

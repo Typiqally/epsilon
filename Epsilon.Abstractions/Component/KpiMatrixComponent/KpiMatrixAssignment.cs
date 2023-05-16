@@ -1,4 +1,4 @@
-namespace Epsilon.Abstractions.Component;
+namespace Epsilon.Abstractions.Component.KpiMatrixComponent;
 
 public record KpiMatrixAssignment(
     string Name,

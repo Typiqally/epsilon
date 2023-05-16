@@ -1,4 +1,5 @@
 ﻿using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Component.KpiMatrixComponent;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.Service;
@@ -83,7 +84,7 @@ public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
                 }
 
                 var outcomeGroups = node.RubricAssessmentsConnection.Nodes
-                    .Where(static n => n.AssessmentRatings != null)
+                    .Where(static n => n.AssessmentRatings != null && n.AssessmentRatings.Count > 0)
                     .SelectMany(static n => n.AssessmentRatings)
                     .Where(static r => r.Outcome != null)
                     .GroupBy(static r => r.Outcome.Id);
