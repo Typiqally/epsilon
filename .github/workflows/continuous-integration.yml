@@ -5,7 +5,6 @@ jobs:
   build-backend:
     name: Build .NET solution
     runs-on: ubuntu-20.04
-    
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-dotnet@v1.7.2
@@ -36,6 +35,15 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
+          
+  build-docker:
+    name: Build Docker
+    runs-on: ubuntu-20.04
+    needs: [ build-backend,build-frontend ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the containers
+        run: docker-compose up -d
   
   lint-frontend:
     name: Lint frontend
