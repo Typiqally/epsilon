@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Epsilon.Component;
 
-public class PersonaPageComponentFetcher : PersonaPageComponentFetcher<PersonaPage>
+public class PersonaPageComponentFetcher : CompetenceComponentFetcher<PersonaPage>
 {
     private readonly IPageHttpService _pageHttpService;
     private readonly IFileHttpService _fileHttpService;
