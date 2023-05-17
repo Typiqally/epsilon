@@ -23,7 +23,7 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
             {
                 var submission = submissionsConnection.SubmissionsHistories.Nodes
                     .Where(static h => h.RubricAssessments.Nodes.Any())
-                    .OrderByDescending(h => h.SubmittedAt)
+                    .OrderByDescending(static h => h.SubmittedAt)
                     .MaxBy(static h => h.Attempt);
 
                 if (submission != null)
@@ -70,17 +70,17 @@ public class CompetenceProfileConverter : ICompetenceProfileConverter
 
         var filteredTerms = enrollmentTerms
             .Where(static term => term is { StartAt: not null, EndAt: not null })
-            .Where(term => taskResults.Any(taskOutcome =>
-                               taskOutcome.SubmittedAt >= term.StartAt && taskOutcome.SubmittedAt <= term.EndAt)
-                           || professionalResults.Any(skillOutcome =>
-                               skillOutcome.SubmittedAt > term.StartAt && skillOutcome.SubmittedAt < term.EndAt))
+            .Where(term =>
+                taskResults.Any(taskOutcome => taskOutcome.SubmittedAt >= term.StartAt && taskOutcome.SubmittedAt <= term.EndAt)
+                || professionalResults.Any(skillOutcome => skillOutcome.SubmittedAt > term.StartAt && skillOutcome.SubmittedAt < term.EndAt)
+            )
             .Distinct()
             .OrderByDescending(static term => term.StartAt);
 
         return new CompetenceProfile(
             domain,
-            taskResults.OrderByDescending(task => task.SubmittedAt),
-            professionalResults.OrderByDescending(skill => skill.SubmittedAt),
+            taskResults.OrderByDescending(static task => task.SubmittedAt),
+            professionalResults.OrderByDescending(static skill => skill.SubmittedAt),
             filteredTerms
         );
     }
