@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Epsilon.Component;
 
-public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
+public class KpiMatrixComponentFetcher : CompetenceComponentFetcher<KpiMatrixCollection>
 {
     private const string GetUserKpiMatrixOutcomes = @"
 query GetUserKpiMatrixOutcomes {

@@ -6,7 +6,7 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component.KpiMatrixComponent;
 
-public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments) : IEpsilonWordComponent
+public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments) : ICompetenceWordComponent
 {
     public OpenXmlElement ToWord()
     {
