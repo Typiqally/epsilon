@@ -82,6 +82,7 @@ const chartOptions = {
 
 onMounted(() => {
     loadChartData()
+    watch(() => loadChartData())
 })
 
 function loadChartData(): void {
@@ -118,6 +119,4 @@ function getMastery(masteryId: number): MasteryLevel | undefined {
         (masteryLevel) => masteryLevel.id == masteryId
     )
 }
-
-watch(() => loadChartData())
 </script>
