@@ -97,7 +97,7 @@ function loadChartData(): void {
     // Add data
     series.push({
         name: "Score",
-        data: DecayingAverageLogic.GetAverageSkillOutcomeScores(
+        data: DecayingAverageLogic.getAverageSkillOutcomeScores(
             props.data,
             props.domain
         )?.map((d) => {

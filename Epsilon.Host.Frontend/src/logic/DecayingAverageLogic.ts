@@ -28,7 +28,7 @@ export class DecayingAverageLogic {
      * @param domain
      * @constructor
      */
-    public static GetAverageSkillOutcomeScores(
+    public static getAverageSkillOutcomeScores(
         taskResults: ProfessionalSkillResult[],
         domain: IHboIDomain
     ): DecayingAveragePerSkill[] {
@@ -36,7 +36,7 @@ export class DecayingAverageLogic {
             this.groupBy(taskResults, (r) => r.outcomeId as unknown as string)
         ).map(([, j]) => {
             return {
-                decayingAverage: this.GetDecayingAverageFromOneOutcomeType(j),
+                decayingAverage: this.getDecayingAverageFromOneOutcomeType(j),
                 skill: j.at(0)?.skill,
                 masteryLevel: j
                     .sort((a) => a.masteryLevel as never as number)
@@ -68,11 +68,11 @@ export class DecayingAverageLogic {
      * @param domain
      * @constructor
      */
-    public static GetAverageTaskOutcomeScores(
+    public static getAverageTaskOutcomeScores(
         taskResults: ProfessionalTaskResult[],
         domain: IHboIDomain
     ): DecayingAveragePerLayer[] {
-        const canvasDecaying = this.GetDecayingAverageForAllOutcomes(
+        const canvasDecaying = this.getDecayingAverageForAllOutcomes(
             taskResults,
             domain
         )
@@ -128,7 +128,7 @@ export class DecayingAverageLogic {
      * @constructor
      * @private
      */
-    private static GetDecayingAverageForAllOutcomes(
+    private static getDecayingAverageForAllOutcomes(
         taskResults: ProfessionalTaskResult[],
         domain: IHboIDomain
     ): DecayingAveragePerLayer[] {
@@ -149,7 +149,7 @@ export class DecayingAverageLogic {
                         outcome: i,
                         activity: j.at(0)?.activity,
                         decayingAverage:
-                            this.GetDecayingAverageFromOneOutcomeType(j),
+                            this.getDecayingAverageFromOneOutcomeType(j),
                     }
                 }) as unknown as DecayingAveragePerActivity[],
             }
@@ -163,7 +163,7 @@ export class DecayingAverageLogic {
      * @constructor
      * @private
      */
-    private static GetDecayingAverageFromOneOutcomeType(
+    private static getDecayingAverageFromOneOutcomeType(
         results: ProfessionalTaskResult[] | ProfessionalSkillResult[]
     ): number {
         let totalGradeScore = 0.0

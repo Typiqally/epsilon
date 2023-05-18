@@ -93,7 +93,7 @@ function loadChartData(): void {
         })
     }
 
-    DecayingAverageLogic.GetAverageTaskOutcomeScores(
+    DecayingAverageLogic.getAverageTaskOutcomeScores(
         props.data,
         props.domain
     ).map((layer: DecayingAveragePerLayer) => {
