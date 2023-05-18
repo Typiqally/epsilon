@@ -10,32 +10,47 @@ namespace Epsilon.Component;
 public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
 {
     private const string GetUserKpiMatrixOutcomes = @"
-        query GetUserKpiMatrixOutcomes {
+query GetUserKpiMatrixOutcomes {
           allCourses {
             submissionsConnection(studentIds: $studentIds) {
+      nodes {
+        submissionHistoriesConnection {
+          nodes {
+            rubricAssessmentsConnection {
               nodes {
-                assignment {
-                  name
-                  modules {
-                    name
-                  }
-                }
-                rubricAssessmentsConnection {
-                  nodes {
-                    assessmentRatings {
-                      points
-                      outcome {
-                        _id
-                        title
-                        masteryPoints
-                      }
+                assessmentRatings {
+                  criterion {
+                    outcome {
+                      _id
+                      title
                     }
+                    masteryPoints
+                  }
+                  points
+                }
+              }
+            }
+            attempt
+            submittedAt
+            assignment {
+              name
+              rubric {
+                criteria {
+                  outcome {
+                    title
+                    _id
+masteryPoints
                   }
                 }
               }
             }
           }
         }
+        postedAt
+      }
+            }
+          }
+}
     ";
 
     private readonly IConfiguration _configuration;
@@ -55,11 +70,10 @@ public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
         var studentId = _configuration["Canvas:StudentId"];
         var outcomesQuery = GetUserKpiMatrixOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCultureIgnoreCase);
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
-
-        return ConvertToComponent(outcomes);
+        return ConvertToComponent(outcomes, new DateTime(2023, 2, 1), DateTime.Now);
     }
 
-    private static GradeStatus GetGradeStatus(double? points, double mastery)
+    private static GradeStatus GetGradeStatus(double? points, double? mastery)
     {
         return points != null
             ? points >= mastery
@@ -69,78 +83,61 @@ public class KpiMatrixComponentFetcher : ComponentFetcher<KpiMatrixCollection>
     }
 
 
-    private static KpiMatrixCollection ConvertToComponent(CanvasGraphQlQueryResponse getUserKpiMatrixOutcomes)
+    private static KpiMatrixCollection ConvertToComponent(
+        CanvasGraphQlQueryResponse queryResponse,
+        DateTime startAt,
+        DateTime endAt
+    )
     {
-        var modules = new List<KpiMatrixModule>();
-
-        foreach (var course in getUserKpiMatrixOutcomes.Data?.Courses)
+        var assignments = new List<KpiMatrixAssignment>();
+        foreach (var course in queryResponse.Data!.Courses!)
         {
-            foreach (var node in course.SubmissionsConnection.Nodes)
+            foreach (var submissionsConnection in course.SubmissionsConnection!.Nodes)
             {
-                var moduleName = node.Assignment.Modules.FirstOrDefault()?.Name;
-                if (moduleName == null)
+                var submission = submissionsConnection.SubmissionsHistories.Nodes
+                    .Where(sub => sub.SubmittedAt > startAt && sub.SubmittedAt < endAt)
+                    .MaxBy(static h => h.Attempt);
+
+                if (submission != null)
                 {
-                    continue;
-                }
-
-                var outcomeGroups = node.RubricAssessmentsConnection.Nodes
-                    .Where(static n => n.AssessmentRatings != null && n.AssessmentRatings.Count > 0)
-                    .SelectMany(static n => n.AssessmentRatings)
-                    .Where(static r => r.Outcome != null)
-                    .GroupBy(static r => r.Outcome.Id);
-
-                var assignments = new List<KpiMatrixAssignment>();
-
-                var module = modules.FirstOrDefault(m => m.Name == moduleName);
-                if (module == null)
-                {
-                    module = new KpiMatrixModule(moduleName,
-                        new KpiMatrix(new List<KpiMatrixOutcome>(), new List<KpiMatrixAssignment>()));
-                    modules.Add(module);
-                }
-
-                var moduleOutcomes = module.KpiMatrix.Outcomes.ToDictionary(static o => o.Id);
-                var outcomes = module.KpiMatrix.Outcomes.ToList();
-
-                foreach (var outcomeGroup in outcomeGroups)
-                {
-                    var outcomeId = outcomeGroup.Key;
-
-                    // Add outcome to moduleOutcomes if it doesn't exist
-                    if (!moduleOutcomes.ContainsKey(outcomeId))
+                    if (submission.Assignment?.Rubric != null)
                     {
-                        var outcome = outcomeGroup.FirstOrDefault(x => x.Outcome.Id == outcomeId).Outcome;
-                        var kpiMatrixOutcome = new KpiMatrixOutcome(outcome.Id, outcome.Title,
-                            GetGradeStatus(0, outcome.MasteryPoints));
-                        moduleOutcomes[outcomeId] = kpiMatrixOutcome;
+                        var rubricAssessments = submission.Assignment.Rubric.Criteria;
+                        var kpiMatrixOutcomes = new List<KpiMatrixOutcome>();
+                        if (submission.Assignment.Rubric.Criteria != null)
+                        {
+                            foreach (var criteria in submission.Assignment.Rubric.Criteria)
+                            {
+                                if (criteria.Outcome != null)
+                                {
+                                    if (FhictConstants.ProfessionalTasks.TryGetValue(criteria.Outcome.Id, out var professionalTask))
+                                    {
+                                        kpiMatrixOutcomes.Add(new KpiMatrixOutcome(criteria.Outcome.Id, criteria.Outcome.Title,
+                                            GetGradeStatus(submission.RubricAssessments?.Nodes?.FirstOrDefault()?.AssessmentRatings.FirstOrDefault(o => o.Criterion.Outcome?.Id == criteria.Outcome.Id)
+                                                    ?.Points
+                                                , criteria.Outcome.MasteryPoints)));
+                                    }
+                                    else if (FhictConstants.ProfessionalSkills.TryGetValue(criteria.Outcome.Id, out var professionalSkill))
+                                    {
+                                        kpiMatrixOutcomes.Add(new KpiMatrixOutcome(criteria.Outcome.Id, criteria.Outcome.Title,
+                                            GetGradeStatus(submission.RubricAssessments?.Nodes?.FirstOrDefault()?.AssessmentRatings.FirstOrDefault(o => o.Criterion.Outcome?.Id == criteria.Outcome.Id)
+                                                    ?.Points
+                                                , criteria.Outcome.MasteryPoints)));
+                                    }
+                                }
+                            }
+                        }
 
-                        outcomes.Add(kpiMatrixOutcome);
-                    }
-
-                    var outcomeAssessments = outcomeGroup.Select(static assessmentRating =>
-                        new KpiMatrixOutcome(assessmentRating.Outcome.Id, assessmentRating.Outcome.Title,
-                            GetGradeStatus(assessmentRating.Points, assessmentRating.Outcome.MasteryPoints)));
-
-                    var assignment = assignments.FirstOrDefault(a => a.Name == node.Assignment.Name);
-                    var outcomeAssessmentsList = outcomeAssessments.ToList();
-                    if (assignment == null)
-                    {
-                        assignments.Add(new KpiMatrixAssignment(node.Assignment.Name, outcomeAssessmentsList));
-                    }
-                    else
-                    {
-                        assignments.Remove(assignment);
-                        var combinedOutcomes = assignment.Outcomes.Concat(outcomeAssessmentsList).ToList();
-                        assignments.Add(new KpiMatrixAssignment(node.Assignment.Name, combinedOutcomes));
+                        if (kpiMatrixOutcomes.Count > 0 && submission.Assignment.Name != null)
+                        {
+                            var assignment = new KpiMatrixAssignment(submission.Assignment.Name, kpiMatrixOutcomes);
+                            assignments.Add(assignment);
+                        }
                     }
                 }
-
-                var newAssignments = module.KpiMatrix.Assignments.Concat(assignments).ToList();
-                var newModule = new KpiMatrixModule(moduleName, new KpiMatrix(outcomes, newAssignments));
-                modules[modules.IndexOf(module)] = newModule;
             }
         }
 
-        return new KpiMatrixCollection(modules);
+        return new KpiMatrixCollection(assignments);
     }
 }
