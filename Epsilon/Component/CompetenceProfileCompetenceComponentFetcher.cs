@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileComponentFetcher : ComponentFetcher<CompetenceProfile>
+public class CompetenceProfileCompetenceComponentFetcher : CompetenceComponentFetcher<CompetenceProfile>
 {
     private const string GetAllUserCoursesSubmissionOutcomes = @"
         query MyQuery {
@@ -43,7 +43,7 @@ public class CompetenceProfileComponentFetcher : ComponentFetcher<CompetenceProf
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IAccountHttpService _accountHttpService;
 
-    public CompetenceProfileComponentFetcher(
+    public CompetenceProfileCompetenceComponentFetcher(
         IGraphQlHttpService graphQlService,
         IAccountHttpService accountHttpService,
         IConfiguration configuration

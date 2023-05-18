@@ -6,11 +6,11 @@ namespace Epsilon.Component;
 public static class ComponentServiceCollectionExtensions
 {
     public static IServiceCollection AddComponentFetcher<TComponent, TFetcher>(this IServiceCollection services)
-        where TFetcher : class, IComponentFetcher<TComponent>, IComponentFetcher
-        where TComponent : IEpsilonComponent
+        where TFetcher : class, ICompetenceComponentFetcher<TComponent>, ICompetenceComponentFetcher
+        where TComponent : ICompetenceComponent
     {
-        services.AddScoped<IComponentFetcher, TFetcher>();
-        services.AddScoped<IComponentFetcher<TComponent>, TFetcher>();
+        services.AddScoped<ICompetenceComponentFetcher, TFetcher>();
+        services.AddScoped<ICompetenceComponentFetcher<TComponent>, TFetcher>();
 
         return services;
     }

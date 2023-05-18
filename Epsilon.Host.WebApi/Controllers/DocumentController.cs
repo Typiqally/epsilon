@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using Epsilon.Abstractions.Component;
+﻿using Epsilon.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
@@ -9,42 +7,18 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class DocumentController : Controller
 {
-    private readonly IWordDocumentBuilder _wordDocumentBuilder;
-    private readonly IEnumerable<IComponentFetcher> _componentFetchers;
+    private readonly ICompetenceDocumentService _competenceDocumentService;
 
-    public DocumentController(
-        IWordDocumentBuilder wordDocumentBuilder,
-        IEnumerable<IComponentFetcher> componentFetchers
-    )
+    public DocumentController(ICompetenceDocumentService competenceDocumentService)
     {
-        _wordDocumentBuilder = wordDocumentBuilder;
-        _componentFetchers = componentFetchers;
+        _competenceDocumentService = competenceDocumentService;
     }
 
     [HttpGet("word")]
     public async Task<IActionResult> DownloadWordDocument()
     {
         var stream = new MemoryStream();
-
-        var components = new List<IEpsilonWordComponent>();
-        foreach (var componentFetcher in _componentFetchers)
-        {
-           var component = await componentFetcher.FetchUnknown();
-           if (component is IEpsilonWordComponent wordComponent)
-           {
-               components.Add(wordComponent);
-           }
-        }
-        
-        using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
-
-        document.AddMainDocumentPart();
-        document.MainDocumentPart!.Document = _wordDocumentBuilder.Build(components);
-
-        document.Save();
-        document.Close();
-
-        stream.Position = 0;
+        await _competenceDocumentService.WriteDocument(stream);
 
         return File(
             stream,
