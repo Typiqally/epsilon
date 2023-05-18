@@ -9,9 +9,4 @@
     <ItemGroup>
       <ProjectReference Include="..\Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Component\" />
-    </ItemGroup>
-
 </Project>
