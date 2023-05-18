@@ -85,25 +85,18 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
                     var cell = CreateTableCellWithBorders("100");
 
                     // Set cell color based on GradeStatus.
-                    var fillColor = "";
-                    if (outcomeAssignment != null)
-                    {
-                        fillColor = outcomeAssignment.GradeStatus switch
+                    var fillColor = outcomeAssignment != null
+                        ? outcomeAssignment.GradeStatus switch
                         {
                             GradeStatus.Approved => "44F656",
                             GradeStatus.Insufficient => "FA1818",
                             GradeStatus.NotGraded => "FAFF00",
                             _ => null,
-                        };
-                        
-                    }
-                    else
-                    {
-                        fillColor = assignments.IndexOf(assignment) % 2 == 0
+                        }
+                        : assignments.IndexOf(assignment) % 2 == 0
                             ? "FFFFFF"
                             : "d3d3d3";
-                    }
-                    cell.FirstChild.Append(new Shading
+                cell.FirstChild.Append(new Shading
                     {
                         Fill = fillColor,
                     });
