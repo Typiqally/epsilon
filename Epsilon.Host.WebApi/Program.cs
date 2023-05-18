@@ -1,4 +1,5 @@
 using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Component.KpiMatrixComponent;
 using Epsilon.Abstractions.Service;
 using Epsilon.Canvas;
 using Epsilon.Component;
@@ -30,6 +31,7 @@ builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentServi
 builder.Services.AddScoped<IWordDocumentBuilder, WordDocumentBuilder>();
 
 builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileCompetenceComponentFetcher>();
+builder.Services.AddComponentFetcher<KpiMatrixCollection, KpiMatrixComponentFetcher>();
 
 var app = builder.Build();
 
