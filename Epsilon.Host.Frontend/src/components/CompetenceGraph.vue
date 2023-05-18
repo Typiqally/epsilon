@@ -110,6 +110,6 @@ function loadChartData(): void {
 
 onMounted(() => {
     loadChartData()
-    watch(() => loadChartData())
 })
+watch(() => loadChartData())
 </script>

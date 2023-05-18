@@ -82,8 +82,8 @@ const chartOptions = {
 
 onMounted(() => {
     loadChartData()
-    watch(() => loadChartData())
 })
+watch(() => loadChartData())
 
 function loadChartData(): void {
     series = []
