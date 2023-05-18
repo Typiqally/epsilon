@@ -104,9 +104,9 @@ masteryPoints
                     {
                         var rubricAssessments = submission.Assignment.Rubric.Criteria;
                         var kpiMatrixOutcomes = new List<KpiMatrixOutcome>();
-                        if (submission.Assignment.Rubric.Criteria != null)
+                        if (rubricAssessments != null)
                         {
-                            foreach (var criteria in submission.Assignment.Rubric.Criteria)
+                            foreach (var criteria in rubricAssessments)
                             {
                                 if (criteria.Outcome != null)
                                 {

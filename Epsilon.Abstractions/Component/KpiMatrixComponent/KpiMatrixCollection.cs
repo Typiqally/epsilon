@@ -1,6 +1,7 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Canvas.Abstractions.Model;
+using TextDirectionValues = DocumentFormat.OpenXml.Wordprocessing.TextDirectionValues;
 
 // using Epsilon.Canvas.Abstractions.Model;
 
@@ -13,6 +14,8 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
         var body = new Body();
         // Create a table, with rows for the outcomes and columns for the assignments.
             var table = new Table();
+
+            var assignments = KpiMatrixAssignments.OrderBy(static ass => ass.Name).ToList();
         
             // Set table properties for formatting.
             table.AppendChild(new TableProperties(
@@ -25,7 +28,7 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
             var headerRowHeight = 0;
             if (KpiMatrixAssignments.Any())
             {
-                headerRowHeight = KpiMatrixAssignments.Max(static a => a.Name.Length) * 111;
+                headerRowHeight = assignments.Max(static a => a.Name.Length) * 111;
             }
         
             // Create the table header row.
@@ -38,15 +41,21 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
             // Empty top-left cell.
             headerRow.AppendChild(CreateTableCellWithBorders("2500", new Paragraph(new Run(new Text("")))));
         
-            foreach (var assignment in KpiMatrixAssignments.OrderBy(static ass => ass.Name))
+            foreach (var assignment in assignments)
             {
                 var cell = CreateTableCellWithBorders("100");
                 cell.FirstChild.Append(new TextDirection
                 {
-                    Val = TextDirectionValues.TopToBottomRightToLeft,
+                    Val = TextDirectionValues.TopToBottomLeftToRightRotated,
                 });
         
                 cell.Append(new Paragraph(new Run(new Text(assignment.Name))));
+                cell.FirstChild.Append(new Shading
+                {
+                    Fill = assignments.IndexOf(assignment) % 2 == 0
+                        ? "FFFFFF"
+                        : "d3d3d3",
+                });
                 headerRow.AppendChild(cell);
             }
         
@@ -70,26 +79,34 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
                 row.AppendChild(CreateTableCellWithBorders("2500", new Paragraph(new Run(new Text(outcome.Value.Title)))));
             
                 // Add the assignment cells.
-                foreach (var assignment in KpiMatrixAssignments.OrderBy(static ass => ass.Name))
+                foreach (var assignment in assignments)
                 {
                     var outcomeAssignment = assignment.Outcomes.FirstOrDefault(o => o.Id == outcome.Key);
                     var cell = CreateTableCellWithBorders("100");
-                
+
                     // Set cell color based on GradeStatus.
+                    var fillColor = "";
                     if (outcomeAssignment != null)
                     {
-                        var fillColor = outcomeAssignment.GradeStatus switch
+                        fillColor = outcomeAssignment.GradeStatus switch
                         {
                             GradeStatus.Approved => "44F656",
                             GradeStatus.Insufficient => "FA1818",
                             GradeStatus.NotGraded => "FAFF00",
-                            _ => "FFFFFF",
+                            _ => null,
                         };
-                        cell.FirstChild.Append(new Shading
-                        {
-                            Fill = fillColor,
-                        });
+                        
                     }
+                    else
+                    {
+                        fillColor = assignments.IndexOf(assignment) % 2 == 0
+                            ? "FFFFFF"
+                            : "d3d3d3";
+                    }
+                    cell.FirstChild.Append(new Shading
+                    {
+                        Fill = fillColor,
+                    });
                 
                     // Add an empty text element since we're using color instead of text.
                     cell.Append(new Paragraph(new Run(new Text(""))));
@@ -100,12 +117,8 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
             }
             
             body.AppendChild(table);
-            body.AppendChild(new Paragraph(new Run(new Break
-            {
-                Type = BreakValues.Page,
-            })));
 
-        return body;
+            return body;
     }
 
     private static TableCell CreateTableCellWithBorders(string? width, params OpenXmlElement[] elements)
