@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using Epsilon.Abstractions.Http;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Service;
+using Epsilon.Canvas.Http;
 
 namespace Epsilon.Canvas.Service;
 
