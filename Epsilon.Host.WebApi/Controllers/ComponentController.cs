@@ -1,3 +1,4 @@
+using System.Globalization;
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -15,16 +16,24 @@ public class ComponentController : ControllerBase
         _competenceComponentService = competenceComponentService;
     }
 
+    //
+    // DateTime.ParseExact(startDate ?? "", "dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-US")),
+    // DateTime.Parse(endDate ?? "", CultureInfo.CreateSpecificCulture("en-US"))
+    
     [HttpGet("{componentName}")]
     [Produces(typeof(CompetenceProfile))]
-    public async Task<ActionResult<ICompetenceComponent>> GetCompetenceProfile(string componentName)
+    public async Task<ActionResult<ICompetenceComponent>> GetCompetenceProfile(string componentName, DateTime? startDate, DateTime? endDate)
     {
-        var component = await _competenceComponentService.GetComponent(componentName);
-        if (component == null)
         {
-            return NotFound();
+            var component = await _competenceComponentService.GetComponent(componentName, startDate, endDate);
+            if (component == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(component);
         }
 
-        return Ok(component);
+        return NotFound();
     }
 }

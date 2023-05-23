@@ -13,17 +13,17 @@ public class CompetenceComponentService : ICompetenceComponentService
         _componentFetchers = componentFetchers;
     }
 
-    public async IAsyncEnumerable<ICompetenceComponent> GetComponents()
+    public async IAsyncEnumerable<ICompetenceComponent> GetComponents(DateTime? startDate = null, DateTime? endDate = null)
     {
         foreach (var componentFetcher in _componentFetchers)
         {
-            yield return await componentFetcher.FetchUnknown();
+            yield return await componentFetcher.FetchUnknown(startDate, endDate);
         }
     }
 
-    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>() where TComponent : ICompetenceComponent
+    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>(DateTime? startDate = null, DateTime? endDate = null) where TComponent : ICompetenceComponent
     {
-        await foreach (var component in GetComponents())
+        await foreach (var component in GetComponents(startDate, endDate))
         {
             if (component is TComponent componentOfT)
             {
@@ -32,7 +32,7 @@ public class CompetenceComponentService : ICompetenceComponentService
         }
     }
 
-    public async Task<ICompetenceComponent?> GetComponent(string name)
+    public async Task<ICompetenceComponent?> GetComponent(string name, DateTime? startDate = null, DateTime? endDate = null)
     {
         var fetcher = _componentFetchers.SingleOrDefault(f =>
         {
@@ -45,11 +45,13 @@ public class CompetenceComponentService : ICompetenceComponentService
 
             return false;
         });
-        return fetcher == null ? null : await fetcher.FetchUnknown();
+        return fetcher == null
+            ? null
+            : await fetcher.FetchUnknown(startDate, endDate);
     }
 
-    public async Task<TComponent?> GetComponent<TComponent>(string name) where TComponent : class, ICompetenceComponent
+    public async Task<TComponent?> GetComponent<TComponent>(string name, DateTime? startDate = null, DateTime? endDate = null) where TComponent : class, ICompetenceComponent
     {
-        return await GetComponent(name) as TComponent;
+        return await GetComponent(name, startDate, endDate) as TComponent;
     }
 }

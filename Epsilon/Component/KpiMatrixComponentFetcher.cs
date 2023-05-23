@@ -64,12 +64,12 @@ masteryPoints
         _configuration = configuration;
     }
 
-    public override async Task<KpiMatrixCollection> Fetch()
+    public override async Task<KpiMatrixCollection> Fetch(DateTime? startDate = null, DateTime? endDate = null)
     {
         var studentId = _configuration["Canvas:StudentId"];
         var outcomesQuery = GetUserKpiMatrixOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCultureIgnoreCase);
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
-        return ConvertToComponent(outcomes, new DateTime(2023, 2, 1), DateTime.Now);
+        return ConvertToComponent(outcomes, startDate ?? DateTime.Now, endDate ?? DateTime.Now);
     }
 
     private static GradeStatus GetGradeStatus(bool isSubmitted, double? points, double? mastery)
@@ -85,9 +85,9 @@ masteryPoints
 
 
     private static KpiMatrixCollection ConvertToComponent(
-        CanvasGraphQlQueryResponse queryResponse,
-        DateTime startAt,
-        DateTime endAt
+        CanvasGraphQlQueryResponse? queryResponse,
+        DateTime? startAt,
+        DateTime? endAt
     )
     {
         var assignments = new List<KpiMatrixAssignment>();
@@ -101,7 +101,7 @@ masteryPoints
 
                 if (submission != null)
                 {
-                    if (submission.Assignment?.Rubric != null)
+                    if (submission.Assignment?.Rubric != null && submission.RubricAssessments?.Nodes != null)
                     {
                         var rubricAssessments = submission.Assignment.Rubric.Criteria;
                         var kpiMatrixOutcomes = new List<KpiMatrixOutcome>();
@@ -112,11 +112,15 @@ masteryPoints
                                 if (criteria.Outcome != null)
                                 {
                                     //Validate that outcome is a HboI KPI 
-                                    if (FhictConstants.ProfessionalTasks.TryGetValue(criteria.Outcome.Id, out var professionalTask) || FhictConstants.ProfessionalSkills.TryGetValue(criteria.Outcome.Id, out var professionalSkill))
+                                    if ((FhictConstants.ProfessionalTasks.TryGetValue(criteria.Outcome.Id, out var professionalTask) ||
+                                         FhictConstants.ProfessionalSkills.TryGetValue(criteria.Outcome.Id, out var professionalSkill)) &&
+                                        rubricAssessments.Any())
                                     {
                                         var assessmentRatings = submission.RubricAssessments?.Nodes?.FirstOrDefault()?.AssessmentRatings;
+                                        var test = assessmentRatings != null;
+                                        var test2 = assessmentRatings?.FirstOrDefault(o => o?.Criterion?.Outcome?.Id == criteria?.Outcome?.Id);
                                         kpiMatrixOutcomes.Add(new KpiMatrixOutcome(criteria.Outcome.Id, criteria.Outcome.Title,
-                                            GetGradeStatus(assessmentRatings != null, assessmentRatings?.FirstOrDefault(o => o.Criterion.Outcome?.Id == criteria.Outcome.Id)
+                                            GetGradeStatus(assessmentRatings != null, assessmentRatings?.FirstOrDefault(o => o?.Criterion?.Outcome?.Id == criteria?.Outcome?.Id)
                                                     ?.Points
                                                 , criteria.Outcome.MasteryPoints)));
                                     }
