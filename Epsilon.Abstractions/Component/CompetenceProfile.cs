@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Model;
@@ -16,7 +15,7 @@ public record CompetenceProfile(
     IEnumerable<DecayingAveragePerSkill> DecayingAveragesPerSkill
 ) : ICompetenceWordComponent
 {
-    public OpenXmlElement ToWord(MainDocumentPart mainDocumentPart)
+    public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
         // TODO: This is simply an example to show the capability of the component architecture
         var body = new Body();
@@ -32,6 +31,6 @@ public record CompetenceProfile(
             );
         }
 
-        return body;
+        mainDocumentPart.Document.AppendChild(body);
     }
 }
