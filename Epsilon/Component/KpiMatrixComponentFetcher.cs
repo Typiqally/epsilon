@@ -1,6 +1,5 @@
 ﻿using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Component.KpiMatrixComponent;
-using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.Extensions.Configuration;
@@ -77,9 +76,9 @@ masteryPoints
     {
         return points != null
             ? points >= mastery
-                ? GradeStatus.Approved
-                : GradeStatus.Insufficient
-            : GradeStatus.NotGraded;
+                ? KpiMatrixConstants.GradeStatus["Approved"]
+                : KpiMatrixConstants.GradeStatus["Insufficient"]
+            : KpiMatrixConstants.GradeStatus["NotGraded"];
     }
 
 
