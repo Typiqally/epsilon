@@ -1,23 +1,28 @@
 <template>
     <ApexChart
-        type="bar"
-        height="350"
-        width="200"
         :options="chartOptions"
-        :series="series" />
+        :series="series"
+        height="350"
+        type="bar"
+        width="200" />
 </template>
 
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts"
-import { DecayingAveragePerSkill, IHboIDomain } from "../logic/Api"
-import { onMounted } from "vue"
+import {
+    IHboIDomain,
+    MasteryLevel,
+    ProfessionalSkillResult,
+} from "../logic/Api"
+import { onMounted, watch } from "vue"
+import { DecayingAverageLogic } from "../logic/DecayingAverageLogic"
 
 const props = defineProps<{
     domain: IHboIDomain
-    data: DecayingAveragePerSkill[]
+    data: ProfessionalSkillResult[]
 }>()
 
-const series: Array<{ name: string; data: Array<number | string> }> = []
+let series: Array<{ name: string; data: Array<number | string> }> = []
 const chartOptions = {
     annotations: {
         yaxis: [
@@ -36,7 +41,7 @@ const chartOptions = {
             },
         ],
     },
-    colors: ["#A8D08D"],
+    colors: ["#FFFFFF"],
     chart: {
         type: "bar",
         stacked: true,
@@ -76,22 +81,42 @@ const chartOptions = {
 }
 
 onMounted(() => {
-    // Setup categories
-    const professionalSkills = props.domain.professionalSkills
+    loadChartData()
+})
+watch(() => loadChartData())
 
-    if (professionalSkills != null) {
-        professionalSkills.forEach((s) => {
-            chartOptions.xaxis.categories.push(s.shortName as never)
+function loadChartData(): void {
+    series = []
+    chartOptions.xaxis.categories = []
+    if (props.domain.professionalSkills != null) {
+        props.domain.professionalSkills.forEach((s) => {
+            chartOptions.xaxis.categories.push(s.name as never)
         })
     }
 
     // Add data
     series.push({
-        name: "Decaying Average",
-        data: props.data.map(
-            (decayingAverage) =>
-                decayingAverage.decayingAverage?.toFixed(2) as string
-        ),
+        name: "Score",
+        data: DecayingAverageLogic.getAverageSkillOutcomeScores(
+            props.data,
+            props.domain
+        )?.map((d) => {
+            return {
+                y: d.decayingAverage.toFixed(3),
+                x: props.domain.professionalSkills?.at(d.skill)?.name,
+                fillColor: getMastery(d.masteryLevel)?.color,
+            }
+        }),
     })
-})
+}
+
+function getMastery(masteryId: number): MasteryLevel | undefined {
+    if (props.domain.masteryLevels == null) {
+        return undefined
+    }
+
+    return props.domain.masteryLevels.find(
+        (masteryLevel) => masteryLevel.id == masteryId
+    )
+}
 </script>

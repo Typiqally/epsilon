@@ -1,18 +1,22 @@
 <template>
     <ApexChart
-        type="bar"
-        height="350"
-        width="750"
         :options="chartOptions"
-        :series="series" />
+        :series="series"
+        height="350"
+        type="bar"
+        width="750" />
 </template>
 
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts"
-import { DecayingAveragePerLayer, IHboIDomain } from "../logic/Api"
-import { onMounted } from "vue"
+import { IHboIDomain, ProfessionalTaskResult } from "../logic/Api"
+import { onMounted, watch } from "vue"
+import {
+    DecayingAverageLogic,
+    DecayingAveragePerLayer,
+} from "../logic/DecayingAverageLogic"
 
-const series: Array<{
+let series: Array<{
     name: string
     color: string
     data: Array<string | number> | undefined
@@ -21,7 +25,7 @@ const chartOptions = {
     annotations: {
         yaxis: [
             {
-                y: 9,
+                y: 3,
                 borderColor: "red",
                 strokeDashArray: 0,
                 label: {
@@ -77,41 +81,35 @@ const chartOptions = {
 
 const props = defineProps<{
     domain: IHboIDomain
-    data: DecayingAveragePerLayer[]
+    data: ProfessionalTaskResult[]
 }>()
 
-onMounted(() => {
-    // Setup categories
-    const activities = props.domain.activities
-
-    if (activities != null) {
-        activities.forEach((s) => {
+function loadChartData(): void {
+    series = []
+    chartOptions.xaxis.categories = []
+    if (props.domain.activities != null) {
+        props.domain.activities.forEach((s) => {
             chartOptions.xaxis.categories.push(s.name as never)
         })
     }
 
-    // Add data
-    const layers = props.domain.architectureLayers
-
-    if (layers != null) {
-        props.data.forEach((layerDecayingAverage) => {
-            const layer = layers.find(
-                (layer) => layer.id == layerDecayingAverage.architectureLayer
-            )
-
-            if (layer != undefined) {
-                series.push({
-                    name: layer.name as string,
-                    color: layer.color as string,
-                    data: layerDecayingAverage.layerActivities?.map(
-                        (decayingAverage) =>
-                            decayingAverage.decayingAverage?.toFixed(
-                                2
-                            ) as string
-                    ),
-                })
-            }
+    DecayingAverageLogic.getAverageTaskOutcomeScores(
+        props.data,
+        props.domain
+    ).map((layer: DecayingAveragePerLayer) => {
+        const ar = props.domain.architectureLayers?.at(layer.architectureLayer)
+        series.push({
+            name: ar?.name,
+            color: ar?.color,
+            data: layer.layerActivities.map((ac) =>
+                ac.decayingAverage.toFixed(3)
+            ),
         })
-    }
+    })
+}
+
+onMounted(() => {
+    loadChartData()
 })
+watch(() => loadChartData())
 </script>
