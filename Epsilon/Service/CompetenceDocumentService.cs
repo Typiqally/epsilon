@@ -15,11 +15,11 @@ public class CompetenceDocumentService : ICompetenceDocumentService
         _competenceComponentService = competenceComponentService;
     }
 
-    public async Task<Stream> WriteDocument(Stream stream)
+    public async Task<Stream> WriteDocument(Stream stream, DateTime? startDate = null, DateTime? endDate = null)
     {
         var startPosition = stream.Position;
 
-        var components = await _competenceComponentService.GetComponents<ICompetenceWordComponent>().ToListAsync();
+        var components = await _competenceComponentService.GetComponents<ICompetenceWordComponent>(startDate, endDate).ToListAsync();
         using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
