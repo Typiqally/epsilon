@@ -54,6 +54,7 @@ public static class QueryConstants
                       }
                     }
                     attempt
+                    submittedAt
                   }
                 }
                 postedAt

@@ -4,16 +4,16 @@
             :terms="data.terms"
             @on-term-selected="setTermFilter" />
         <CompetenceProfileComponent
-            :domain="data.hboIDomain"
-            :data="filteredProfessionalTaskOutcomes" />
+            :data="filteredProfessionalTaskOutcomes"
+            :domain="data.hboIDomain" />
         <CompetenceProfileLegend :domain="data.hboIDomain" />
         <div />
         <CompetenceGraph
-            :domain="data.hboIDomain"
-            :data="data.decayingAveragesPerTask" />
-        <PersonalDevelopmentMatrix
-            :domain="data.hboIDomain"
-            :data="data.decayingAveragesPerSkill" />
+            :data="filteredProfessionalTaskOutcomes"
+            :domain="data.hboIDomain" />
+        <PersonalDevelopmentGraph
+            :data="filteredProfessionalSkillOutcomes"
+            :domain="data?.hboIDomain"></PersonalDevelopmentGraph>
     </div>
     <RoundLoader v-else />
 </template>
@@ -21,17 +21,17 @@
 <script lang="ts" setup>
 import {
     Api,
-    HttpResponse,
     CompetenceProfile,
     EnrollmentTerm,
+    HttpResponse,
 } from "../logic/Api"
 import CompetenceProfileComponent from "@/components/CompetenceProfile.vue"
 import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
 import CompetenceGraph from "@/components/CompetenceGraph.vue"
-import PersonalDevelopmentMatrix from "@/components/PersonalDevelopmentGraph.vue"
 import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
 import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
+import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
@@ -39,16 +39,30 @@ const App = new Api()
 const selectedTerm = ref<EnrollmentTerm | null>(null)
 
 const filteredProfessionalTaskOutcomes = computed(() => {
-    if (!data.value) {
+    if (!data.value?.professionalTaskOutcomes) {
         return []
     }
 
-    if (!selectedTerm.value) {
+    if (!selectedTerm.value?.end_at) {
         return data.value?.professionalTaskOutcomes
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < selectedTerm.value.end_at
+        (o) => o.assessedAt < selectedTerm.value?.end_at
+    )
+})
+
+const filteredProfessionalSkillOutcomes = computed(() => {
+    if (!data.value?.professionalSkillOutcomes) {
+        return []
+    }
+
+    if (!selectedTerm.value?.end_at) {
+        return data.value?.professionalSkillOutcomes
+    }
+
+    return data.value?.professionalSkillOutcomes?.filter(
+        (o) => o.assessedAt < selectedTerm.value?.end_at
     )
 })
 
