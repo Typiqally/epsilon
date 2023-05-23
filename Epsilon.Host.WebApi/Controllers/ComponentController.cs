@@ -1,4 +1,3 @@
-using System.Globalization;
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
