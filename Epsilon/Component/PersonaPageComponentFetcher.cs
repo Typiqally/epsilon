@@ -23,7 +23,7 @@ public class PersonaPageComponentFetcher : CompetenceComponentFetcher<PersonaPag
         _canvasSettings = canvasSettings.Value;
     }
 
-    public override async Task<PersonaPage> Fetch()
+    public override async Task<PersonaPage> Fetch(DateTime ?startDate = null, DateTime ?endDate = null)
     {
         var courseId = _canvasSettings.CourseId;
         var personaHtml = await _pageHttpService.GetPageByName(courseId, "front_page");
