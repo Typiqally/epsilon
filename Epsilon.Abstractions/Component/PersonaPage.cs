@@ -10,7 +10,7 @@ public record PersonaPage(string PersonaHtml) : ICompetenceWordComponent
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
         var personaHtmlBuffer = Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes($"<html>{PersonaHtml}</html>")).ToArray();
-        var personaHtmlStream = new MemoryStream(personaHtmlBuffer);
+        using var personaHtmlStream = new MemoryStream(personaHtmlBuffer);
 
         var formatImportPart = mainDocumentPart.AddAlternativeFormatImportPart(AlternativeFormatImportPartType.Html);
         formatImportPart.FeedData(personaHtmlStream);
