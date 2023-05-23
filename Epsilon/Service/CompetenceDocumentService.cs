@@ -1,5 +1,6 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 
@@ -7,15 +8,10 @@ namespace Epsilon.Service;
 
 public class CompetenceDocumentService : ICompetenceDocumentService
 {
-    private readonly IWordDocumentBuilder _wordDocumentBuilder;
     private readonly ICompetenceComponentService _competenceComponentService;
 
-    public CompetenceDocumentService(
-        IWordDocumentBuilder wordDocumentBuilder,
-        ICompetenceComponentService competenceComponentService
-    )
+    public CompetenceDocumentService(ICompetenceComponentService competenceComponentService)
     {
-        _wordDocumentBuilder = wordDocumentBuilder;
         _competenceComponentService = competenceComponentService;
     }
 
@@ -27,7 +23,12 @@ public class CompetenceDocumentService : ICompetenceDocumentService
         using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
-        document.MainDocumentPart!.Document = _wordDocumentBuilder.Build(components);
+        document.MainDocumentPart!.Document = new Document();
+
+        foreach (var competenceWordComponent in components)
+        {
+            competenceWordComponent.AddToWordDocument(document.MainDocumentPart);
+        }
 
         document.Save();
         document.Close();
