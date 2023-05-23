@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Epsilon.Component;
 
-public class CompetenceProfileCompetenceComponentFetcher : CompetenceComponentFetcher<CompetenceProfile>
+public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<CompetenceProfile>
 {
     private const string GetAllUserCoursesSubmissionOutcomes = @"
         query MyQuery {
@@ -37,13 +37,14 @@ public class CompetenceProfileCompetenceComponentFetcher : CompetenceComponentFe
               }
             }
           }
+        }
     ";
 
     private readonly IConfiguration _configuration;
     private readonly IGraphQlHttpService _graphQlService;
     private readonly IAccountHttpService _accountHttpService;
 
-    public CompetenceProfileCompetenceComponentFetcher(
+    public CompetenceProfileComponentFetcher(
         IGraphQlHttpService graphQlService,
         IAccountHttpService accountHttpService,
         IConfiguration configuration
@@ -97,11 +98,12 @@ public class CompetenceProfileCompetenceComponentFetcher : CompetenceComponentFe
                             {
                                 taskResults.Add(
                                     new ProfessionalTaskResult(
+                                        assessmentRating.Criterion.Outcome.Id,
                                         professionalTask.Layer,
                                         professionalTask.Activity,
                                         professionalTask.MasteryLevel,
                                         assessmentRating.Points!.Value,
-                                        new DateTime()
+                                        submission.SubmittedAt!.Value
                                     )
                                 );
                             }
@@ -109,10 +111,11 @@ public class CompetenceProfileCompetenceComponentFetcher : CompetenceComponentFe
                             {
                                 professionalResults.Add(
                                     new ProfessionalSkillResult(
+                                        assessmentRating.Criterion.Outcome.Id,
                                         professionalSkill.Skill,
                                         professionalSkill.MasteryLevel,
                                         assessmentRating.Points!.Value,
-                                        new DateTime()
+                                        submission.SubmittedAt!.Value
                                     )
                                 );
                             }
@@ -129,39 +132,13 @@ public class CompetenceProfileCompetenceComponentFetcher : CompetenceComponentFe
                            || professionalResults.Any(skillOutcome =>
                                skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt))
             .Distinct()
-            .OrderBy(static term => term.StartAt);
+            .OrderByDescending(static term => term.StartAt);
 
         return new CompetenceProfile(
             domain,
-            taskResults,
-            professionalResults,
-            filteredTerms,
-            GetDecayingAverageTasks(domain, taskResults),
-            GetDecayingAverageSkills(domain, professionalResults)
+            taskResults.OrderByDescending(static r => r.SubmittedAt),
+            professionalResults.OrderByDescending(static r => r.SubmittedAt),
+            filteredTerms
         );
-    }
-
-    private static IEnumerable<DecayingAveragePerLayer> GetDecayingAverageTasks(IHboIDomain domain, IEnumerable<ProfessionalTaskResult> taskResults)
-    {
-        return domain.ArchitectureLayers.Select(layer => new DecayingAveragePerLayer(layer.Id,
-            domain.Activities.Select(activity =>
-            {
-                var decayingAverage = taskResults
-                    .Where(task => task.ArchitectureLayer == layer.Id && task.Activity == activity.Id)
-                    .Aggregate<ProfessionalTaskResult, double>(0, static (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
-
-                return new DecayingAveragePerActivity(activity.Id, decayingAverage);
-            })));
-    }
-
-    private static IEnumerable<DecayingAveragePerSkill> GetDecayingAverageSkills(IHboIDomain domain, IEnumerable<ProfessionalSkillResult> skillResults)
-    {
-        return domain.ProfessionalSkills.Select(skill =>
-        {
-            var decayingAverage = skillResults.Where(outcome => outcome.Skill == skill.Id)
-                .Aggregate<ProfessionalSkillResult, double>(0, static (current, outcome) => current * 0.35 + outcome.Grade * 0.65);
-
-            return new DecayingAveragePerSkill(skill.Id, decayingAverage);
-        });
     }
 }

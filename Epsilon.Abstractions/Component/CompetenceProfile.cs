@@ -10,9 +10,7 @@ public record CompetenceProfile(
     IHboIDomain HboIDomain,
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
     IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes,
-    IEnumerable<EnrollmentTerm> Terms,
-    IEnumerable<DecayingAveragePerLayer> DecayingAveragesPerTask,
-    IEnumerable<DecayingAveragePerSkill> DecayingAveragesPerSkill
+    IEnumerable<EnrollmentTerm> Terms
 ) : ICompetenceWordComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
