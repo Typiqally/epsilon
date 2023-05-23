@@ -1,19 +1,16 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using TextDirectionValues = DocumentFormat.OpenXml.Wordprocessing.TextDirectionValues;
-
-// using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component.KpiMatrixComponent;
 [CompetenceComponentName("kpi_matrix")]
-public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments) : ICompetenceWordComponent
+public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments, IDictionary<string, GradeStatus> GradeStatus) : ICompetenceWordComponent
 {
 
-    private static OpenXmlElement GetLegend()
+    private OpenXmlElement GetLegend()
     {
         var table = new Table();
-        foreach (var status in KpiMatrixConstants.GradeStatus)
+        foreach (var status in GradeStatus)
         {
             var row = new TableRow();
             var cellName = CreateTableCellWithBorders("200");

@@ -3,7 +3,6 @@ using Epsilon.Abstractions.Component.KpiMatrixComponent;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.Extensions.Configuration;
-using KpiMatrixOutcome = Epsilon.Abstractions.Component.KpiMatrixComponent.KpiMatrixOutcome;
 
 namespace Epsilon.Component;
 
@@ -135,6 +134,6 @@ masteryPoints
             }
         }
 
-        return new KpiMatrixCollection(assignments);
+        return new KpiMatrixCollection(assignments, KpiMatrixConstants.GradeStatus);
     }
 }
