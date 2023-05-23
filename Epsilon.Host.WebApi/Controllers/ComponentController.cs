@@ -16,10 +16,6 @@ public class ComponentController : ControllerBase
         _competenceComponentService = competenceComponentService;
     }
 
-    //
-    // DateTime.ParseExact(startDate ?? "", "dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-US")),
-    // DateTime.Parse(endDate ?? "", CultureInfo.CreateSpecificCulture("en-US"))
-    
     [HttpGet("{componentName}")]
     [Produces(typeof(CompetenceProfile))]
     public async Task<ActionResult<ICompetenceComponent>> GetCompetenceProfile(string componentName, DateTime? startDate, DateTime? endDate)
