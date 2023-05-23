@@ -1,11 +1,12 @@
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using TextDirectionValues = DocumentFormat.OpenXml.Wordprocessing.TextDirectionValues;
 
 // using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component.KpiMatrixComponent;
-
+[CompetenceComponentName("kpi_matrix")]
 public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments) : ICompetenceWordComponent
 {
 
@@ -32,7 +33,7 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
         return table;
     }
 
-    public OpenXmlElement ToWord()
+    public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
         var body = new Body();
         // Create a table, with rows for the outcomes and columns for the assignments.
@@ -131,7 +132,7 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
         body.Append(new Paragraph(new Run(new Text(""))));
         body.AppendChild(table);
 
-        return body;
+        mainDocumentPart.Document.AppendChild(body);
     }
 
     private static TableCell CreateTableCellWithBorders(string? width, params OpenXmlElement[] elements)
