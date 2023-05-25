@@ -4,18 +4,18 @@ import { Ref, ref } from "vue"
 
 const api = new Api()
 const today = new Date()
-const OtherMonth = new Date()
-OtherMonth.setMonth(OtherMonth.getMonth() - 3)
+const otherMonth = new Date()
+otherMonth.setMonth(otherMonth.getMonth() - 3)
 const data: Ref<unknown | undefined> = ref(undefined)
 const Kpis: Ref<unknown | undefined> = ref(undefined)
 api.component
     .componentDetail("kpi_matrix", {
         startDate:
-            OtherMonth.getFullYear() +
+            otherMonth.getFullYear() +
             "-" +
-            `${OtherMonth.getMonth() + 1}`.padStart(2, "0") +
+            `${otherMonth.getMonth() + 1}`.padStart(2, "0") +
             "-" +
-            OtherMonth.getDate(),
+            otherMonth.getDate(),
         endDate:
             today.getFullYear() +
             "-" +
