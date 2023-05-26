@@ -1,4 +1,5 @@
 ﻿using Epsilon.Abstractions.Component;
+using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.Extensions.Configuration;
@@ -85,24 +86,22 @@ public class KpiMatrixComponentFetcher : CompetenceComponentFetcher<KpiMatrixCol
                         RubricAssessments.Nodes: not null,
                     })
                 {
-                    var rubricAssessments = submission.Assignment.Rubric.Criteria?.ToArray();
+                    var rubricCriteria = submission.Assignment.Rubric.Criteria?.ToArray();
                     var kpiMatrixOutcomes = new List<KpiMatrixOutcome>();
 
-                    if (rubricAssessments != null)
+                    if (rubricCriteria != null)
                     {
-                        foreach (var criteria in rubricAssessments)
+                        foreach (var outcome in rubricCriteria.Select(static criteria => criteria.Outcome))
                         {
                             //Validate that outcome is a HboI KPI 
-                            if (criteria.Outcome != null
-                                && (FhictConstants.ProfessionalTasks.ContainsKey(criteria.Outcome.Id) || FhictConstants.ProfessionalSkills.ContainsKey(criteria.Outcome.Id))
-                                && rubricAssessments.Any())
+                            if (outcome != null
+                                && (FhictConstants.ProfessionalTasks.ContainsKey(outcome.Id) || FhictConstants.ProfessionalSkills.ContainsKey(outcome.Id))
+                                && rubricCriteria.Any())
                             {
-                                var assessmentRatings = submission.RubricAssessments.Nodes?.FirstOrDefault()?.AssessmentRatings;
+                                var assessmentRatings = submission.RubricAssessments.Nodes.FirstOrDefault()?.AssessmentRatings;
+                                var gradeStatus = GetGradeStatus(assessmentRatings?.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome.Id));
 
-                                kpiMatrixOutcomes.Add(new KpiMatrixOutcome(criteria.Outcome.Id, criteria.Outcome.Title,
-                                    GetGradeStatus(assessmentRatings != null, assessmentRatings?.FirstOrDefault(o => o?.Criterion?.Outcome?.Id == criteria?.Outcome?.Id)
-                                            ?.Points
-                                        , criteria.Outcome.MasteryPoints)));
+                                kpiMatrixOutcomes.Add(new KpiMatrixOutcome(outcome.Id, outcome.Title, KpiMatrixCollection.DefaultGradeStatus[gradeStatus]));
                             }
                         }
                     }
@@ -119,22 +118,20 @@ public class KpiMatrixComponentFetcher : CompetenceComponentFetcher<KpiMatrixCol
         return new KpiMatrixCollection(assignments, KpiMatrixCollection.DefaultGradeStatus);
     }
 
-    private static KpiMatrixOutcomeGradeStatus GetGradeStatus(bool isSubmitted, double? points, double? mastery)
+    private static OutcomeGradeStatus GetGradeStatus(AssessmentRating? rating)
     {
-        var gradeStatuses = KpiMatrixCollection.DefaultGradeStatus;
-
-        if (isSubmitted)
+        if (rating != null)
         {
-            if (points != null)
+            if (rating.Points != null)
             {
-                return points >= mastery
-                    ? gradeStatuses["Mastered"]
-                    : gradeStatuses["Insufficient"];
+                return rating.IsMastery
+                    ? OutcomeGradeStatus.Mastered
+                    : OutcomeGradeStatus.NotMastered;
             }
 
-            return gradeStatuses["NotGradedAssessed"];
+            return OutcomeGradeStatus.NotGraded;
         }
 
-        return gradeStatuses["NotGradedNotAssessed"];
+        return OutcomeGradeStatus.NotAssessed;
     }
 }

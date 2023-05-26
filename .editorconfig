@@ -435,6 +435,9 @@ dotnet_diagnostic.ca2007.severity = none
 # CA1848: Use the LoggerMessage delegates
 dotnet_diagnostic.ca1848.severity = none
 
+# CA1826: Do not use Enumerable methods on indexable collections. Instead use the collection directly.
+dotnet_diagnostic.ca1826.severity = none
+
 # Code style errors
 dotnet_diagnostic.ide0001.severity = error
 dotnet_diagnostic.ide0002.severity = error

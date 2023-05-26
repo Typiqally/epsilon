@@ -3,5 +3,5 @@
 namespace Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 public record Criteria(
-    [property: JsonPropertyName("outcome")] Outcome? Outcome 
-    );
+    [property: JsonPropertyName("outcome")] Outcome? Outcome
+);

@@ -1,28 +1,29 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
 [CompetenceComponentName("kpi_matrix")]
 public record KpiMatrixCollection(
     IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments,
-    IDictionary<string, KpiMatrixOutcomeGradeStatus> GradeStatus
+    IDictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus> GradeStatus
 ) : ICompetenceWordComponent
 {
-    public static readonly IDictionary<string, KpiMatrixOutcomeGradeStatus> DefaultGradeStatus = new Dictionary<string, KpiMatrixOutcomeGradeStatus>
+    public static readonly IDictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus> DefaultGradeStatus = new Dictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus>
     {
         {
-            "Mastered", new KpiMatrixOutcomeGradeStatus("Mastered", "44F656")
+            OutcomeGradeStatus.Mastered, new KpiMatrixOutcomeGradeStatus("Mastered", "44F656")
         },
         {
-            "Insufficient", new KpiMatrixOutcomeGradeStatus("Insufficient", "FA1818")
+            OutcomeGradeStatus.NotMastered, new KpiMatrixOutcomeGradeStatus("Insufficient", "FA1818")
         },
         {
-            "NotGradedAssessed", new KpiMatrixOutcomeGradeStatus("Not applicable", "FAFF00")
+            OutcomeGradeStatus.NotGraded, new KpiMatrixOutcomeGradeStatus("Not applicable", "FAFF00")
         },
         {
-            "NotGradedNotAssessed", new KpiMatrixOutcomeGradeStatus("Needs grade", "9F2B68")
+            OutcomeGradeStatus.NotAssessed, new KpiMatrixOutcomeGradeStatus("Needs grade", "9F2B68")
         },
     };
 
@@ -103,7 +104,7 @@ public record KpiMatrixCollection(
 
                 // Set cell color based on GradeStatus.
                 var fillColor = outcomeAssignment != null
-                    ? outcomeAssignment.KpiMatrixOutcomeGradeStatus.Color
+                    ? outcomeAssignment.GradeStatus.Color
                     : assignments.IndexOf(assignment) % 2 == 0
                         ? "ffffff"
                         : "d3d3d3";
