@@ -28,9 +28,9 @@ builder.Services.AddCanvas(canvasConfiguration);
 builder.Services.AddScoped<ICompetenceDocumentService, CompetenceDocumentService>();
 builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentService>();
 
+builder.Services.AddComponentFetcher<PersonaPage, PersonaPageComponentFetcher>();
 builder.Services.AddComponentFetcher<CompetenceProfile,CompetenceProfileCompetenceComponentFetcher>();
 builder.Services.AddComponentFetcher<KpiMatrixCollection, KpiMatrixComponentFetcher>();
-builder.Services.AddComponentFetcher<PersonaPage, PersonaPageComponentFetcher>();
 
 var app = builder.Build();
 
