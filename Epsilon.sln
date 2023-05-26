@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Host.Cli", "Epsilon.Host.Cli\Epsilon.Host.Cli.csproj", "{358E6BB1-E2A2-4397-A831-A2194604D532}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Epsilon.Canvas", "Epsilon.Canvas\Epsilon.Canvas.csproj", "{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Epsilon.Canvas.Abstractions", "Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj", "{A8301F2C-F889-464F-9385-862BFB447435}"
@@ -22,10 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,5 +52,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {63F9A5D2-3979-4C37-9A45-C0AF94B7FEE9}
+		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

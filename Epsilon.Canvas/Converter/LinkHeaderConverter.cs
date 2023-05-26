@@ -6,17 +6,14 @@ namespace Epsilon.Canvas.Converter;
 
 public class LinkHeaderConverter : ILinkHeaderConverter
 {
-    private static readonly Regex s_relationRegex = new("(?<=rel=\").+?(?=\")", RegexOptions.IgnoreCase);
-    private static readonly Regex s_linkRegex = new("(?<=<).+?(?=>)", RegexOptions.IgnoreCase);
+    private static readonly Regex s_relationRegex = new Regex("(?<=rel=\").+?(?=\")", RegexOptions.IgnoreCase);
+    private static readonly Regex s_linkRegex = new Regex("(?<=<).+?(?=>)", RegexOptions.IgnoreCase);
 
     public LinkHeader ConvertFrom(HttpResponseMessage response)
     {
-        if (!response.Headers.Contains("Link"))
-        {
-            throw new KeyNotFoundException("Header does not contain link key");
-        }
-
-        return ConvertFrom(response.Headers.GetValues("Link").First());
+        return !response.Headers.Contains("Link")
+            ? throw new KeyNotFoundException("Header does not contain link key")
+            : ConvertFrom(response.Headers.GetValues("Link").First());
     }
 
     public LinkHeader ConvertFrom(string from)
@@ -31,22 +28,24 @@ public class LinkHeaderConverter : ILinkHeaderConverter
 
             if (relMatch.Success && linkMatch.Success)
             {
-                var relation = relMatch.Value.ToLower();
+                var relation = relMatch.Value.ToUpperInvariant();
                 var link = linkMatch.Value;
 
                 switch (relation)
                 {
-                    case "first":
+                    case "FIRST":
                         linkHeader.FirstLink = link;
                         break;
-                    case "prev":
+                    case "PREV":
                         linkHeader.PrevLink = link;
                         break;
-                    case "next":
+                    case "NEXT":
                         linkHeader.NextLink = link;
                         break;
-                    case "last":
+                    case "LAST":
                         linkHeader.LastLink = link;
+                        break;
+                    default:
                         break;
                 }
             }

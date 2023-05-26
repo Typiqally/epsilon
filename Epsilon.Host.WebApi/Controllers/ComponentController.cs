@@ -1,8 +1,5 @@
 using Epsilon.Abstractions.Component;
-using Epsilon.Abstractions.Model;
-using Epsilon.Canvas;
-using Epsilon.Canvas.Abstractions.QueryResponse;
-using Epsilon.Canvas.Abstractions.Service;
+using Epsilon.Abstractions.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Epsilon.Host.WebApi.Controllers;
@@ -11,29 +8,23 @@ namespace Epsilon.Host.WebApi.Controllers;
 [Route("[controller]")]
 public class ComponentController : ControllerBase
 {
-    private readonly IGraphQlHttpService _graphQlService;
-    private readonly IConfiguration _configuration;
-    private readonly ICompetenceProfileConverter _competenceProfileConverter;
-    private readonly IAccountHttpService _accountHttpService;
+    private readonly ICompetenceComponentService _competenceComponentService;
 
-    public ComponentController(IGraphQlHttpService graphQlService, IConfiguration configuration, ICompetenceProfileConverter competenceProfileConverter, IAccountHttpService accountHttpService)
+    public ComponentController(ICompetenceComponentService competenceComponentService)
     {
-        _graphQlService = graphQlService;
-        _configuration = configuration;
-        _competenceProfileConverter = competenceProfileConverter;
-        _accountHttpService = accountHttpService;
+        _competenceComponentService = competenceComponentService;
     }
 
-    [HttpGet("competence_profile")]
-    public async Task<ActionResult<CompetenceProfile>> GetCompetenceProfile()
+    [HttpGet("{componentName}")]
+    [Produces(typeof(CompetenceProfile))]
+    public async Task<ActionResult<ICompetenceComponent>> GetCompetenceProfile(string componentName, DateTime startDate, DateTime endDate)
     {
-        var studentId = _configuration["Canvas:StudentId"];
-        var query = QueryConstants.GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}");
-        var queryResult = await _graphQlService.Query<GetAllUserCoursesSubmissionOutcomes>(query);
+        var component = await _competenceComponentService.GetComponent(componentName, startDate, endDate);
+        if (component == null)
+        {
+            return NotFound();
+        }
 
-        var terms = await _accountHttpService.GetAllTerms(1);
-
-        var competenceProfile = _competenceProfileConverter.ConvertFrom(queryResult, new HboIDomain2018(), terms);
-        return competenceProfile;
+        return Ok(component);
     }
 }

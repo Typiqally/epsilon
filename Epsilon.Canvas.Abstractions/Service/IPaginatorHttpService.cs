@@ -2,5 +2,5 @@
 
 public interface IPaginatorHttpService
 {
-    public Task<IEnumerable<T>> GetAllPages<T>(HttpMethod method, string uri);
+    public Task<IEnumerable<T>> GetAllPages<T>(HttpMethod method, Uri uri);
 }

@@ -6,4 +6,5 @@ public record OutcomeResultLink(
     [property: JsonPropertyName("user")] string? User,
     [property: JsonPropertyName("learning_outcome")] string? Outcome,
     [property: JsonPropertyName("alignment")] string? Alignment,
-    [property: JsonPropertyName("assignment")] string? Assignment);
+    [property: JsonPropertyName("assignment")] string? Assignment
+);
