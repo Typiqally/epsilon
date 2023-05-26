@@ -39,8 +39,6 @@ public static class CanvasServiceCollectionExtensions
         
         services.AddScoped<ILinkHeaderConverter, LinkHeaderConverter>();
 
-        services.AddScoped<ICanvasModuleCollectionFetcher, CanvasModuleCollectionFetcher>();
-
         return services;
     }
 }
