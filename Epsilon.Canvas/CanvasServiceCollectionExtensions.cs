@@ -1,5 +1,4 @@
 using System.Net.Http.Headers;
-using Epsilon.Canvas.Abstractions;
 using Epsilon.Canvas.Abstractions.Converter;
 using Epsilon.Canvas.Abstractions.Service;
 using Epsilon.Canvas.Converter;
