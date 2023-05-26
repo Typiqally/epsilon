@@ -10,5 +10,5 @@ namespace Epsilon.Canvas.Abstractions.Model.GraphQl;
 
 public record User(
     [property: JsonPropertyName("name")] string? Name
->>>>>>> f6062a3 (Link submission query with competence profile endpoint (#79))
+DateTime startDate, DateTime endDate>> f6062a3 (Link submission query with competence profile endpoint (#79))
 );
