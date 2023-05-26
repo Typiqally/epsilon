@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Api } from "../../logic/Api"
+import { Api } from "../logic/Api"
 import { Ref, ref } from "vue"
 
 const api = new Api()

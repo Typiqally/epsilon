@@ -68,7 +68,10 @@ const filteredProfessionalSkillOutcomes = computed(() => {
 
 onMounted(() => {
     App.component
-        .competenceProfileList()
+        .componentDetail("competence_profile", {
+            startDate: "02-26-2023",
+            endDate: "05-26-2023",
+        })
         .then((r: HttpResponse<CompetenceProfile>) => {
             data.value = r.data
         })
