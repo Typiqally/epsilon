@@ -1,8 +1,8 @@
 using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Service;
 using Epsilon.Canvas;
-using Epsilon.Canvas.Abstractions.Service;
-using Epsilon.Canvas.Service;
-using Epsilon.Component.Converters;
+using Epsilon.Component;
+using Epsilon.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +24,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCanvas(canvasConfiguration);
-builder.Services.AddScoped<ICompetenceProfileConverter, CompetenceProfileConverter>();
+
+builder.Services.AddScoped<ICompetenceDocumentService, CompetenceDocumentService>();
+builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentService>();
+
+builder.Services.AddComponentFetcher<PersonaPage, PersonaPageComponentFetcher>();
+builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
+builder.Services.AddComponentFetcher<KpiMatrixCollection, KpiMatrixComponentFetcher>();
 
 var app = builder.Build();
 

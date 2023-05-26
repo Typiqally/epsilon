@@ -1,16 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Host.Cli", "Epsilon.Host.Cli\Epsilon.Host.Cli.csproj", "{358E6BB1-E2A2-4397-A831-A2194604D532}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Epsilon.Canvas", "Epsilon.Canvas\Epsilon.Canvas.csproj", "{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Canvas", "Epsilon.Canvas\Epsilon.Canvas.csproj", "{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Epsilon.Canvas.Abstractions", "Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj", "{A8301F2C-F889-464F-9385-862BFB447435}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Canvas.Abstractions", "Epsilon.Canvas.Abstractions\Epsilon.Canvas.Abstractions.csproj", "{A8301F2C-F889-464F-9385-862BFB447435}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Epsilon.Canvas.Tests", "Epsilon.Canvas.Tests\Epsilon.Canvas.Tests.csproj", "{9DF6EB90-439D-4372-9912-0B82B84D1C36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Canvas.Tests", "Epsilon.Canvas.Tests\Epsilon.Canvas.Tests.csproj", "{9DF6EB90-439D-4372-9912-0B82B84D1C36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Epsilon", "Epsilon\Epsilon.csproj", "{30C8913E-6FAF-42AF-A3AE-0CF0E5A3DC88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon", "Epsilon\Epsilon.csproj", "{30C8913E-6FAF-42AF-A3AE-0CF0E5A3DC88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Epsilon.Abstractions", "Epsilon.Abstractions\Epsilon.Abstractions.csproj", "{4AEA96B5-B30A-49C7-8871-29D18587936F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Abstractions", "Epsilon.Abstractions\Epsilon.Abstractions.csproj", "{4AEA96B5-B30A-49C7-8871-29D18587936F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Tests", "Epsilon.Tests\Epsilon.Tests.csproj", "{4F5E4A10-5D0E-4C7D-B24C-33C9B6FA52CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Epsilon.Host.WebApi", "Epsilon.Host.WebApi\Epsilon.Host.WebApi.csproj", "{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}"
 EndProject
@@ -20,10 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{358E6BB1-E2A2-4397-A831-A2194604D532}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD6AB75F-D71B-4FDD-8B37-1FB547AAC753}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,6 +40,18 @@ Global
 		{4AEA96B5-B30A-49C7-8871-29D18587936F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AEA96B5-B30A-49C7-8871-29D18587936F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AEA96B5-B30A-49C7-8871-29D18587936F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5E4A10-5D0E-4C7D-B24C-33C9B6FA52CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5E4A10-5D0E-4C7D-B24C-33C9B6FA52CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5E4A10-5D0E-4C7D-B24C-33C9B6FA52CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5E4A10-5D0E-4C7D-B24C-33C9B6FA52CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {63F9A5D2-3979-4C37-9A45-C0AF94B7FEE9}
 		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{194C4770-0BCD-4EC2-BC7C-5D672A3B6557}.Release|Any CPU.ActiveCfg = Release|Any CPU
