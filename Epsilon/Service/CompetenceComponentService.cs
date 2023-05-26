@@ -13,7 +13,7 @@ public class CompetenceComponentService : ICompetenceComponentService
         _componentFetchers = componentFetchers;
     }
 
-    public async IAsyncEnumerable<ICompetenceComponent> GetComponents(DateTime? startDate = null, DateTime? endDate = null)
+    public async IAsyncEnumerable<ICompetenceComponent> GetComponents(DateTime startDate, DateTime endDate)
     {
         foreach (var componentFetcher in _componentFetchers)
         {
@@ -21,7 +21,7 @@ public class CompetenceComponentService : ICompetenceComponentService
         }
     }
 
-    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>(DateTime? startDate = null, DateTime? endDate = null) where TComponent : ICompetenceComponent
+    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>(DateTime startDate, DateTime endDate) where TComponent : ICompetenceComponent
     {
         await foreach (var component in GetComponents(startDate, endDate))
         {
@@ -32,7 +32,7 @@ public class CompetenceComponentService : ICompetenceComponentService
         }
     }
 
-    public async Task<ICompetenceComponent?> GetComponent(string name, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<ICompetenceComponent?> GetComponent(string name, DateTime startDate, DateTime endDate)
     {
         var fetcher = _componentFetchers.SingleOrDefault(f =>
         {
@@ -50,7 +50,7 @@ public class CompetenceComponentService : ICompetenceComponentService
             : await fetcher.FetchUnknown(startDate, endDate);
     }
 
-    public async Task<TComponent?> GetComponent<TComponent>(string name, DateTime? startDate = null, DateTime? endDate = null) where TComponent : class, ICompetenceComponent
+    public async Task<TComponent?> GetComponent<TComponent>(string name, DateTime startDate, DateTime endDate) where TComponent : class, ICompetenceComponent
     {
         return await GetComponent(name, startDate, endDate) as TComponent;
     }

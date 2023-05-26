@@ -17,18 +17,14 @@ public class ComponentController : ControllerBase
 
     [HttpGet("{componentName}")]
     [Produces(typeof(CompetenceProfile))]
-    public async Task<ActionResult<ICompetenceComponent>> GetCompetenceProfile(string componentName, DateTime? startDate, DateTime? endDate)
+    public async Task<ActionResult<ICompetenceComponent>> GetCompetenceProfile(string componentName, DateTime startDate, DateTime endDate)
     {
+        var component = await _competenceComponentService.GetComponent(componentName, startDate, endDate);
+        if (component == null)
         {
-            var component = await _competenceComponentService.GetComponent(componentName, startDate, endDate);
-            if (component == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(component);
+            return NotFound();
         }
 
-        return NotFound();
+        return Ok(component);
     }
 }

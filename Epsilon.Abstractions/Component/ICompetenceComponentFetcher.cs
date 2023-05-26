@@ -2,11 +2,11 @@
 
 public interface ICompetenceComponentFetcher
 {
-    public Task<ICompetenceComponent> FetchUnknown(DateTime? startDate = null, DateTime? endDate = null);
+    public Task<ICompetenceComponent> FetchUnknown(DateTime startDate, DateTime endDate);
 }
 
 public interface ICompetenceComponentFetcher<TComponent> : ICompetenceComponentFetcher
     where TComponent : ICompetenceComponent
 {
-    public Task<TComponent> Fetch(DateTime? startDate = null, DateTime? endDate = null);
+    public Task<TComponent> Fetch(DateTime startDate, DateTime endDate);
 }

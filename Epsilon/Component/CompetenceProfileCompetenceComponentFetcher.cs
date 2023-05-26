@@ -54,7 +54,7 @@ public class CompetenceProfileCompetenceComponentFetcher : CompetenceComponentFe
         _configuration = configuration;
     }
 
-    public override async Task<CompetenceProfile> Fetch(DateTime ?startDate = null, DateTime ?endDate = null)
+    public override async Task<CompetenceProfile> Fetch(DateTime startDate, DateTime endDate)
     {
         var studentId = _configuration["Canvas:StudentId"];
         var outcomesQuery = GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCulture);

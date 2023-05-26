@@ -2,33 +2,29 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 
-namespace Epsilon.Abstractions.Component.KpiMatrixComponent;
+namespace Epsilon.Abstractions.Component;
+
 [CompetenceComponentName("kpi_matrix")]
-public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments, IDictionary<string, GradeStatus> GradeStatus) : ICompetenceWordComponent
+public record KpiMatrixCollection(
+    IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments,
+    IDictionary<string, KpiMatrixOutcomeGradeStatus> GradeStatus
+) : ICompetenceWordComponent
 {
-
-    private OpenXmlElement GetLegend()
+    public static readonly IDictionary<string, KpiMatrixOutcomeGradeStatus> DefaultGradeStatus = new Dictionary<string, KpiMatrixOutcomeGradeStatus>
     {
-        var table = new Table();
-        foreach (var status in GradeStatus)
         {
-            var row = new TableRow();
-            var cellName = CreateTableCellWithBorders("200");
-            cellName.Append(new Paragraph(new Run(new Text(status.Value.Status))));
-
-            var cellValue = CreateTableCellWithBorders("200");
-            cellValue.Append(new Paragraph(new Run(new Text(""))));
-            cellValue.FirstChild.Append(new Shading
-            {
-                Fill = status.Value.Color,
-            });
-            row.AppendChild(cellName);
-            row.AppendChild(cellValue);
-            table.AppendChild(row);
-        }
-
-        return table;
-    }
+            "Mastered", new KpiMatrixOutcomeGradeStatus("Mastered", "44F656")
+        },
+        {
+            "Insufficient", new KpiMatrixOutcomeGradeStatus("Insufficient", "FA1818")
+        },
+        {
+            "NotGradedAssessed", new KpiMatrixOutcomeGradeStatus("Not graded, Assignment assessed", "FAFF00")
+        },
+        {
+            "NotGradedNotAssessed", new KpiMatrixOutcomeGradeStatus("Not graded, Assignment not assessed", "9F2B68")
+        },
+    };
 
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
@@ -107,11 +103,12 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
 
                 // Set cell color based on GradeStatus.
                 var fillColor = outcomeAssignment != null
-                    ? outcomeAssignment.GradeStatus.Color
+                    ? outcomeAssignment.KpiMatrixOutcomeGradeStatus.Color
                     //When no item is present give the cell alternating background color
                     : assignments.IndexOf(assignment) % 2 == 0
                         ? "FFFFFF"
                         : "d3d3d3";
+
                 cell.FirstChild.Append(new Shading
                 {
                     Fill = fillColor,
@@ -131,6 +128,30 @@ public record KpiMatrixCollection(IEnumerable<KpiMatrixAssignment> KpiMatrixAssi
 
         mainDocumentPart.Document.AppendChild(body);
     }
+
+    private OpenXmlElement GetLegend()
+    {
+        var table = new Table();
+        foreach (var status in GradeStatus)
+        {
+            var row = new TableRow();
+            var cellName = CreateTableCellWithBorders("200");
+            cellName.Append(new Paragraph(new Run(new Text(status.Value.Status))));
+
+            var cellValue = CreateTableCellWithBorders("200");
+            cellValue.Append(new Paragraph(new Run(new Text(""))));
+            cellValue.FirstChild.Append(new Shading
+            {
+                Fill = status.Value.Color,
+            });
+            row.AppendChild(cellName);
+            row.AppendChild(cellValue);
+            table.AppendChild(row);
+        }
+
+        return table;
+    }
+
 
     private static TableCell CreateTableCellWithBorders(string? width, params OpenXmlElement[] elements)
     {

@@ -15,7 +15,7 @@ public class CompetenceDocumentService : ICompetenceDocumentService
         _competenceComponentService = competenceComponentService;
     }
 
-    public async Task<Stream> WriteDocument(Stream stream, DateTime? startDate = null, DateTime? endDate = null)
+    public async Task<Stream> WriteDocument(Stream stream, DateTime startDate, DateTime endDate)
     {
         var startPosition = stream.Position;
 

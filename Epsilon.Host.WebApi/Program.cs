@@ -1,5 +1,4 @@
 using Epsilon.Abstractions.Component;
-using Epsilon.Abstractions.Component.KpiMatrixComponent;
 using Epsilon.Abstractions.Service;
 using Epsilon.Canvas;
 using Epsilon.Component;
