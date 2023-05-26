@@ -19,10 +19,10 @@ public record KpiMatrixCollection(
             "Insufficient", new KpiMatrixOutcomeGradeStatus("Insufficient", "FA1818")
         },
         {
-            "NotGradedAssessed", new KpiMatrixOutcomeGradeStatus("Not graded, Assignment assessed", "FAFF00")
+            "NotGradedAssessed", new KpiMatrixOutcomeGradeStatus("Not applicable", "FAFF00")
         },
         {
-            "NotGradedNotAssessed", new KpiMatrixOutcomeGradeStatus("Not graded, Assignment not assessed", "9F2B68")
+            "NotGradedNotAssessed", new KpiMatrixOutcomeGradeStatus("Needs grade", "9F2B68")
         },
     };
 
@@ -104,12 +104,11 @@ public record KpiMatrixCollection(
                 // Set cell color based on GradeStatus.
                 var fillColor = outcomeAssignment != null
                     ? outcomeAssignment.KpiMatrixOutcomeGradeStatus.Color
-                    //When no item is present give the cell alternating background color
                     : assignments.IndexOf(assignment) % 2 == 0
-                        ? "FFFFFF"
+                        ? "ffffff"
                         : "d3d3d3";
 
-                cell.FirstChild.Append(new Shading
+                cell.FirstChild?.Append(new Shading
                 {
                     Fill = fillColor,
                 });
@@ -140,7 +139,7 @@ public record KpiMatrixCollection(
 
             var cellValue = CreateTableCellWithBorders("200");
             cellValue.Append(new Paragraph(new Run(new Text(""))));
-            cellValue.FirstChild.Append(new Shading
+            cellValue.FirstChild?.Append(new Shading
             {
                 Fill = status.Value.Color,
             });
