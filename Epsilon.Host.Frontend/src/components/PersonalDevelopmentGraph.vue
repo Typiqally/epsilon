@@ -108,9 +108,11 @@ function loadChartData(): void {
             }
         }),
     })
+    console.log(series)
 }
 
 function getMastery(masteryId: number): MasteryLevel | undefined {
+    console.log(masteryId)
     if (props.domain.masteryLevels == null) {
         return undefined
     }
