@@ -35,20 +35,25 @@ import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
+const selectedTerm = ref<EnrollmentTerm | null>()
 
-const selectedTerm = ref<EnrollmentTerm | null>(null)
+function getTermDate(): string | null | undefined {
+    const index = data.value?.terms?.indexOf(selectedTerm.value) as number
+    const term = data.value?.terms?.at(index > 0 ? index - 1 : index)
+    return index > 0 ? term?.start_at : term?.end_at
+}
 
 const filteredProfessionalTaskOutcomes = computed(() => {
     if (!data.value?.professionalTaskOutcomes) {
         return []
     }
 
-    if (!selectedTerm.value?.end_at) {
+    if (!getTermDate()) {
         return data.value?.professionalTaskOutcomes
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < selectedTerm.value?.end_at
+        (o) => o.assessedAt < getTermDate()
     )
 })
 
@@ -57,12 +62,12 @@ const filteredProfessionalSkillOutcomes = computed(() => {
         return []
     }
 
-    if (!selectedTerm.value?.end_at) {
+    if (!getTermDate()) {
         return data.value?.professionalSkillOutcomes
     }
 
     return data.value?.professionalSkillOutcomes?.filter(
-        (o) => o.assessedAt < selectedTerm.value?.end_at
+        (o) => o.assessedAt < getTermDate()
     )
 })
 
@@ -74,6 +79,7 @@ onMounted(() => {
         })
         .then((r: HttpResponse<CompetenceProfile>) => {
             data.value = r.data
+            setTermFilter(data.value?.terms?.at(0) as unknown as EnrollmentTerm)
         })
 })
 
