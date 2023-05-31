@@ -35,12 +35,18 @@ import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
-const selectedTerm = ref<EnrollmentTerm | null>()
+const selectedTerm = ref<EnrollmentTerm | undefined>()
 
-function getTermDate(): string | null | undefined {
+function getEndTermDateDependingOnStartDatePreviousTerm():
+    | string
+    | null
+    | undefined {
     const index = data.value?.terms?.indexOf(selectedTerm.value) as number
-    const term = data.value?.terms?.at(index > 0 ? index - 1 : index)
-    return index > 0 ? term?.start_at : term?.end_at
+    if (index > 0) {
+        return data.value?.terms?.at(index - 1)?.start_at
+    } else {
+        return data.value?.terms?.at(index)?.end_at
+    }
 }
 
 const filteredProfessionalTaskOutcomes = computed(() => {
@@ -48,12 +54,12 @@ const filteredProfessionalTaskOutcomes = computed(() => {
         return []
     }
 
-    if (!getTermDate()) {
+    if (!getEndTermDateDependingOnStartDatePreviousTerm()) {
         return data.value?.professionalTaskOutcomes
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < getTermDate()
+        (o) => o.assessedAt < getEndTermDateDependingOnStartDatePreviousTerm()
     )
 })
 
@@ -62,12 +68,12 @@ const filteredProfessionalSkillOutcomes = computed(() => {
         return []
     }
 
-    if (!getTermDate()) {
+    if (!getEndTermDateDependingOnStartDatePreviousTerm()) {
         return data.value?.professionalSkillOutcomes
     }
 
     return data.value?.professionalSkillOutcomes?.filter(
-        (o) => o.assessedAt < getTermDate()
+        (o) => o.assessedAt < getEndTermDateDependingOnStartDatePreviousTerm()
     )
 })
 
