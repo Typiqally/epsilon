@@ -14,7 +14,7 @@ import {
     MasteryLevel,
     ProfessionalSkillResult,
 } from "../logic/Api"
-import { onMounted, watch } from "vue"
+import { onMounted, watchEffect } from "vue"
 import { DecayingAverageLogic } from "../logic/DecayingAverageLogic"
 
 const props = defineProps<{
@@ -83,7 +83,7 @@ const chartOptions = {
 onMounted(() => {
     loadChartData()
 })
-watch(() => loadChartData())
+watchEffect(() => loadChartData())
 
 function loadChartData(): void {
     series = []
