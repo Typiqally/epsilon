@@ -61,7 +61,6 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
         var outcomesQuery = GetAllUserCoursesSubmissionOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCulture);
 
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
-        var terms = await _accountHttpService.GetAllTerms(1);
 
         var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018());
 
@@ -128,7 +127,6 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
             domain,
             taskResults.OrderByDescending(static r => r.SubmittedAt),
             professionalResults.OrderByDescending(static r => r.SubmittedAt)
-            // filteredTerms
         );
     }
 }
