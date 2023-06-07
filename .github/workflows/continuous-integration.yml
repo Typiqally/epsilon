@@ -40,6 +40,7 @@ jobs:
   lint-frontend:
     name: Lint frontend
     runs-on: ubuntu-20.04
+    needs: [ build-frontend ]
     defaults:
       run:
         working-directory: Epsilon.Host.Frontend
@@ -57,3 +58,13 @@ jobs:
         run: pnpm install
       - name: Perform linting
         run: pnpm lint
+
+
+  build-docker:
+    name: Build Docker
+    runs-on: ubuntu-20.04
+    needs: [ build-backend,lint-frontend ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the containers
+        run: docker-compose up -d
