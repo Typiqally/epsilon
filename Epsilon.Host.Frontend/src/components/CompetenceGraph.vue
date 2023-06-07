@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts"
 import { IHboIDomain, ProfessionalTaskResult } from "../logic/Api"
-import { onMounted, watch } from "vue"
+import { onMounted, watchEffect } from "vue"
 import {
     DecayingAverageLogic,
     DecayingAveragePerLayer,
@@ -111,5 +111,5 @@ function loadChartData(): void {
 onMounted(() => {
     loadChartData()
 })
-watch(() => loadChartData())
+watchEffect(() => loadChartData())
 </script>
