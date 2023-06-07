@@ -63,15 +63,14 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
         var terms = await _accountHttpService.GetAllTerms(1);
 
-        var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018(), terms);
+        var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018());
 
         return competenceProfile;
     }
 
     private static CompetenceProfile ConvertToComponent(
         CanvasGraphQlQueryResponse queryResponse,
-        IHboIDomain domain,
-        IEnumerable<EnrollmentTerm> enrollmentTerms
+        IHboIDomain domain
     )
     {
         var taskResults = new List<ProfessionalTaskResult>();
