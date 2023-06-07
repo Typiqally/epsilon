@@ -1,2 +1,4 @@
-FROM httpd:2.4
-COPY ./Epsilon.Host.Frontend/dist/ /usr/local/apache2/htdocs/
+FROM node:18-alpine
+RUN npm i -g pnpm
+WORKDIR Epsilon.Host.Frontend/
+RUN pnpm run vite build
