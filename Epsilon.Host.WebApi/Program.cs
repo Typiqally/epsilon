@@ -27,6 +27,7 @@ builder.Services.AddCanvas(canvasConfiguration);
 
 builder.Services.AddScoped<ICompetenceDocumentService, CompetenceDocumentService>();
 builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentService>();
+builder.Services.AddScoped<IFilterService, FilterService>();
 
 builder.Services.AddComponentFetcher<PersonaPage, PersonaPageComponentFetcher>();
 builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
