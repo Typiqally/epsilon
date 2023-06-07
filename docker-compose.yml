@@ -17,8 +17,8 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: ./Epsilon.Host.Frontend/Dockerfile
+      context: ./Epsilon.Host.Frontend
+      dockerfile: ./Dockerfile
     ports:
       - "5002:80"
       - "5003:443"
