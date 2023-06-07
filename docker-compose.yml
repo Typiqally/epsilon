@@ -1,0 +1,16 @@
+﻿version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./Epsilon.Host.WebApi/Dockerfile
+    ports:
+      - "5000:80"
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80;https://+:443;
+      - ASPNETCORE_HTTPS_PORT=5001
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=ob6KdSAOuNB3oe7
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/dev-cert.pfx
