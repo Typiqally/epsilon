@@ -37,10 +37,7 @@ const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
 const selectedTerm = ref<EnrollmentTerm | undefined>()
 
-function getEndTermDateDependingOnStartDatePreviousTerm():
-    | string
-    | null
-    | undefined {
+function getCorrectedTermDate(): string | null | undefined {
     const index = data.value?.terms?.indexOf(selectedTerm.value) as number
     if (index > 0) {
         return data.value?.terms?.at(index - 1)?.start_at
@@ -54,12 +51,12 @@ const filteredProfessionalTaskOutcomes = computed(() => {
         return []
     }
 
-    if (!getEndTermDateDependingOnStartDatePreviousTerm()) {
+    if (!getCorrectedTermDate()) {
         return data.value?.professionalTaskOutcomes
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < getEndTermDateDependingOnStartDatePreviousTerm()
+        (o) => o.assessedAt < getCorrectedTermDate()
     )
 })
 
@@ -68,12 +65,12 @@ const filteredProfessionalSkillOutcomes = computed(() => {
         return []
     }
 
-    if (!getEndTermDateDependingOnStartDatePreviousTerm()) {
+    if (!getCorrectedTermDate()) {
         return data.value?.professionalSkillOutcomes
     }
 
     return data.value?.professionalSkillOutcomes?.filter(
-        (o) => o.assessedAt < getEndTermDateDependingOnStartDatePreviousTerm()
+        (o) => o.assessedAt < getCorrectedTermDate()
     )
 })
 
