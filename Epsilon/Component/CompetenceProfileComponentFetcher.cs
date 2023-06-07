@@ -42,16 +42,13 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
 
     private readonly IConfiguration _configuration;
     private readonly IGraphQlHttpService _graphQlService;
-    private readonly IAccountHttpService _accountHttpService;
 
     public CompetenceProfileComponentFetcher(
         IGraphQlHttpService graphQlService,
-        IAccountHttpService accountHttpService,
         IConfiguration configuration
     )
     {
         _graphQlService = graphQlService;
-        _accountHttpService = accountHttpService;
         _configuration = configuration;
     }
 
