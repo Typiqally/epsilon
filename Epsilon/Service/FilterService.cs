@@ -12,7 +12,7 @@ namespace Epsilon.Service;
 
 public class FilterService : IFilterService
 {
-    private const string GetUserSubmissions = @"
+    private const string GetUserSubmissionsQuery = @"
         query GetUserSubmissions {
           allCourses {
             submissionsConnection(studentIds: $studentIds) {
@@ -40,9 +40,15 @@ public class FilterService : IFilterService
         var allTerms = await _accountHttpService.GetAllTerms(1);
 
         var studentId = _configuration["Canvas:StudentId"];
-        var submissionsQuery = GetUserSubmissions.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCultureIgnoreCase);
+        var submissionsQuery = GetUserSubmissionsQuery.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCultureIgnoreCase);
 
         var response = await _graphQlService.Query<CanvasGraphQlQueryResponse>(submissionsQuery);
+
+        if (response == null)
+        {
+            return Enumerable.Empty<EnrollmentTerm>();
+        }
+
         var submissions = response!.Data!.Courses!.SelectMany(c => c.SubmissionsConnection!.Nodes);
 
         var participatedTerms = allTerms!
