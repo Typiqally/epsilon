@@ -9,8 +9,7 @@ namespace Epsilon.Abstractions.Component;
 public record CompetenceProfile(
     IHboIDomain HboIDomain,
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
-    IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes,
-    IEnumerable<EnrollmentTerm> Terms
+    IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes
 ) : ICompetenceWordComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
@@ -18,16 +17,13 @@ public record CompetenceProfile(
         // TODO: This is simply an example to show the capability of the component architecture
         var body = new Body();
 
-        foreach (var enrollmentTerm in Terms)
-        {
-            body.AppendChild(
-                new Paragraph(
-                    new Run(
-                        new Text(enrollmentTerm.Name)
+        body.AppendChild(
+            new Paragraph(
+                new Run(
+                    new Text("Competence profile comes here")
                     )
                 )
             );
-        }
 
         mainDocumentPart.Document.AppendChild(body);
     }

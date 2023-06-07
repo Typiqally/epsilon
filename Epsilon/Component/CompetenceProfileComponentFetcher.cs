@@ -1,4 +1,4 @@
-﻿using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
@@ -125,20 +125,11 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
             }
         }
 
-        var filteredTerms = enrollmentTerms
-            .Where(static term => term is { StartAt: not null, EndAt: not null, })
-            .Where(term => taskResults.Any(taskOutcome =>
-                               taskOutcome.AssessedAt >= term.StartAt && taskOutcome.AssessedAt <= term.EndAt)
-                           || professionalResults.Any(skillOutcome =>
-                               skillOutcome.AssessedAt > term.StartAt && skillOutcome.AssessedAt < term.EndAt))
-            .Distinct()
-            .OrderByDescending(static term => term.StartAt);
-
         return new CompetenceProfile(
             domain,
             taskResults.OrderByDescending(static r => r.SubmittedAt),
-            professionalResults.OrderByDescending(static r => r.SubmittedAt),
-            filteredTerms
+            professionalResults.OrderByDescending(static r => r.SubmittedAt)
+            // filteredTerms
         );
     }
 }
