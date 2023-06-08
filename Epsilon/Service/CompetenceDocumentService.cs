@@ -19,7 +19,7 @@ public class CompetenceDocumentService : ICompetenceDocumentService
     {
         var startPosition = stream.Position;
 
-        var components = await _competenceComponentService.GetComponents<ICompetenceWordComponent>(startDate, endDate).ToListAsync();
+        var components = await _competenceComponentService.GetComponents<IWordCompetenceComponent>(startDate, endDate).ToListAsync();
         using var document = WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document);
 
         document.AddMainDocumentPart();
