@@ -5,7 +5,6 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
-[CompetenceComponentName("kpi_matrix")]
 public record KpiMatrixCollection(
     IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments,
     IDictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus> GradeStatus

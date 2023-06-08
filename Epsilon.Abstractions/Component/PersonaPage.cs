@@ -4,7 +4,6 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Epsilon.Abstractions.Component;
 
-[CompetenceComponentName("persona")]
 public record PersonaPage(string PersonaHtml) : IWordCompetenceComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
