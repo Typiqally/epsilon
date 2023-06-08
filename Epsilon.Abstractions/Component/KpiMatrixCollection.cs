@@ -9,7 +9,7 @@ namespace Epsilon.Abstractions.Component;
 public record KpiMatrixCollection(
     IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments,
     IDictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus> GradeStatus
-) : ICompetenceWordComponent
+) : IWordCompetenceComponent
 {
     public static readonly IDictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus> DefaultGradeStatus = new Dictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus>
     {

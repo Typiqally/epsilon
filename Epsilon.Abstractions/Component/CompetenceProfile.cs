@@ -11,7 +11,7 @@ public record CompetenceProfile(
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
     IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes,
     IEnumerable<EnrollmentTerm> Terms
-) : ICompetenceWordComponent
+) : IWordCompetenceComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
