@@ -1,7 +1,6 @@
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 using Epsilon.Canvas;
-using Epsilon.Component;
 using Epsilon.Service;
 
 var builder = WebApplication.CreateBuilder(args);

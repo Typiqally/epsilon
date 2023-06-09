@@ -1,7 +1,4 @@
 using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;
-using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
@@ -49,7 +46,7 @@ public class FilterService : IFilterService
             return Enumerable.Empty<EnrollmentTerm>();
         }
 
-        var submissions = response!.Data!.Courses!.SelectMany(c => c.SubmissionsConnection!.Nodes);
+        var submissions = response.Data.Courses!.SelectMany(c => c.SubmissionsConnection!.Nodes);
 
         var participatedTerms = allTerms!
             .Where(static term => term is { StartAt: not null, EndAt: not null, })
