@@ -9,7 +9,7 @@ public record CompetenceProfile(
     IHboIDomain HboIDomain,
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
     IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes
-) : ICompetenceWordComponent
+) : IWordCompetenceComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
