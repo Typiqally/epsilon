@@ -1,4 +1,3 @@
-using System.Reflection;
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 
@@ -6,16 +5,16 @@ namespace Epsilon.Service;
 
 public class CompetenceComponentService : ICompetenceComponentService
 {
-    private readonly IEnumerable<ICompetenceComponentFetcher> _componentFetchers;
+    private readonly IDictionary<string, ICompetenceComponentFetcher> _componentFetchers;
 
-    public CompetenceComponentService(IEnumerable<ICompetenceComponentFetcher> componentFetchers)
+    public CompetenceComponentService(IDictionary<string, ICompetenceComponentFetcher> componentFetchers)
     {
         _componentFetchers = componentFetchers;
     }
 
     public async IAsyncEnumerable<ICompetenceComponent> GetComponents(DateTime startDate, DateTime endDate)
     {
-        foreach (var componentFetcher in _componentFetchers)
+        foreach (var componentFetcher in _componentFetchers.Values)
         {
             yield return await componentFetcher.FetchUnknown(startDate, endDate);
         }
@@ -34,20 +33,12 @@ public class CompetenceComponentService : ICompetenceComponentService
 
     public async Task<ICompetenceComponent?> GetComponent(string name, DateTime startDate, DateTime endDate)
     {
-        var fetcher = _componentFetchers.SingleOrDefault(f =>
+        if (_componentFetchers.TryGetValue(name, out var fetcher))
         {
-            var componentType = f.GetType().BaseType?.GetGenericArguments()[0];
-            if (componentType != null)
-            {
-                var componentNameAttribute = componentType.GetCustomAttribute<CompetenceComponentNameAttribute>(false);
-                return componentNameAttribute?.Name == name;
-            }
+            return await fetcher.FetchUnknown(startDate, endDate);
+        }
 
-            return false;
-        });
-        return fetcher == null
-            ? null
-            : await fetcher.FetchUnknown(startDate, endDate);
+        return null;
     }
 
     public async Task<TComponent?> GetComponent<TComponent>(string name, DateTime startDate, DateTime endDate) where TComponent : class, ICompetenceComponent

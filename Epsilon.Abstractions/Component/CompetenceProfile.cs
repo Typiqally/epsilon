@@ -5,7 +5,6 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
-[CompetenceComponentName("competence_profile")]
 public record CompetenceProfile(
     IHboIDomain HboIDomain,
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,

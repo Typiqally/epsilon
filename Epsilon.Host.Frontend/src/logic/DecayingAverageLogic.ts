@@ -36,11 +36,11 @@ export class DecayingAverageLogic {
             this.groupBy(taskResults, (r) => r.outcomeId as unknown as string)
         ).map(([, j]) => {
             return {
-                decayingAverage: this.getDecayingAverageFromOneOutcomeType(j),
-                skill: j.at(0)?.skill,
+                skill: j.at(0)?.skill as number,
                 masteryLevel: j
                     .sort((a) => a.masteryLevel as never as number)
-                    .at(0)?.masteryLevel,
+                    .at(0)?.masteryLevel as number,
+                decayingAverage: this.getDecayingAverageFromOneOutcomeType(j),
             } as DecayingAveragePerSkill
         })
 
@@ -53,11 +53,11 @@ export class DecayingAverageLogic {
                 score += result.decayingAverage
             })
             return {
-                decayingAverage: score / filteredResults.length,
                 skill: s.id,
                 masteryLevel: filteredResults
                     .sort((a) => a.masteryLevel as never as number)
-                    .at(0)?.masteryLevel,
+                    .at(filteredResults.length - 1)?.masteryLevel,
+                decayingAverage: score / filteredResults.length,
             } as DecayingAveragePerSkill
         }) as DecayingAveragePerSkill[]
     }
