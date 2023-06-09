@@ -44,7 +44,7 @@ public class FilterService : IFilterService
 
         var response = await _graphQlService.Query<CanvasGraphQlQueryResponse>(submissionsQuery);
 
-        if (response!.Data == null)
+        if (response?.Data == null)
         {
             return Enumerable.Empty<EnrollmentTerm>();
         }
