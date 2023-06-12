@@ -1,4 +1,5 @@
 ﻿using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Model;
 using Epsilon.Canvas;
 using Epsilon.Canvas.Abstractions.Service;
 using HtmlAgilityPack;
@@ -6,36 +7,40 @@ using Microsoft.Extensions.Options;
 
 namespace Epsilon.Component;
 
-public class PersonaPageComponentFetcher : CompetenceComponentFetcher<PersonaPage>
+public class PageComponentFetcher : CompetenceComponentFetcher<Page>
 {
     private readonly IPageHttpService _pageHttpService;
     private readonly IFileHttpService _fileHttpService;
     private readonly CanvasSettings _canvasSettings;
+    private readonly StudentSettings _studentSettings;
 
-    public PersonaPageComponentFetcher(
+    public PageComponentFetcher(
         IPageHttpService pageHttpService,
         IFileHttpService fileHttpService,
-        IOptions<CanvasSettings> canvasSettings
+        IOptions<CanvasSettings> canvasSettings,
+        StudentSettings studentSettings
     )
     {
         _pageHttpService = pageHttpService;
         _fileHttpService = fileHttpService;
         _canvasSettings = canvasSettings.Value;
+        _studentSettings = studentSettings;
     }
 
-    public override async Task<PersonaPage> Fetch(DateTime startDate, DateTime endDate)
+    public override async Task<Page> Fetch(DateTime startDate, DateTime endDate)
     {
         var courseId = _canvasSettings.CourseId;
-        var personaHtml = await _pageHttpService.GetPageByName(courseId, "front_page");
+        var htmlString = await _pageHttpService.GetPageByName(courseId, _studentSettings.PageMapping[""]);
 
-        var updatedPersonaHtml = await GetPersonaHtmlDocument(personaHtml);
+        var updatedPersonaHtml = await GetHtmlDocument(htmlString);
 
-        var personaPage = new PersonaPage(updatedPersonaHtml.Text);
+        var page = new Page(updatedPersonaHtml.Text);
 
-        return personaPage;
+        return page;
     }
 
-    private async Task<HtmlDocument> GetPersonaHtmlDocument(string htmlString)
+
+    private async Task<HtmlDocument> GetHtmlDocument(string htmlString)
     {
         var htmlDoc = new HtmlDocument();
         htmlDoc.LoadHtml(htmlString);
@@ -62,5 +67,4 @@ public class PersonaPageComponentFetcher : CompetenceComponentFetcher<PersonaPag
 
         return htmlDoc;
     }
-
 }
