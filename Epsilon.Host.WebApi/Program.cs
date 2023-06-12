@@ -1,6 +1,7 @@
 using Epsilon.Abstractions.Component;
 using Epsilon.Abstractions.Service;
 using Epsilon.Canvas;
+using Epsilon.Component;
 using Epsilon.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +35,11 @@ builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentServi
         { "kpi_matrix", services.GetRequiredService<ICompetenceComponentFetcher<KpiMatrixCollection>>() },
     }
 ));
+
+builder.Services.AddScoped<ICompetenceComponentFetcher<PersonaPage>, PersonaPageComponentFetcher>();
+builder.Services.AddScoped<ICompetenceComponentFetcher<CompetenceProfile>, CompetenceProfileComponentFetcher>();
+builder.Services.AddScoped<ICompetenceComponentFetcher<KpiMatrixCollection>, KpiMatrixComponentFetcher>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
