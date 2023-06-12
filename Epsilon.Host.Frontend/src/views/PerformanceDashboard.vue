@@ -1,7 +1,7 @@
 <template>
     <div v-if="data" class="performance-dashboard">
         <EnrollmentTermButtons
-            :terms="data.terms"
+            :terms="terms"
             @on-term-selected="setTermFilter" />
         <CompetenceProfileComponent
             :data="filteredProfessionalTaskOutcomes"
@@ -34,15 +34,17 @@ import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
 import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
-const App = new Api()
-const selectedTerm = ref<EnrollmentTerm | undefined>()
+const terms: Ref<EnrollmentTerm[]> = ref([])
 
-function getCorrectedTermDate(): string | null | undefined {
-    const index = data.value?.terms?.indexOf(selectedTerm.value) as number
+const App = new Api()
+const selectedTerm = ref<EnrollmentTerm | undefined>(undefined)
+
+function getCorrectedTermDate(): string | undefined {
+    const index = terms.value?.indexOf(selectedTerm.value) as number
     if (index > 0) {
-        return data.value?.terms?.at(index - 1)?.start_at
+        return terms.value?.at(index - 1)?.start_at
     } else {
-        return data.value?.terms?.at(index)?.end_at
+        return terms.value?.at(index)?.end_at
     }
 }
 
@@ -75,6 +77,13 @@ const filteredProfessionalSkillOutcomes = computed(() => {
 })
 
 onMounted(() => {
+    App.filter
+        .participatedTermsList()
+        .then((r: HttpResponse<EnrollmentTerm[]>) => {
+            terms.value = r.data
+            setTermFilter(terms.value?.at(0) as unknown as EnrollmentTerm)
+        })
+
     App.component
         .componentDetail("competence_profile", {
             startDate: "02-26-2023",
@@ -82,7 +91,6 @@ onMounted(() => {
         })
         .then((r: HttpResponse<CompetenceProfile>) => {
             data.value = r.data
-            setTermFilter(data.value?.terms?.at(0) as unknown as EnrollmentTerm)
         })
 })
 

@@ -1,4 +1,4 @@
-/* eslint-disable */
+ /* eslint-disable */
 /* tslint:disable */
 /*
  * ---------------------------------------------------------------
@@ -28,7 +28,6 @@ export interface CompetenceProfile {
     hboIDomain?: IHboIDomain
     professionalTaskOutcomes?: ProfessionalTaskResult[] | null
     professionalSkillOutcomes?: ProfessionalSkillResult[] | null
-    terms?: EnrollmentTerm[] | null
 }
 
 export interface EnrollmentTerm {
@@ -388,6 +387,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/Document/word`,
                 method: "GET",
                 query: query,
+                ...params,
+            }),
+    }
+    filter = {
+        /**
+         * No description
+         *
+         * @tags Filter
+         * @name ParticipatedTermsList
+         * @request GET:/Filter/participated-terms
+         */
+        participatedTermsList: (params: RequestParams = {}) =>
+            this.request<EnrollmentTerm[], any>({
+                path: `/Filter/participated-terms`,
+                method: "GET",
+                format: "json",
                 ...params,
             }),
     }
