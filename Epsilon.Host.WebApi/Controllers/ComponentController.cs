@@ -31,6 +31,20 @@ public class ComponentController : ControllerBase
         return Ok(component);
     }
     
+    [HttpGet("/Page/{pageName}")]
+    [Produces(typeof(CompetenceProfile))]
+    public async Task<ActionResult<ICompetenceComponent>> GetPage(string pageName, int courseId)
+    {
+        var page = await _pageHttpService.GetPageByName(courseId, pageName);
+
+        if (page == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(page);
+    }
+    
     [HttpPost("{componentName}")]
     // [Produces(typeof(CompetenceProfile))]
     public async Task<ActionResult<ICompetenceComponent>> UpdateCompetenceComponent(string componentName, int courseId, string pageContent)
