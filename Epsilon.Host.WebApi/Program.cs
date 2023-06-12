@@ -30,7 +30,7 @@ builder.Services.AddScoped<ICompetenceDocumentService, CompetenceDocumentService
 builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentService>(static (services) => new CompetenceComponentService(
     new Dictionary<string, ICompetenceComponentFetcher>
     {
-        { "persona_page", services.GetRequiredService<ICompetenceComponentFetcher<Page>>() },
+        { "front_page", services.GetRequiredService<ICompetenceComponentFetcher<Page>>() },
         { "competence_profile", services.GetRequiredService<ICompetenceComponentFetcher<CompetenceProfile>>() },
         { "kpi_matrix", services.GetRequiredService<ICompetenceComponentFetcher<KpiMatrixCollection>>() },
     }

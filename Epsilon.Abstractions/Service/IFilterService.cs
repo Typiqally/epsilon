@@ -1,4 +1,3 @@
-using Epsilon.Abstractions.Component;
 using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Service;
