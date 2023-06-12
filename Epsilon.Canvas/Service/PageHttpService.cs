@@ -30,26 +30,26 @@ public class PageHttpService : HttpService, IPageHttpService
     public async Task<Page?> CreatePage(int courseId, string pageName, string pageContent)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, $"v1/courses/{courseId}/pages");
-        var pageCreation = new { wiki_page = new { title = pageName, body = pageContent } };
+        var pageCreation = new { wiki_page = new { title = pageName, body = pageContent, }, };
         request.Content = new StringContent(JsonSerializer.Serialize(pageCreation), Encoding.UTF8, "application/json");
 
         using var response = await Client.SendAsync(request);
 
         return response.StatusCode == HttpStatusCode.OK
-            ? (await response.Content.ReadFromJsonAsync<Page?>()) 
+            ? await response.Content.ReadFromJsonAsync<Page?>()
             : null;
     }
 
     public async Task<Page?> UpdatePage(int courseId, string pageName, string pageContent)
     {
         using var request = new HttpRequestMessage(HttpMethod.Put, $"v1/courses/{courseId}/pages/{pageName}");
-        var pageUpdate = new { wiki_page = new { title = pageName, body = pageContent } };
+        var pageUpdate = new { wiki_page = new { title = pageName, body = pageContent, }, };
         request.Content = new StringContent(JsonSerializer.Serialize(pageUpdate), Encoding.UTF8, "application/json");
 
         using var response = await Client.SendAsync(request);
 
         return response.StatusCode == HttpStatusCode.OK
-            ? (await response.Content.ReadFromJsonAsync<Page?>())
+            ? await response.Content.ReadFromJsonAsync<Page?>()
             : null;
     }
 
