@@ -10,10 +10,12 @@ services:
       - "5001:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80;https://+:443;
+      - ASPNETCORE_URLS=https://+:443;
       - ASPNETCORE_HTTPS_PORT=5001
       - ASPNETCORE_Kestrel__Certificates__Default__Password=ob6KdSAOuNB3oe7
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/dev-cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/cert/cert.pfx
+    volumes:
+      - certificates:/cert
 
   frontend:
     build:
@@ -22,3 +24,8 @@ services:
     ports:
       - "5002:80"
       - "5003:443"
+    volumes:
+      - certificates:/cert
+
+volumes:
+  certificates:
