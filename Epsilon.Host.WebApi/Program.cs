@@ -14,7 +14,7 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy.WithOrigins(builder.Configuration["Lti:TargetUri"])
-            .AllowCredentials();
+              .AllowCredentials();
     });
 });
 
@@ -25,12 +25,20 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddCanvas(canvasConfiguration);
 
+builder.Services.AddScoped<IFilterService, FilterService>();
 builder.Services.AddScoped<ICompetenceDocumentService, CompetenceDocumentService>();
-builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentService>();
+builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentService>(static (services) => new CompetenceComponentService(
+    new Dictionary<string, ICompetenceComponentFetcher>
+    {
+        { "persona_page", services.GetRequiredService<ICompetenceComponentFetcher<PersonaPage>>() },
+        { "competence_profile", services.GetRequiredService<ICompetenceComponentFetcher<CompetenceProfile>>() },
+        { "kpi_matrix", services.GetRequiredService<ICompetenceComponentFetcher<KpiMatrixCollection>>() },
+    }
+));
 
-builder.Services.AddComponentFetcher<PersonaPage, PersonaPageComponentFetcher>();
-builder.Services.AddComponentFetcher<CompetenceProfile, CompetenceProfileComponentFetcher>();
-builder.Services.AddComponentFetcher<KpiMatrixCollection, KpiMatrixComponentFetcher>();
+builder.Services.AddScoped<ICompetenceComponentFetcher<PersonaPage>, PersonaPageComponentFetcher>();
+builder.Services.AddScoped<ICompetenceComponentFetcher<CompetenceProfile>, CompetenceProfileComponentFetcher>();
+builder.Services.AddScoped<ICompetenceComponentFetcher<KpiMatrixCollection>, KpiMatrixComponentFetcher>();
 
 var app = builder.Build();
 
