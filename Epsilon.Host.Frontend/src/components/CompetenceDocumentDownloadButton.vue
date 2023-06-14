@@ -1,13 +1,13 @@
 <template>
-    <a 
-        class="btn" 
-        href="https://localhost:7084/document/word" 
+    <a
+        class="btn"
+        href="https://localhost:7084/document/word"
         style="display: flex; justify-content: space-between">
-        <img 
-            width="20" 
-            height="20" 
-            src="@/assets/download-icon.png" 
-            alt="download-button-icon"/> 
+        <img
+            width="20"
+            height="20"
+            src="@/assets/download-icon.png"
+            alt="download-button-icon" />
         Download document
     </a>
 </template>
@@ -27,7 +27,7 @@ img {
     border-radius: 9px;
 }
 
-.btn:hover {        
+.btn:hover {
     color: white;
     background-color: #848da4;
 }
