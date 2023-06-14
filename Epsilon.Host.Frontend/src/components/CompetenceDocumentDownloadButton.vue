@@ -1,13 +1,13 @@
 <template>
     <a class="btn" href="https://localhost:7084/document/word" style="display: flex; justify-content: space-between;">
-        <img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/download.png" alt="download"/> 
+        <img width="20" height="20" src="@/assets/download-icon.png" alt="download-button-icon"/> 
         Download document
     </a>
 </template>
 
 <style>
     img {
-        margin-right: 5px;
+        margin-right: 8px;
 
         /* This makes the PNG black by default */
         filter: brightness(1) invert(0);
