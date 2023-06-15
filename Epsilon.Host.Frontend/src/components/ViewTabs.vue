@@ -1,34 +1,26 @@
 <template>
-    <ul class="slider">
-        <li class="sliderOne">
-            <input
-                id="slide1"
-                type="radio"
-                name="switch_view"
-                value="performance"
-                :checked="true" />
-            <label class="slider-item" for="slide1">
-                Performance dashboard
-            </label>
-        </li>
-        <li class="sliderOne">
-            <input
-                id="slide2"
-                type="radio"
-                name="switch_view"
-                value="competence" />
-            <label class="slider-item" for="slide2">
-                Competence document
-            </label>
-        </li>
-    </ul>
+    <TabGroup class="slider">
+        <TabList>
+            <Tab
+                v-slot="{ selected }"
+                :class="{ 'slider-item': selected, 'slider-item': !selected }"
+                >Performance dashboard</Tab
+            >
+            <Tab class="slider-item">Competence document</Tab>
+        </TabList>
+    </TabGroup>
 </template>
+
+<script lang="ts" setup>
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue"
+</script>
 
 <style scoped>
 .slider {
     list-style: none;
     background-color: #f2f3f8;
     margin: 2rem 0;
+    padding: 5px;
     border-radius: 0.5rem;
     min-height: 40px;
     width: fit-content;
@@ -39,20 +31,22 @@
 
 .slider-item {
     color: black;
-    padding: 6px 1rem;
-    margin: 0 3px;
     border-radius: 0.4rem;
     cursor: pointer;
+    background-color: transparent;
+    border: none;
 }
 
-input {
-    visibility: hidden;
-    height: 0;
-    width: 0;
-    position: absolute;
+.slider-item:active, 
+.slider-item:focus {
+    outline: transparent;
 }
 
-input[type="radio"]:checked + label {
+.slider-item:hover {
+    background-color: #d8d9dd;
+}
+
+.slider-item[data-headlessui-state="selected"] {
     background-color: white;
 }
 </style>

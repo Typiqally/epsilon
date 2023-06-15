@@ -35,8 +35,9 @@ const terms: Array<EnrollmentTerm> = [
 </script>
 
 <style scoped>
-.termselect {
-    margin-left: 2rem;
+
+.profileselect {
+    margin-right: 4rem;
 }
 
 .dropdown {
@@ -46,6 +47,23 @@ const terms: Array<EnrollmentTerm> = [
 
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     font-size: 1rem;
+}
+
+.dropdown:active, 
+.dropdown:focus {
+    outline: none;
+    border: none;
+}
+
+.slide-item {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: white;
+    padding: 1rem;
+    margin-top: 3.5rem;
+    border-radius: 6px;
+    border: 1px solid black;
 }
 
 </style>
