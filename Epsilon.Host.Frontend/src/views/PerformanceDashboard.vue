@@ -34,21 +34,31 @@ import RoundLoader from "@/components/RoundLoader.vue"
 import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
-const App = new Api()
+const terms: Ref<EnrollmentTerm[]> = ref([])
 
-const selectedTerm = ref<EnrollmentTerm | null>(null)
+const App = new Api()
+const selectedTerm = ref<EnrollmentTerm | undefined>(undefined)
+
+function getCorrectedTermDate(): string | undefined {
+    const index = terms.value?.indexOf(selectedTerm.value) as number
+    if (index > 0) {
+        return terms.value?.at(index - 1)?.start_at
+    } else {
+        return terms.value?.at(index)?.end_at
+    }
+}
 
 const filteredProfessionalTaskOutcomes = computed(() => {
     if (!data.value?.professionalTaskOutcomes) {
         return []
     }
 
-    if (!selectedTerm.value?.end_at) {
+    if (!getCorrectedTermDate()) {
         return data.value?.professionalTaskOutcomes
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < selectedTerm.value?.end_at
+        (o) => o.assessedAt < getCorrectedTermDate()
     )
 })
 
@@ -57,16 +67,23 @@ const filteredProfessionalSkillOutcomes = computed(() => {
         return []
     }
 
-    if (!selectedTerm.value?.end_at) {
+    if (!getCorrectedTermDate()) {
         return data.value?.professionalSkillOutcomes
     }
 
     return data.value?.professionalSkillOutcomes?.filter(
-        (o) => o.assessedAt < selectedTerm.value?.end_at
+        (o) => o.assessedAt < getCorrectedTermDate()
     )
 })
 
 onMounted(() => {
+    App.filter
+        .participatedTermsList()
+        .then((r: HttpResponse<EnrollmentTerm[]>) => {
+            terms.value = r.data
+            setTermFilter(terms.value?.at(0) as unknown as EnrollmentTerm)
+        })
+
     App.component
         .componentDetail("competence_profile", {
             startDate: "02-26-2023",

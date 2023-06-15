@@ -5,11 +5,10 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
-[CompetenceComponentName("kpi_matrix")]
 public record KpiMatrixCollection(
     IEnumerable<KpiMatrixAssignment> KpiMatrixAssignments,
     IDictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus> GradeStatus
-) : ICompetenceWordComponent
+) : IWordCompetenceComponent
 {
     public static readonly IDictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus> DefaultGradeStatus = new Dictionary<OutcomeGradeStatus, KpiMatrixOutcomeGradeStatus>
     {

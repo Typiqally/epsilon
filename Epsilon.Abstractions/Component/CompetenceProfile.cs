@@ -5,29 +5,24 @@ using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
-[CompetenceComponentName("competence_profile")]
 public record CompetenceProfile(
     IHboIDomain HboIDomain,
     IEnumerable<ProfessionalTaskResult> ProfessionalTaskOutcomes,
-    IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes,
-    IEnumerable<EnrollmentTerm> Terms
-) : ICompetenceWordComponent
+    IEnumerable<ProfessionalSkillResult> ProfessionalSkillOutcomes
+) : IWordCompetenceComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
         // TODO: This is simply an example to show the capability of the component architecture
         var body = new Body();
 
-        foreach (var enrollmentTerm in Terms)
-        {
-            body.AppendChild(
-                new Paragraph(
-                    new Run(
-                        new Text(enrollmentTerm.Name)
+        body.AppendChild(
+            new Paragraph(
+                new Run(
+                    new Text("Competence profile comes here")
                     )
                 )
             );
-        }
 
         mainDocumentPart.Document.AppendChild(body);
     }
