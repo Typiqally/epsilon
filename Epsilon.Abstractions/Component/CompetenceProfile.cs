@@ -1,7 +1,6 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Epsilon.Abstractions.Model;
-using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
