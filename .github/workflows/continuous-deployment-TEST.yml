@@ -26,7 +26,7 @@ jobs:
           context: .
           file: ./Epsilon.Host.WebApi/Dockerfile
           push: true
-          tags: API
+          tags: epsilon-api
           labels: ${{ steps.meta.outputs.labels }}
           
           
@@ -35,6 +35,6 @@ jobs:
         with:
           context: ./Epsilon.Host.Frontend
           push: true
-          tags: Frontend
+          tags: epsilon-frontend
           labels: ${{ steps.meta.outputs.labels }}
     
