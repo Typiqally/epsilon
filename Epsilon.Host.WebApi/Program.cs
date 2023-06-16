@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -33,12 +34,14 @@ builder.Services.AddScoped<ICompetenceComponentService, CompetenceComponentServi
         { "persona_page", services.GetRequiredService<ICompetenceComponentFetcher<PersonaPage>>() },
         { "competence_profile", services.GetRequiredService<ICompetenceComponentFetcher<CompetenceProfile>>() },
         { "kpi_matrix", services.GetRequiredService<ICompetenceComponentFetcher<KpiMatrixCollection>>() },
+        { "kpi_table", services.GetRequiredService<ICompetenceComponentFetcher<KpiTable>>() },
     }
 ));
 
 builder.Services.AddScoped<ICompetenceComponentFetcher<PersonaPage>, PersonaPageComponentFetcher>();
 builder.Services.AddScoped<ICompetenceComponentFetcher<CompetenceProfile>, CompetenceProfileComponentFetcher>();
 builder.Services.AddScoped<ICompetenceComponentFetcher<KpiMatrixCollection>, KpiMatrixComponentFetcher>();
+builder.Services.AddScoped<ICompetenceComponentFetcher<KpiTable>, KpiTableComponentFetcher>();
 
 var app = builder.Build();
 
@@ -49,7 +52,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseSwagger();
-
 
 app.UseHttpsRedirection();
 
