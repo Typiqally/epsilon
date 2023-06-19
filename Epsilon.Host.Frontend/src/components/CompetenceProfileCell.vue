@@ -54,10 +54,10 @@ function cellColor(kpis): MasteryLevel | undefined {
 
 <style scoped>
 .cell-changed .cell-value {
-    animation: 700ms 1 ease cell-value-changed;
+    animation: 700ms 1 ease rotate-upwards;
 }
 
-@keyframes cell-value-changed {
+@keyframes rotate-upwards {
     0% {
         transform: scale(130%);
         transform: translate3d(0, 1.75em, -10em) rotateY(-225deg);
