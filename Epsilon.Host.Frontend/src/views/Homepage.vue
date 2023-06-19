@@ -1,28 +1,34 @@
-<template>
-    <div v-if="data" class="wrapper">
-        <div class="banner">
-            <img
-                src="../assets/Epsilon_Logo_Blue-Blue.png"
-                alt="logo"
-                class="logo" />
-            <div class="selection-boxes">
-                <DropdownBtn />
-            </div>
+<template class="homepage">
+    <div class="banner">
+        <img
+            src="../assets/Epsilon_Logo_Blue-Blue.png"
+            alt="logo"
+            class="logo" />
+        <div class="selection-boxes">
+            <DropdownBtn />
         </div>
-        <ViewTabs />
-        <PerformanceDashboard />
     </div>
-    <RoundLoader v-else />
+    <TabGroup as="template">
+        <div class="slider">
+            <TabList>
+                <Tab class="slider-item">Performance dashboard</Tab>
+                <Tab class="slider-item">Competence document</Tab>
+            </TabList>
+        </div>
+        <TabPanels>
+            <TabPanel><PerformanceDashboard /> </TabPanel>
+            <TabPanel>Competence document</TabPanel>
+        </TabPanels>
+    </TabGroup>
 </template>
 
 <script lang="ts" setup>
 import { Api, CompetenceProfile, HttpResponse } from "../logic/Api"
 
 import PerformanceDashboard from "./PerformanceDashboard.vue"
-import RoundLoader from "@/components/RoundLoader.vue"
-import ViewTabs from "@/components/ViewTabs.vue"
 import DropdownBtn from "@/components/DropdownBtn.vue"
 import { onMounted, Ref, ref } from "vue"
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const App = new Api()
@@ -41,6 +47,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.homepage {
+    width: 1366px;
+}
 .banner {
     display: flex;
     justify-content: space-between;
@@ -50,6 +59,7 @@ onMounted(() => {
     background-color: #f2f3f8;
     height: 9rem;
     width: 100%;
+    max-width: 1366px;
     border-radius: 0.5rem;
 }
 .logo {
@@ -66,5 +76,41 @@ onMounted(() => {
 .dropdown:focus,
 .dropdown:active {
     outline: transparent;
+}
+
+.slider {
+    list-style: none;
+    background-color: #f2f3f8;
+    margin: 2rem 0;
+    padding: 5px;
+    border-radius: 0.5rem;
+    min-height: 40px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider-item {
+    color: black;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    position: relative;
+    z-index: 2;
+}
+
+.slider-item:active,
+.slider-item:focus {
+    outline: transparent;
+}
+
+.slider-item:hover {
+    background-color: #d8d9dd;
+}
+
+.slider-item[data-headlessui-state="selected"] {
+    background-color: white;
 }
 </style>

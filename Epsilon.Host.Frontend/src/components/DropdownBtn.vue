@@ -1,14 +1,40 @@
 <template>
-    <div class="profileselect dropdown">Profile</div>
-    <select id="term" name="term" class="termselect dropdown">
-        <option v-for="term of terms" :key="term.name" :value="term.name">
-            {{ term.name }}
-        </option>
-    </select>
+    <Listbox v-model="selectedTerm">
+        <ListboxButton class="termselect dropdown">
+            <span> {{ selectedTerm.name }}</span>
+            <span class="list-arrow">
+                <ChevronUpDownIcon aria-hidden="true" />
+            </span>
+        </ListboxButton>
+        <ListboxOptions class="dropdown-options">
+            <ListboxOption
+                v-slot="{ active, selected }"
+                :key="term.name"
+                v-for="term in terms"
+                class="dropdown-option"
+                :value="term"
+                as="template">
+                <li>
+                    <span>{{ term.name }}</span>
+                    <span v-if="selected" class="list-select">
+                        <CheckIcon aria-hidden="true" />
+                    </span>
+                </li>
+            </ListboxOption>
+        </ListboxOptions>
+    </Listbox>
 </template>
 
 <script lang="ts" setup>
 import { EnrollmentTerm } from "../logic/Api"
+import { ref } from "vue"
+import {
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+} from "@headlessui/vue"
+import { ChevronUpDownIcon, CheckIcon } from "@heroicons/vue/20/solid"
 
 const terms: Array<EnrollmentTerm> = [
     {
@@ -32,38 +58,68 @@ const terms: Array<EnrollmentTerm> = [
         end_at: "2022-03-26T22:00:00Z",
     },
 ]
+const selectedTerm = ref(terms[0])
 </script>
 
 <style scoped>
-
 .profileselect {
     margin-right: 4rem;
+    min-width: 15rem;
+}
+
+.termselect {
+    min-width: 9rem;
+}
+
+.list-arrow svg,
+.list-select svg {
+    max-height: 30px;
+}
+  
+.list-arrow, 
+.list-select {
+    vertical-align: middle;
+    padding-left: 1rem;
+    position: relative;
+    padding-bottom: 6px;
 }
 
 .dropdown {
-    background-color: #fff;
-    padding: 1rem 2rem;
-    border: 5px;
-
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    font-size: 1rem;
-}
-
-.dropdown:active, 
-.dropdown:focus {
-    outline: none;
     border: none;
+    font-weight: 400;
+    position: relative;
+    z-index: 1;
+    text-align: left;
 }
 
-.slide-item {
-    display: flex;
-    flex-direction: column;
+
+.dropdown:hover,
+.dropdown:focus,
+.dropdown:active {
+    border: none;
+    outline: none;
+}
+
+.dropdown-options {
+    list-style-type: none;
     position: absolute;
-    background-color: white;
+    background-color: #fff;
     padding: 1rem;
-    margin-top: 3.5rem;
+    margin-top: 3rem;
+    width: 10rem;
     border-radius: 6px;
-    border: 1px solid black;
+    border: 1px solid #d8d8d8;
+    text-align: left;
+    z-index: 999;
 }
 
+.profileselect-options {
+    margin-top: 3rem;
+    margin-right: 12rem;
+}
+
+.dropdown-option {
+    padding: 15px;
+    cursor: pointer;
+}
 </style>

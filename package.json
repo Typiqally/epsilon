@@ -1,5 +1,6 @@
 {
   "devDependencies": {
-    "@headlessui/vue": "^1.7.14"
+    "@headlessui/vue": "^1.7.14",
+    "@heroicons/vue": "^2.0.18"
   }
 }
