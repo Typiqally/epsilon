@@ -6,26 +6,12 @@ services:
       context: .
       dockerfile: ./Epsilon.Host.WebApi/Dockerfile
     ports:
-      - "5000:80"
-      - "5001:443"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;
-      - ASPNETCORE_HTTPS_PORT=5001
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=ob6KdSAOuNB3oe7
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/cert/cert.pfx
+      - "5003:443"
     volumes:
-      - certificates:/cert
-
+      - /apsettings.json:/Epsilon.Host.WebApi/appsettings.json
   frontend:
     build:
       context: ./Epsilon.Host.Frontend
       dockerfile: ./Dockerfile
     ports:
-      - "5002:80"
-      - "5003:443"
-    volumes:
-      - certificates:/cert
-
-volumes:
-  certificates:
+      - "5004:443"
