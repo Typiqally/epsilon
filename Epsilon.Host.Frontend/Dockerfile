@@ -10,8 +10,8 @@ COPY pnpm-lock.yaml ./
 
 ADD . ./
 RUN pnpm install
+ARG VITE_EPSILON_API_ENDPOINT
 RUN pnpm run build
-
 
 FROM httpd:2.4 AS Host
 

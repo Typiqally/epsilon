@@ -39,6 +39,8 @@ export interface EnrollmentTerm {
     end_at?: string | null
 }
 
+export type ICompetenceComponent = object
+
 export interface IHboIDomain {
     architectureLayers?: ArchitectureLayer[] | null
     activities?: Activity[] | null
@@ -363,6 +365,21 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 path: `/Component/${componentName}`,
                 method: "GET",
                 query: query,
+                format: "json",
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Component
+         * @name TestList
+         * @request GET:/Component/Test
+         */
+        testList: (params: RequestParams = {}) =>
+            this.request<ICompetenceComponent, any>({
+                path: `/Component/Test`,
+                method: "GET",
                 format: "json",
                 ...params,
             }),
