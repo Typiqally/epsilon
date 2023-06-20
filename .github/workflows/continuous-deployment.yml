@@ -1,7 +1,7 @@
 name: Continuous deployment
 on:
   workflow_run:
-    workflows: ["Continuous-integration"]
+    workflows: ["continuous-integration"]
     branches: develop
     types:
       - completed

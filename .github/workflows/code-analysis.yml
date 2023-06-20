@@ -2,7 +2,7 @@ name: "Code analysis"
 
 on:
   workflow_run:
-    workflows: [ "Continuous-integration" ]
+    workflows: [ "continuous-integration" ]
     types:
       - completed
   schedule:
