@@ -2,16 +2,14 @@ version: "3.8"
 
 services:
   api:
-    build:
-      context: .
-      dockerfile: ./Epsilon.Host.WebApi/Dockerfile
+    image: typiqally/epsilon:docker-api
     ports:
       - "5003:443"
     volumes:
-      - /apsettings.json:/Epsilon.Host.WebApi/appsettings.json
+      - type: bind
+        source: ./appsettings.json
+        target: /app/appsettings.json
   frontend:
-    build:
-      context: ./Epsilon.Host.Frontend
-      dockerfile: ./Dockerfile
+    image: typiqally/epsilon:docker-frontend
     ports:
       - "5004:443"
