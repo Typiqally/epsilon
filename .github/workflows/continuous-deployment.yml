@@ -1,10 +1,9 @@
 name: Continuous deployment
 on:
   workflow_run:
-    workflows: [ "Continuous integration" ]
-#    branches: [ master ]
-    types:
-      - completed
+    workflows: [ "build-backend" ]
+    #    branches: [ master ]
+    types: [ requested ]
     paths:
       - '**.js'
       - '**.yml'
