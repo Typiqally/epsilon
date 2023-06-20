@@ -74,14 +74,7 @@ const selectedTerm = ref(terms[0])
 .list-arrow svg,
 .list-select svg {
     max-height: 30px;
-}
-  
-.list-arrow, 
-.list-select {
-    vertical-align: middle;
-    padding-left: 1rem;
-    position: relative;
-    padding-bottom: 6px;
+    float: right;
 }
 
 .dropdown {
