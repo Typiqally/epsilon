@@ -142,8 +142,8 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-    public baseUrl: string = import.meta.env.VITE_EPSILON_API_ENDPOINT as string
-    private securityData: SecurityDataType | null = null
+    public baseUrl: string = import.meta.env.VITE_EPSILON_API_ENDPOINT ?? "api"
+        private securityData: SecurityDataType | null = null
     private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]
     private abortControllers = new Map<CancelToken, AbortController>()
     private customFetch = (...fetchParams: Parameters<typeof fetch>) => fetch(...fetchParams)
