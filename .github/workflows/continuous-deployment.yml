@@ -1,4 +1,4 @@
-name: Continuous integration
+name: Continuous deployment
 on:
   workflow_run:
     workflows: [ "Continuous integration" ]
