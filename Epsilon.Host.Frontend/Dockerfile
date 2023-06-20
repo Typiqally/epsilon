@@ -7,7 +7,6 @@ RUN curl -f https://get.pnpm.io/v6.16.js | node - add --global pnpm
 
 # pnpm fetch does require only lockfile
 COPY pnpm-lock.yaml ./
-ENV VITE_EPSILON_API_ENDPOINT ${VITE_EPSILON_API_ENDPOINT}
 
 ADD . ./
 RUN pnpm install
