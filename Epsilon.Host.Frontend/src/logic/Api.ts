@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -139,7 +140,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-    public baseUrl: string = "https://localhost:7084"
+    public baseUrl: string = import.meta.env.VITE_EPSILON_API_ENDPOINT as string
     private securityData: SecurityDataType | null = null
     private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]
     private abortControllers = new Map<CancelToken, AbortController>()
@@ -179,7 +180,7 @@ export class HttpClient<SecurityDataType = unknown> {
         const keys = Object.keys(query).filter((key) => "undefined" !== typeof query[key])
         return keys
             .map((key) =>
-                Array.isArray(query[key]) ? this.addArrayQueryParam(query, key) : this.addQueryParam(query, key)
+                Array.isArray(query[key]) ? this.addArrayQueryParam(query, key) : this.addQueryParam(query, key),
             )
             .join("&")
     }
@@ -202,8 +203,8 @@ export class HttpClient<SecurityDataType = unknown> {
                     property instanceof Blob
                         ? property
                         : typeof property === "object" && property !== null
-                        ? JSON.stringify(property)
-                        : `${property}`
+                            ? JSON.stringify(property)
+                            : `${property}`,
                 )
                 return formData
             }, new FormData()),
@@ -247,16 +248,16 @@ export class HttpClient<SecurityDataType = unknown> {
     }
 
     public request = async <T = any, E = any>({
-        body,
-        secure,
-        path,
-        type,
-        query,
-        format,
-        baseUrl,
-        cancelToken,
-        ...params
-    }: FullRequestParams): Promise<HttpResponse<T, E>> => {
+                                                  body,
+                                                  secure,
+                                                  path,
+                                                  type,
+                                                  query,
+                                                  format,
+                                                  baseUrl,
+                                                  cancelToken,
+                                                  ...params
+                                              }: FullRequestParams): Promise<HttpResponse<T, E>> => {
         const secureParams =
             ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
                 this.securityWorker &&
@@ -283,18 +284,18 @@ export class HttpClient<SecurityDataType = unknown> {
             const data = !responseFormat
                 ? r
                 : await response[responseFormat]()
-                      .then((data) => {
-                          if (r.ok) {
-                              r.data = data
-                          } else {
-                              r.error = data
-                          }
-                          return r
-                      })
-                      .catch((e) => {
-                          r.error = e
-                          return r
-                      })
+                    .then((data) => {
+                        if (r.ok) {
+                            r.data = data
+                        } else {
+                            r.error = data
+                        }
+                        return r
+                    })
+                    .catch((e) => {
+                        r.error = e
+                        return r
+                    })
 
             if (cancelToken) {
                 this.abortControllers.delete(cancelToken)
@@ -356,7 +357,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @format date-time */
                 endDate?: string
             },
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<CompetenceProfile, any>({
                 path: `/Component/${componentName}`,
@@ -381,7 +382,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @format date-time */
                 endDate?: string
             },
-            params: RequestParams = {}
+            params: RequestParams = {},
         ) =>
             this.request<void, any>({
                 path: `/Document/word`,
