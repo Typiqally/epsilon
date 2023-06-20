@@ -1,8 +1,8 @@
-name: Continuous deployment
+name: Continuous integration
 on:
   workflow_run:
-    workflows: [ "build-backend" ]
-    #    branches: [ master ]
+    workflows: [ "Continuous integration" ]
+    branches: [ docker ]
     types: [ requested ]
     paths:
       - '**.js'
