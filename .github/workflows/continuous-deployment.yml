@@ -27,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [login]
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
@@ -45,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [login]
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
