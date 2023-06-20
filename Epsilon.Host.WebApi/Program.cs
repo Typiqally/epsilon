@@ -59,10 +59,9 @@ app.UseSwagger(static options =>
     options.PreSerializeFilters.Add(static (swagger, request) =>
     {
         if (request.Headers.TryGetValue("X-Forwarded-Proto", out var scheme)
-            && request.Headers.TryGetValue("X-Forwarded-Host", out var host)
             && request.Headers.TryGetValue("X-Forwarded-Prefix", out var prefix))
         {
-            swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{scheme}://{host}/{prefix}", }, };
+            swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{scheme}://{request.Host}/{prefix}", }, };
         }
     });
 });
