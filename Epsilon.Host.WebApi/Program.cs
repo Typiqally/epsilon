@@ -4,6 +4,7 @@ using Epsilon.Canvas;
 using Epsilon.Component;
 using Epsilon.Service;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,10 +46,7 @@ builder.Services.AddScoped<ICompetenceComponentFetcher<KpiMatrixCollection>, Kpi
 
 var app = builder.Build();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
-});
+app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto, });
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -56,7 +54,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseSwagger();
+app.UseSwagger(static options =>
+{
+    options.PreSerializeFilters.Add(static (swagger, request) =>
+    {
+        if (request.Headers.TryGetValue("X-Forwarded-Prefix", out var prefix))
+        {
+            swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{request.Scheme}://{request.Host}/{prefix}", }, };
+        }
+    });
+});
 
 
 app.UseHttpsRedirection();
