@@ -27,11 +27,4 @@ public class ComponentController : ControllerBase
 
         return Ok(component);
     }
-    
-    
-    [HttpGet("Test")]
-    public Task<ActionResult<ICompetenceComponent>> GetTestEndpoint()
-    {
-       return Task.FromResult<ActionResult<ICompetenceComponent>>(Ok());
-    }
 }
