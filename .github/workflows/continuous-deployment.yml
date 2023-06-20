@@ -29,7 +29,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}-API
   
   frontend:
-    name: Api building and publishing
+    name: frontend building and publishing
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
