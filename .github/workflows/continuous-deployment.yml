@@ -1,75 +1,46 @@
 name: Continuous deployment
 on:
-  pull_request:
-    branches:
-      - master
-      - develop
-    types: [closed]
   workflow_dispatch:
-    inputs:
-      VERSION:
-        description: 'The version of the new release (v*.*.*)'
-        required: true
-        default: false
-      DRAFT_RELEASE:
-        description: 'The release will be created as a draft'
-        required: false
-        default: true
-        type: boolean
+  workflow_run:
+    workflows: [ "Continuous integration" ]
+    branches: [ main, develop ]
+    types: [ completed ]
 jobs:
-  building:
-    name: Building artifacts
-    runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        RID: [ 'linux-x64', 'win-x64', 'osx-x64' ]
-    env:
-      release-directory: ./Epsilon.Cli/bin/Release/net6.0/
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1.7.2
-        with:
-          dotnet-version: '6.0.x'
-      - name: Build
-        run: dotnet publish Epsilon.Cli --runtime ${{ matrix.RID }} --configuration Release -p:PublishSingleFile=true -p:PublishTrimmed=true --self-contained true
-      - name: Copy appsettings.json
-        run: cp ./Epsilon.Cli/appsettings.example.json ${{env.release-directory}}${{ matrix.RID }}/publish/appsettings.json
-      - name: Removing unnecessary files
-        run: rm ${{env.release-directory}}${{ matrix.RID }}/publish/*.pdb
-      - name: Zip files
-        run: zip -r Epsilon.Cli-${{ matrix.RID }}.zip *
-        working-directory: ${{env.release-directory}}${{ matrix.RID }}/publish
-      - name: Create artifact ${{ matrix.RID }}
-        uses: actions/upload-artifact@v2
-        with:
-          name: Epsilon.Cli-${{ matrix.RID }}
-          path: ${{env.release-directory}}${{ matrix.RID }}/publish/Epsilon.Cli-${{ matrix.RID }}.zip
-  release:
-    needs: building
-    if: ${{ inputs.VERSION }}
-    name: Creating release
-    runs-on: ubuntu-20.04
-    env:
-      release-directory: ./Epsilon.Cli/bin/Release/net6.0/
-    steps:
-      - name: Checkout
+      - name: Check out the repo
         uses: actions/checkout@v3
-      - name: Getting release files
-        uses: actions/download-artifact@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
-          path: download/releases
-      - name: Display structure of downloaded files
-        run: ls download/releases -R
-      - name: Release
-        uses: meeDamian/github-release@2.0
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
-          draft: ${{ inputs.DRAFT_RELEASE }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ inputs.VERSION }}
-          name: ${{ inputs.VERSION }}
-          gzip: false
-          files: >
-            download/releases/Epsilon.Cli-linux-x64/Epsilon.Cli-linux-x64.zip
-            download/releases/Epsilon.Cli-win-x64/Epsilon.Cli-win-x64.zip
-            download/releases/Epsilon.Cli-osx-x64/Epsilon.Cli-osx-x64.zip
+          images: typiqally/epsilon
+
+      - name: Build and push Docker image API
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./Epsilon.Host.WebApi/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-api
+          labels: ${{ steps.meta.outputs.labels }}-API
+
+
+      - name: Build and push Docker image Frontend
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: ./Epsilon.Host.Frontend
+          secrets: VITE_EPSILON_API_ENDPOINT=https://staging-epsilon.tpcly.com/api
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}-frontend
+          labels: ${{ steps.meta.outputs.labels }}
     
