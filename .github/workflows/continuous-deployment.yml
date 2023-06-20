@@ -1,18 +1,10 @@
 name: Continuous deployment
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: [ "Continuous integration" ]
-    branches: [ docker ]
-    types: [ requested ]
-    paths:
-      - '**.js'
-      - '**.yml'
-      - '**.cs'
-      - '**.json'
-      - '**.csproj'
-      - '**.ts'
-      - '**.vue'
-      - '**.css'
+    branches: [ main, develop ]
+    types: [ completed ]
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub

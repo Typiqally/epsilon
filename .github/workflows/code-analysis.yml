@@ -3,8 +3,7 @@ name: "Code analysis"
 on:
   workflow_run:
     workflows: [ "Continuous integration" ]
-    branches: [ docker ]
-    types: [ requested ]
+    types: [ completed ]
   schedule:
     - cron: '22 18 * * 5'
 
