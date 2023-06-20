@@ -1,4 +1,4 @@
-﻿using Epsilon.Abstractions.Component;
+using Epsilon.Abstractions.Component;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;
 using Epsilon.Canvas.Abstractions.Service;
 using Microsoft.Extensions.Configuration;
@@ -67,7 +67,7 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
     public override async Task<KpiTable> Fetch(DateTime startDate, DateTime endDate)
     {
         var studentId = _configuration["Canvas:StudentId"];
-        var outcomesQuery = GetUserKpis.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCultureIgnoreCase);
+        var outcomesQuery = GetUserKpis.Replace("$studentIds", studentId, StringComparison.InvariantCultureIgnoreCase);
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
 
         var kpiTableEntries = new List<KpiTableEntry>();

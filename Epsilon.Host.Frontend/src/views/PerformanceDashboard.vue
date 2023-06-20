@@ -1,5 +1,5 @@
 <template>
-    <div v-if="data" class="performance-dashboard">
+    <!-- <div v-if="data" class="performance-dashboard">
         <EnrollmentTermButtons
             :terms="terms"
             @on-term-selected="setTermFilter" />
@@ -15,7 +15,8 @@
             :data="filteredProfessionalSkillOutcomes"
             :domain="data?.hboIDomain"></PersonalDevelopmentGraph>
     </div>
-    <RoundLoader v-else />
+    <RoundLoader v-else /> -->
+    <KpiTable />
 </template>
 
 <script lang="ts" setup>
@@ -32,6 +33,7 @@ import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
 import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
 import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
+import KpiTable from "@/components/KpiTable.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const terms: Ref<EnrollmentTerm[]> = ref([])
