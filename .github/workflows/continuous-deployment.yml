@@ -1,10 +1,20 @@
 name: Continuous deployment
 on:
-  workflow_run:
-    workflows: ["continuous-integration"]
-    branches: develop
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.yml'
+      - '**.cs'
+      - '**.json'
+      - '**.csproj'
+      - '**.ts'
+      - '**.vue'
+      - '**.css'
     types:
-      - completed
+      - closed
+    branches:
+      - main
+      - develop
   push:
 jobs:
   push_to_registry:

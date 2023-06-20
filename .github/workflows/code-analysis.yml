@@ -1,10 +1,7 @@
 name: "Code analysis"
 
 on:
-  workflow_run:
-    workflows: [ "continuous-integration" ]
-    types:
-      - completed
+  pull_request:
   schedule:
     - cron: '22 18 * * 5'
 
