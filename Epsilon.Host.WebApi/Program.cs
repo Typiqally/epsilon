@@ -3,6 +3,7 @@ using Epsilon.Abstractions.Service;
 using Epsilon.Canvas;
 using Epsilon.Component;
 using Epsilon.Service;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,11 @@ builder.Services.AddScoped<ICompetenceComponentFetcher<CompetenceProfile>, Compe
 builder.Services.AddScoped<ICompetenceComponentFetcher<KpiMatrixCollection>, KpiMatrixComponentFetcher>();
 
 var app = builder.Build();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
