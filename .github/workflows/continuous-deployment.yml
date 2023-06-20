@@ -14,7 +14,6 @@ on:
       - '**.ts'
       - '**.vue'
       - '**.css'
-  push:
 jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
