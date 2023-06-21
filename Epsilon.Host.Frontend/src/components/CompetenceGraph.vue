@@ -4,7 +4,8 @@
         :series="series"
         height="350"
         type="bar"
-        width="750" />
+        class="competence-graph"
+        width="490" />
 </template>
 
 <script lang="ts" setup>
@@ -69,7 +70,7 @@ const chartOptions = {
         show: false,
     },
     legend: {
-        position: "bottom",
+        show: false,
     },
     fill: {
         opacity: 1,
@@ -113,3 +114,9 @@ onMounted(() => {
 })
 watchEffect(() => loadChartData())
 </script>
+
+<style scoped>
+.competence-graph {
+    margin-left: auto;
+}
+</style>

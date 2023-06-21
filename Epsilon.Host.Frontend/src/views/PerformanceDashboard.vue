@@ -110,7 +110,7 @@ function setTermFilter(term: EnrollmentTerm): void {
     .performance-dashboard {
         display: grid;
         grid-template-columns: 1fr 5fr 1fr;
-        gap: 4rem 0;
+        gap: 2rem 0;
         align-items: center;
         justify-items: center;
     }

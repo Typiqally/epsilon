@@ -7,6 +7,7 @@
                     v-for="activity of props.domain.activities as Activity[]"
                     :key="activity.id"
                     class="competence-profile-header competence-profile-header-col">
+                    <!-- <span class="profile-header-color"></span> -->
                     {{ activity.name }}
                 </th>
             </tr>
@@ -72,33 +73,47 @@ function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
         (masteryLevel) => masteryLevel.id == kpis[0]?.masteryLevel
     )
 }
+
+const colors: Array = [
+    {}
+]
 </script>
 
 <style>
 .competence-profile {
     border-collapse: collapse;
+    width: 750px;
 }
 
 .competence-profile-header {
     padding: 0.5rem;
-    font-weight: 600;
+    font-weight: 400;
+    font-size: 0.9rem;
 }
 
 .competence-profile-header-row {
     text-align: left;
     border: 1px solid #e6e6e6;
     border-left: transparent;
+    padding-right: 4rem;
 }
 
 .competence-profile-header-col {
     text-align: center;
     border: 1px solid #e6e6e6;
     border-top: transparent;
+    width: 6rem;
+}
+
+.profile-header-color {
+    width: 15px;
+    height: 15px;
 }
 
 .competence-profile-data {
+    font-size: 0.9rem;
     padding: 0.5rem;
     min-width: 5rem;
-    border: 0 solid #e6e6e6;
+    border: 1px solid #e6e6e6;
 }
 </style>
