@@ -13,6 +13,7 @@ export interface Activity {
     /** @format int32 */
     id?: number
     name?: string | null
+    shortName?: string | null
     color?: string | null
 }
 

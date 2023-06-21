@@ -1,21 +1,24 @@
 <template>
-    <Listbox v-model="selectedTerm">
+    <Listbox
+        v-if="modelValue"
+        :model-value="props.modelValue"
+        @update:model-value="$emit('update:modelValue', $event)">
         <ListboxButton class="termselect dropdown">
-            <span> {{ selectedTerm.name }}</span>
+            <span> {{ modelValue.name }}</span>
             <span class="list-arrow">
                 <ChevronUpDownIcon aria-hidden="true" />
             </span>
         </ListboxButton>
         <ListboxOptions class="dropdown-options">
             <ListboxOption
+                v-for="item in items"
                 v-slot="{ active, selected }"
-                :key="term.name"
-                v-for="term in terms"
+                :key="item.name"
                 class="dropdown-option"
-                :value="term"
+                :value="item"
                 as="template">
                 <li>
-                    <span>{{ term.name }}</span>
+                    <span>{{ item.name }}</span>
                     <span v-if="selected" class="list-select">
                         <CheckIcon aria-hidden="true" />
                     </span>
@@ -26,8 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { EnrollmentTerm } from "../logic/Api"
-import { ref } from "vue"
+import { defineProps } from "vue"
 import {
     Listbox,
     ListboxButton,
@@ -36,29 +38,12 @@ import {
 } from "@headlessui/vue"
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/vue/20/solid"
 
-const terms: Array<EnrollmentTerm> = [
-    {
-        name: "2223vj",
-        start_at: "2023-01-15T23:00:00Z",
-        end_at: "2023-08-26T22:00:00Z",
-    },
-    {
-        name: "2223nj",
-        start_at: "2022-07-31T22:00:00Z",
-        end_at: "2023-03-26T22:00:00Z",
-    },
-    {
-        name: "2122vj",
-        start_at: "2022-01-15T23:00:00Z",
-        end_at: "2022-08-26T22:00:00Z",
-    },
-    {
-        name: "2122nj",
-        start_at: "2021-08-01T22:00:00Z",
-        end_at: "2022-03-26T22:00:00Z",
-    },
-]
-const selectedTerm = ref(terms[0])
+const props = defineProps<{
+    items: Array<{ name: string }>
+    modelValue: { name: string }
+}>()
+
+defineEmits(["update:modelValue"])
 </script>
 
 <style scoped>
@@ -84,7 +69,6 @@ const selectedTerm = ref(terms[0])
     z-index: 1;
     text-align: left;
 }
-
 
 .dropdown:hover,
 .dropdown:focus,

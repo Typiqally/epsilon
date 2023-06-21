@@ -90,7 +90,7 @@ function loadChartData(): void {
     chartOptions.xaxis.categories = []
     if (props.domain.activities != null) {
         props.domain.activities.forEach((s) => {
-            chartOptions.xaxis.categories.push(s.name as never)
+            chartOptions.xaxis.categories.push(s.shortName as never)
         })
     }
 

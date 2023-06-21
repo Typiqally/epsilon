@@ -7,7 +7,6 @@
                     v-for="activity of props.domain.activities as Activity[]"
                     :key="activity.id"
                     class="competence-profile-header competence-profile-header-col">
-                    <!-- <span class="profile-header-color"></span> -->
                     {{ activity.name }}
                 </th>
             </tr>
@@ -18,6 +17,11 @@
                 :key="i">
                 <th
                     class="competence-profile-header competence-profile-header-row">
+                    <span
+                        class="profile-header-color"
+                        :style="{
+                            backgroundColor: architectureLayer.color,
+                        }"></span>
                     {{ architectureLayer.name }}
                 </th>
                 <td
@@ -74,9 +78,7 @@ function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
     )
 }
 
-const colors: Array = [
-    {}
-]
+const colors: Array = [{}]
 </script>
 
 <style>
@@ -106,8 +108,7 @@ const colors: Array = [
 }
 
 .profile-header-color {
-    width: 15px;
-    height: 15px;
+    padding: 0.5rem;
 }
 
 .competence-profile-data {

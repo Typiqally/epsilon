@@ -5,7 +5,10 @@
             alt="logo"
             class="logo" />
         <div class="selection-boxes">
-            <DropdownBtn />
+            <DropdownBtn
+                v-if="selectedTerm"
+                v-model="selectedTerm"
+                :items="terms" />
         </div>
     </div>
     <TabGroup as="template">
@@ -16,24 +19,43 @@
             </TabList>
         </div>
         <TabPanels>
-            <TabPanel><PerformanceDashboard /> </TabPanel>
-            <TabPanel>Competence document</TabPanel>
+            <TabPanel>
+                <PerformanceDashboard :till-date="getCorrectedTermDate" />
+            </TabPanel>
+            <TabPanel>Here comes the comp profile :=</TabPanel>
         </TabPanels>
     </TabGroup>
 </template>
 
 <script lang="ts" setup>
-import { Api, CompetenceProfile, HttpResponse } from "../logic/Api"
+import {
+    Api,
+    CompetenceProfile,
+    EnrollmentTerm,
+    HttpResponse,
+} from "../logic/Api"
 
 import PerformanceDashboard from "./PerformanceDashboard.vue"
 import DropdownBtn from "@/components/DropdownBtn.vue"
 import { onMounted, Ref, ref } from "vue"
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue"
+import { computed } from "vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
+
+const terms: Ref<EnrollmentTerm[]> = ref([])
+const selectedTerm: Ref<EnrollmentTerm | undefined> = ref(undefined)
+
 const App = new Api()
 
 onMounted(() => {
+    App.filter
+        .participatedTermsList()
+        .then((r: HttpResponse<EnrollmentTerm[]>) => {
+            terms.value = r.data
+            selectedTerm.value = terms.value[0]
+        })
+
     App.component
         .componentDetail("competence_profile", {
             startDate: "02-26-2023",
@@ -41,8 +63,20 @@ onMounted(() => {
         })
         .then((r: HttpResponse<CompetenceProfile>) => {
             data.value = r.data
-            console.log(r.data.terms)
         })
+})
+
+const getCorrectedTermDate = computed(() => {
+    if (!selectedTerm.value) {
+        return undefined
+    }
+
+    const index = terms.value?.indexOf(selectedTerm.value) as number
+    if (index > 0) {
+        return terms.value?.at(index - 1)?.start_at
+    } else {
+        return terms.value?.at(index)?.end_at
+    }
 })
 </script>
 
