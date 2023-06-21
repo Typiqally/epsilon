@@ -13,7 +13,7 @@ const Kpis: Ref<unknown | undefined> = ref(undefined)
 api.component
     .componentDetail("kpi_table", {
         startDate:
-            otherMonth.getFullYear() +   
+            otherMonth.getFullYear() +
             "-" +
             `${otherMonth.getMonth() + 1}`.padStart(2, "0") +
             "-" +
@@ -32,29 +32,26 @@ api.component
             Kpis.value[index] = entry
         })
     })
-    .then(() => {
-        console.log("kpi.value:", Kpis.value)
-        console.log("data:", data)
-    })
 </script>
 
 <template>
     <table v-if="!!data">
         <tr>
-            <th>
-                KPI
-            </th>
-            <th style="">
-                Assignments
-            </th>
-            <th>
-                Grades
-            </th>
+            <th>KPI</th>
+            <th style="">Assignments</th>
+            <th>Grades</th>
         </tr>
         <tr v-for="KPI of Kpis" :key="KPI">
-            <td>{{ KPI.kpi }}</td>
+            <td
+                :style="{
+                    border: '3px solid #' + KPI.level.color,
+                }">
+                {{ KPI.kpi }}
+            </td>
             <td>
-                <div v-for="assignment of KPI.assignments">
+                <div
+                    v-for="assignment of KPI.assignments"
+                    :style="{ textAlign: 'start' }">
                     <a :href="`${assignment.link}`">{{ assignment.name }}</a>
                 </div>
             </td>
@@ -68,13 +65,11 @@ api.component
 </template>
 
 <style scoped>
-    table {
-        text-align: start;
-    }
-    th, td {
-        padding: 1rem;
-    }
-
+td,
+th {
+    border: 2px solid;
+    padding: 1rem;
+}
 </style>
 
 <!-- 

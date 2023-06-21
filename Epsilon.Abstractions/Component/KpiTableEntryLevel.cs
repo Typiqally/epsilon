@@ -1,6 +1,6 @@
 namespace Epsilon.Abstractions.Component;
 
-public record KpiTableEntryAssignmentGradeStatus(
+public record KpiTableEntryLevel(
     string Level,
     string Color
 );

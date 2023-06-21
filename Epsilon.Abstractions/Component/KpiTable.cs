@@ -8,22 +8,22 @@ namespace Epsilon.Abstractions.Component;
 
 public record KpiTable(
     IEnumerable<KpiTableEntry> Entries,
-    IDictionary<OutcomeGradeLevel, KpiTableEntryAssignmentGradeStatus> GradeStatus
+    IDictionary<OutcomeGradeLevel, KpiTableEntryLevel> GradeStatus
 ) : IWordCompetenceComponent
 {
-    public static readonly IDictionary<OutcomeGradeLevel, KpiTableEntryAssignmentGradeStatus> DefaultGradeStatus = new Dictionary<OutcomeGradeLevel, KpiTableEntryAssignmentGradeStatus>
+    public static readonly IDictionary<OutcomeGradeLevel, KpiTableEntryLevel> DefaultGradeStatus = new Dictionary<OutcomeGradeLevel, KpiTableEntryLevel>
     {
         {
-            OutcomeGradeLevel.One, new KpiTableEntryAssignmentGradeStatus("One", "CBF5DD")
+            OutcomeGradeLevel.One, new KpiTableEntryLevel("One", "CBF5DD")
         },
         {
-            OutcomeGradeLevel.Two, new KpiTableEntryAssignmentGradeStatus("Two", "64E3A1")
+            OutcomeGradeLevel.Two, new KpiTableEntryLevel("Two", "64E3A1")
         },
         {
-            OutcomeGradeLevel.Three, new KpiTableEntryAssignmentGradeStatus("Three", "27A567")
+            OutcomeGradeLevel.Three, new KpiTableEntryLevel("Three", "27A567")
         },
         {
-            OutcomeGradeLevel.Four, new KpiTableEntryAssignmentGradeStatus("Four", "198450")
+            OutcomeGradeLevel.Four, new KpiTableEntryLevel("Four", "198450")
         },
     };
     

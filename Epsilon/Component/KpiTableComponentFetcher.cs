@@ -81,78 +81,65 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
                     .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
                     .MaxBy(static h => h.Attempt);
 
-                if (submission is
-                    {
-                        Assignment.Rubric: not null,
-                        RubricAssessments.Nodes: not null,
-                    }
-                   )
+                if (submission?.Assignment.Rubric is { Criteria: { } rubricCriteria, })
                 {
-                    var rubricCriteria = submission.Assignment.Rubric.Criteria?.ToArray();
-
-                    if (rubricCriteria != null)
+                    foreach (var outcome in rubricCriteria.Select(static criteria => criteria.Outcome))
                     {
-                        foreach (var outcome in rubricCriteria.Select(static criteria => criteria.Outcome))
+                        if (outcome is not null && FhictConstants.ProfessionalTasks.ContainsKey(outcome.Id) && rubricCriteria.Any())
                         {
-                            // Validate that outcome is a HboI KPI 
-                            if (outcome != null
-                                && FhictConstants.ProfessionalTasks.ContainsKey(outcome.Id)
-                                && rubricCriteria.Any()) // || FhictConstants.ProfessionalSkills.ContainsKey(outcome.Id))
+                            var assessmentRatings = submission.RubricAssessments.Nodes.FirstOrDefault()?.AssessmentRatings;
+
+                            if (assessmentRatings is not null)
                             {
-                                var assessmentRatings = submission.RubricAssessments.Nodes.FirstOrDefault()?.AssessmentRatings;
-
-                                if (assessmentRatings != null)
+                                var gradeStatus = assessmentRatings
+                                    .Where(ar => ar?.Criterion?.Outcome?.Id == outcome.Id)
+                                    .Select(static ar => ar.Points)
+                                    .FirstOrDefault();
+                                
+                                if (gradeStatus != null)
                                 {
-                                    var gradeStatus = assessmentRatings
-                                        .Where(ar => ar?.Criterion?.Outcome?.Id == outcome.Id)
-                                        .Select(static ar => ar.Points)
-                                        .FirstOrDefault();
+                                    var kpiName = outcome.Title;
+                                    var assignmentName = submission.Assignment.Name;
+                                    var htmlUrl = submission.Assignment.HtmlUrl;
+                                    var assessmentRating = assessmentRatings.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome.Id);
+                                    var outcomeGradeLevel = GetMasteryLevel(assessmentRating);
                                     
-                                    if (gradeStatus != null)
-                                    {
-                                        var kpiName = outcome.Title;
-                                        var assignmentName = submission.Assignment.Name;
-                                        var htmlUrl = submission.Assignment.HtmlUrl;
-                                        var assessmentRating = assessmentRatings.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome.Id);
-                                        var outcomeGradeLevel = GetMasteryLevel(assessmentRating);
-                                        
-                                        // Check if the KPI entry already exists
-                                        var kpiTableEntryIndex = kpiTableEntries.FindIndex(kte => kte.Kpi == kpiName);
+                                    var kpiTableEntryIndex = kpiTableEntries.FindIndex(kte => kte.Kpi == kpiName);
 
-                                        if (kpiTableEntryIndex > -1)
+                                    if (kpiTableEntryIndex > -1)
+                                    {
+                                        if (outcomeGradeLevel is not null)
                                         {
-                                            if (outcomeGradeLevel != null)
+                                            var existingEntry = kpiTableEntries[kpiTableEntryIndex];
+                                            var updatedAssignments = existingEntry.Assignments.Append(
+                                                new KpiTableEntryAssignment(
+                                                    assignmentName,
+                                                    GetGradeStatus(gradeStatus.Value),
+                                                    htmlUrl
+                                                ));
+
+                                            var updatedEntry = existingEntry with
                                             {
-                                                // Add assignment to existing KPI entry
-                                                kpiTableEntries[kpiTableEntryIndex].Assignments = kpiTableEntries[kpiTableEntryIndex].Assignments.Append(
-                                                    new KpiTableEntryAssignment(
-                                                        assignmentName, 
-                                                        GetGradeStatus(gradeStatus.Value),
-                                                        KpiTable.DefaultGradeStatus[outcomeGradeLevel.Value + 1],
-                                                        htmlUrl
-                                                    ));
-                                            }
+                                                Assignments = updatedAssignments,
+                                            };
+
+                                            kpiTableEntries[kpiTableEntryIndex] = updatedEntry;
                                         }
-                                        else
-                                        {
-                                            if (outcomeGradeLevel != null)
+                                    }
+                                    else if (outcomeGradeLevel is not null)
+                                    {
+                                        kpiTableEntries.Add(new KpiTableEntry(
+                                            kpiName,
+                                            KpiTable.DefaultGradeStatus[outcomeGradeLevel.Value + 1],
+                                            new List<KpiTableEntryAssignment>
                                             {
-                                                // Create a new KPI entry
-                                                kpiTableEntries.Add(new KpiTableEntry
-                                                {
-                                                    Kpi = kpiName,
-                                                    Assignments = new List<KpiTableEntryAssignment>
-                                                    {
-                                                        new KpiTableEntryAssignment(
-                                                            assignmentName,
-                                                            GetGradeStatus(gradeStatus.Value),
-                                                            KpiTable.DefaultGradeStatus[outcomeGradeLevel.Value + 1],
-                                                            htmlUrl
-                                                        ),
-                                                    },
-                                                });
+                                                new KpiTableEntryAssignment(
+                                                    assignmentName,
+                                                    GetGradeStatus(gradeStatus.Value),
+                                                    htmlUrl
+                                                ),
                                             }
-                                        }
+                                        ));
                                     }
                                 }
                             }
@@ -162,8 +149,8 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
             }
         }
         
-        kpiTableEntries = kpiTableEntries.OrderByDescending(static kte => kte.Assignments.Count()).ToList();
-
+        kpiTableEntries = kpiTableEntries.OrderBy(static kte => kte.Kpi).ToList();
+        
         return new KpiTable(kpiTableEntries, KpiTable.DefaultGradeStatus);
     }
     
