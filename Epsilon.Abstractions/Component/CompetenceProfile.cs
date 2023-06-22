@@ -14,6 +14,22 @@ public record CompetenceProfile(
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
         var body = new Body();
+
+        body.Append(new Paragraph(new Run(new Text(""))));
+        body.AppendChild(GetTasks());
+        body.Append(new Paragraph(new Run(new Text(""))));
+        body.AppendChild(GetSkills());
+        body.Append(new Paragraph(new Run(new Text(""))));
+        body.AppendChild(GetLegend());
+        body.Append(new Paragraph(new Run(new Text(""))));
+
+
+
+        mainDocumentPart.Document.AppendChild(body);
+    }
+
+    private OpenXmlElement GetTasks()
+    {
         // Create a table, with rows for the outcomes and columns for the assignments.
         var table = new Table();
 
@@ -58,7 +74,6 @@ public record CompetenceProfile(
         foreach (var architecture in tasks)
         {
             var row = new TableRow();
-            Console.WriteLine($"Architecture: {architecture.architectureId}");
             // Add the outcome title cell.
             row.AppendChild(CreateTableCellWithBorders("2500", new Paragraph(new Run(new 
                 Text(HboIDomain.ArchitectureLayers.First(x => x.Id == architecture.architectureId).Name)))));
@@ -88,16 +103,8 @@ public record CompetenceProfile(
 
             table.AppendChild(row);
         }
-        
-        body.Append(new Paragraph(new Run(new Text(""))));
-        body.AppendChild(GetLegend());
-        body.Append(new Paragraph(new Run(new Text(""))));
-        body.AppendChild(table);
-        body.Append(new Paragraph(new Run(new Text(""))));
-        body.AppendChild(GetSkills());
-        body.Append(new Paragraph(new Run(new Text(""))));
 
-        mainDocumentPart.Document.AppendChild(body);
+        return table;
     }
 
     private OpenXmlElement GetSkills()
