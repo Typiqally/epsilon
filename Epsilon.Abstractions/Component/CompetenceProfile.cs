@@ -31,20 +31,18 @@ public record CompetenceProfile(
                                          masteryLevel = group.Max(static m => m.MasteryLevel),
                                      }).OrderBy(static i => i.activityId).ToList(),
                     }).OrderBy(static i => i.architectureId).ToList();
-
-        var hboI = HboIDomain;
         
         // Set table properties for formatting.
         table.AppendChild(new TableProperties(
             new TableWidth {
-                Width = "6", Type = TableWidthUnitValues.Auto, }));
+                Width = "8", Type = TableWidthUnitValues.Auto, }));
 
         var headerRow = new TableRow();
 
         // Empty top-left cell.
         headerRow.AppendChild(CreateTableCellWithBorders("2500", new Paragraph(new Run(new Text("")))));
 
-        foreach (var activity in hboI.Activities)
+        foreach (var activity in HboIDomain.Activities)
         {
             var cell = CreateTableCellWithBorders("500");
             cell.FirstChild.Append(new TextDirection 
@@ -63,10 +61,10 @@ public record CompetenceProfile(
             Console.WriteLine($"Architecture: {architecture.architectureId}");
             // Add the outcome title cell.
             row.AppendChild(CreateTableCellWithBorders("2500", new Paragraph(new Run(new 
-                Text(hboI.ArchitectureLayers.First(x => x.Id == architecture.architectureId).Name)))));
+                Text(HboIDomain.ArchitectureLayers.First(x => x.Id == architecture.architectureId).Name)))));
 
             // Add the assignment cells.
-            foreach (var activityValue in hboI.Activities)
+            foreach (var activityValue in HboIDomain.Activities)
             {
                 var fillColor= "#fffff";
                 var kpiCount = 0;
@@ -78,7 +76,7 @@ public record CompetenceProfile(
                             .activities
                             .First(x => x.activityId == activityValue.Id);
                     // Set cell color based on GradeStatus.
-                    fillColor = hboI.MasteryLevels.FirstOrDefault(x => x.Id == activity.masteryLevel).Color;
+                    fillColor = HboIDomain.MasteryLevels.FirstOrDefault(x => x.Id == activity.masteryLevel).Color;
                     kpiCount = activity.count;
                 }
 
