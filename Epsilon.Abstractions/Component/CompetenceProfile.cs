@@ -39,20 +39,14 @@ public record CompetenceProfile(
             new TableWidth {
                 Width = "6", Type = TableWidthUnitValues.Auto, }));
 
-        // Calculate the header row height based on the longest assignment name.
-        var headerRowHeight = hboI.Activities.Max(static a => a.Name.Length) * 111; 
-        
-        // Create the table header row.
         var headerRow = new TableRow();
-        headerRow.AppendChild(new TableRowProperties(new TableRowHeight {
-            Val = (UInt32Value)(uint)headerRowHeight, }));
 
         // Empty top-left cell.
         headerRow.AppendChild(CreateTableCellWithBorders("2500", new Paragraph(new Run(new Text("")))));
 
         foreach (var activity in hboI.Activities)
         {
-            var cell = CreateTableCellWithBorders("100");
+            var cell = CreateTableCellWithBorders("500");
             cell.FirstChild.Append(new TextDirection 
                 { Val = TextDirectionValues.LeftToRightTopToBottom2010,});
 
@@ -76,7 +70,7 @@ public record CompetenceProfile(
             {
                 var fillColor= "#fffff";
                 var kpiCount = 0;
-                var cell = CreateTableCellWithBorders("100");
+                var cell = CreateTableCellWithBorders("500");
                 if (architecture.activities.Exists(x => x.activityId == activityValue.Id))
                 {
                     var activity =
@@ -85,11 +79,6 @@ public record CompetenceProfile(
                             .First(x => x.activityId == activityValue.Id);
                     // Set cell color based on GradeStatus.
                     fillColor = hboI.MasteryLevels.FirstOrDefault(x => x.Id == activity.masteryLevel).Color;
-                    
-                    Console.WriteLine($" MasteryLevel: {activity.masteryLevel} ");
-                    Console.Write($" Color:{fillColor} ");
-                    Console.WriteLine($"Masterycolors: {hboI.MasteryLevels}");
-
                     kpiCount = activity.count;
                 }
 
@@ -101,14 +90,70 @@ public record CompetenceProfile(
 
             table.AppendChild(row);
         }
-
-        body.Append(new Paragraph(new Run(new Text(""))));
-        body.AppendChild(table);
+        
         body.Append(new Paragraph(new Run(new Text(""))));
         body.AppendChild(GetLegend());
         body.Append(new Paragraph(new Run(new Text(""))));
+        body.AppendChild(table);
+        body.Append(new Paragraph(new Run(new Text(""))));
+        body.AppendChild(GetSkills());
+        body.Append(new Paragraph(new Run(new Text(""))));
 
         mainDocumentPart.Document.AppendChild(body);
+    }
+
+    private OpenXmlElement GetSkills()
+    {
+        var table = new Table();
+
+        var skills = ProfessionalSkillOutcomes
+                     .GroupBy(static x => x.Skill)
+                     .Select(group => new
+                     {
+                         skillId = group.Key,
+                         count = group.Count(),
+                         maxMastery = HboIDomain
+                                      .MasteryLevels
+                                      .FirstOrDefault(
+                                          x => x.Id == group.Max(
+                                              static m => m.MasteryLevel)),
+                     });
+
+        // Set table properties for formatting.
+        table.AppendChild(new TableProperties(
+            new TableWidth {
+                Width = "4", Type = TableWidthUnitValues.Auto, }));
+
+        // Create the table header row.
+        var headerRow = new TableRow();
+
+        
+        foreach (var skill in HboIDomain.ProfessionalSkills)
+        {
+            var cell = CreateTableCellWithBorders("500");
+            cell.FirstChild.Append(new TextDirection 
+                { Val = TextDirectionValues.LeftToRightTopToBottom2010,});
+            
+
+            cell.Append(new Paragraph(new Run(new Text(skill.Name))));
+            headerRow.AppendChild(cell);
+        }
+
+        table.AppendChild(headerRow);
+        var valueRow = new TableRow();
+        
+        foreach (var skill in HboIDomain.ProfessionalSkills)
+        {
+            var value = skills.First(x => x.skillId == skill.Id);
+            var cell = CreateTableCellWithBorders("500");
+            cell.FirstChild?.Append(new Shading
+                { Fill = value.maxMastery.Color, });
+            cell.Append(new Paragraph(new Run(new Text($"{value.count}"))));
+            valueRow.AppendChild(cell);
+        }
+        table.AppendChild(valueRow);
+
+        return table;
     }
 
     private OpenXmlElement GetLegend()
@@ -119,9 +164,9 @@ public record CompetenceProfile(
         {
             var row = new TableRow();
             var cellName = CreateTableCellWithBorders("200");
-            cellName.Append(new Paragraph(new Run(new Text($"{level.Level}"))));
+            cellName.Append(new Paragraph(new Run(new Text($"Level: {level.Level}"))));
 
-            var cellValue = CreateTableCellWithBorders("200");
+            var cellValue = CreateTableCellWithBorders("600");
             cellValue.Append(new Paragraph(new Run(new Text(""))));
             cellValue.FirstChild?.Append(new Shading
             {
