@@ -1,5 +1,44 @@
 <template>
-    <div class="termselect">
+    <div><img src="../assets/vue.svg" alt="" class="student-image"/></div>
+    <div class="profileselect combobox-wrapper">
+        <Combobox
+            v-if="modelValue"
+            :model-value="props.modelValue"
+            @update:model-value="$emit('update:modelValue', $event)">
+            <div class="dropdown">
+                <ComboboxInput
+                    class="dropdown-input"
+                    :display-value="(modelValue) => modelValue.name"
+                    @update:model-value="$emit('update:modelValue', $event)" />
+                <ComboboxButton class="list-arrow">
+                    <ChevronUpDownIcon aria-hidden="true" />
+                </ComboboxButton>
+            </div>
+            <ComboboxOptions class="dropdown-options">
+                <div v-if="filteredTerm.length === 0 && query !== ''">
+                    Nothing found.
+                </div>
+
+                <ComboboxOption
+                    v-for="item in items"
+                    v-slot="{ active, selected }"
+                    :key="item.name"
+                    class="dropdown-option"
+                    :value="item"
+                    as="template">
+                    <li>
+                        <span>
+                            {{ item.name }}
+                        </span>
+                        <span v-if="selected">
+                            <CheckIcon aria-hidden="true" />
+                        </span>
+                    </li>
+                </ComboboxOption>
+            </ComboboxOptions>
+        </Combobox>
+    </div>
+    <div class="termselect combobox-wrapper">
         <Combobox
             v-if="modelValue"
             :model-value="props.modelValue"
@@ -73,10 +112,29 @@ const filteredTerm = computed(() =>
 </script>
 
 <style scoped>
+
+.student-image {
+    width: 3rem;
+    height: 3rem;
+    aspect-ratio: 1/1;
+    border: none;
+    border-radius: 3rem;
+    margin-right: 0.75rem;
+    overflow: hidden;
+    background-color: #fff;
+}
+.profileselect {
+    margin-right: 2rem;
+    min-width: 15rem;
+}
+
 .termselect {
+    min-width: 8rem;
+}
+
+.combobox-wrapper {
     background-color: #fff;
     height: 3rem;
-    width: 10rem;
     border-radius: 5px;
 }
 
@@ -113,6 +171,8 @@ const filteredTerm = computed(() =>
     padding: 0.75rem;
     height: 3rem;
     width: 6rem;
+    font-size: 1rem;
+    
 }
 
 .dropdown-options {

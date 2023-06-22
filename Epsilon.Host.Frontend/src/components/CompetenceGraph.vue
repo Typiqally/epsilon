@@ -2,7 +2,7 @@
     <ApexChart
         :options="chartOptions"
         :series="series"
-        height="350"
+        height="300"
         type="bar"
         class="competence-graph"
         width="490" />
@@ -43,7 +43,7 @@ const chartOptions = {
     colors: [],
     chart: {
         type: "bar",
-        height: 350,
+        height: 300,
         stacked: true,
         toolbar: {
             show: true,

@@ -2,7 +2,7 @@
     <ApexChart
         :options="chartOptions"
         :series="series"
-        height="350"
+        height="300"
         type="bar"
         width="200" />
 </template>
