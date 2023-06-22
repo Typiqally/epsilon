@@ -84,10 +84,8 @@ public record CompetenceProfile(
                             .activities
                             .First(x => x.activityId == activityValue.Id);
                     // Set cell color based on GradeStatus.
-                    if (activity.masteryLevel > 0)
-                    {
-                        fillColor = hboI.MasteryLevels.FirstOrDefault(x => x.Id == activity.masteryLevel).Color;
-                    }
+                    fillColor = hboI.MasteryLevels.FirstOrDefault(x => x.Id == activity.masteryLevel).Color;
+                    
                     Console.WriteLine($" MasteryLevel: {activity.masteryLevel} ");
                     Console.Write($" Color:{fillColor} ");
                     Console.WriteLine($"Masterycolors: {hboI.MasteryLevels}");
@@ -107,8 +105,34 @@ public record CompetenceProfile(
         body.Append(new Paragraph(new Run(new Text(""))));
         body.AppendChild(table);
         body.Append(new Paragraph(new Run(new Text(""))));
+        body.AppendChild(GetLegend());
+        body.Append(new Paragraph(new Run(new Text(""))));
 
         mainDocumentPart.Document.AppendChild(body);
+    }
+
+    private OpenXmlElement GetLegend()
+    {
+        var table = new Table();
+
+        foreach (var level in HboIDomain.MasteryLevels)
+        {
+            var row = new TableRow();
+            var cellName = CreateTableCellWithBorders("200");
+            cellName.Append(new Paragraph(new Run(new Text($"{level.Level}"))));
+
+            var cellValue = CreateTableCellWithBorders("200");
+            cellValue.Append(new Paragraph(new Run(new Text(""))));
+            cellValue.FirstChild?.Append(new Shading
+            {
+                Fill = level.Color,
+            });
+            row.AppendChild(cellName);
+            row.AppendChild(cellValue);
+            table.AppendChild(row);
+        }
+
+        return table;
     }
 
     private static TableCell CreateTableCellWithBorders(string? width, params OpenXmlElement[] elements)
