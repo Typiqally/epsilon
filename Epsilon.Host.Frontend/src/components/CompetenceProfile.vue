@@ -17,11 +17,11 @@
                 :key="i">
                 <th
                     class="competence-profile-header competence-profile-header-row">
-                    <span
+                    <div
                         class="profile-header-color"
                         :style="{
                             backgroundColor: architectureLayer.color,
-                        }"></span>
+                        }"></div>
                     {{ architectureLayer.name }}
                 </th>
                 <td
@@ -98,6 +98,7 @@ const colors: Array = [{}]
     border: 1px solid #e6e6e6;
     border-left: transparent;
     padding-right: 4rem;
+    display: flex;
 }
 
 .competence-profile-header-col {
@@ -108,7 +109,9 @@ const colors: Array = [{}]
 }
 
 .profile-header-color {
-    padding: 0.5rem;
+    margin: 3px 10px 0;
+    width: 15px;
+    height: 15px;
 }
 
 .competence-profile-data {
