@@ -1,9 +1,16 @@
 name: "Code analysis"
 
 on:
-  workflow_run:
-    workflows: [ "Continuous integration" ]
-    types: [ completed ]
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.yml'
+      - '**.cs'
+      - '**.json'
+      - '**.csproj'
+      - '**.ts'
+      - '**.vue'
+      - '**.css'
   schedule:
     - cron: '22 18 * * 5'
 
