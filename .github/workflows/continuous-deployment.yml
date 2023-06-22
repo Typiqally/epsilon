@@ -2,10 +2,10 @@ name: Continuous deployment
 on:
   workflow_dispatch:
   push:
-    branches: [ master,develop ]
+    branches: [ master, develop ]
 jobs:
   api:
-    name: Api building and publishing
+    name: Build API Docker image and publish
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -29,7 +29,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}-API
   
   frontend:
-    name: frontend building and publishing
+    name: Build frontend Docker image and publish
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
