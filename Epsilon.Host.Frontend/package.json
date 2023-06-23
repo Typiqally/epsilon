@@ -16,7 +16,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "apexcharts": "^3.37.3",
-    "axios": "^1.4.0",
     "sass": "^1.63.6",
     "sass-loader": "^13.3.2",
     "typescript": "^4.9.5",
