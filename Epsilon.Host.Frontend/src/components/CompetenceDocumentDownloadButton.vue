@@ -16,29 +16,33 @@
     import { ref } from 'vue'
     import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
     import RoundLoader from "@/components/RoundLoader.vue"
-    import axios from 'axios'
+    import { Api } from "../logic/Api"
+
+    const api = new Api();
 
     const isDownloading = ref(false);
   
     async function downloadCompetenceDocument() {
-        isDownloading.value = true;
-        axios({
-            method: 'get',
-            url: 'https://localhost:7084/document/word',
-            responseType: 'arraybuffer',
-        })
-            .then((response) => {
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'competence_document.docx');
-                document.body.appendChild(link);
-                link.click();
-            })
-                .catch(() => console.log('error occurred'))
-                .finally(() => {
-                    isDownloading.value = false; // Update isDownloading to false after the download is completed or failed
-            });
+      // Setting downloading ref to true, triggering loading icon
+      isDownloading.value = true;
+
+      let wordlist = await api.document.wordList();
+      let data = await wordlist.text();
+      const blob = new Blob([data], { type: 'application/octet-stream' });
+
+      // Create a temporary anchor element
+      const downloadLink = document.createElement("a");
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = "competence_document.docx";
+
+      // Programmatically trigger the download
+      downloadLink.click();
+
+      // Clean up resources
+      URL.revokeObjectURL(downloadLink.href);
+
+      // Setting downloading ref to false, triggering regular icon
+      isDownloading.value = false;
     }
   </script>
   
