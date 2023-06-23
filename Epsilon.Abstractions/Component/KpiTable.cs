@@ -62,13 +62,11 @@ public record KpiTable(
             
             foreach (var assignment in entry.Assignments)
             {
-                var runProperties = new RunProperties();
-                var underline = new Underline { Val = UnderlineValues.Single, };
-                
-                runProperties.Append(underline);
-                
                 var rel = mainDocumentPart.AddHyperlinkRelationship(assignment.Link, true);
                 var relationshipId = rel.Id;
+                
+                var runProperties = new RunProperties(
+                    new Underline { Val = UnderlineValues.Single, });
                 
                 aRun.AppendChild(new Hyperlink(new Run(runProperties, new Text(assignment.Name)))
                 {

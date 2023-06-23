@@ -81,40 +81,52 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
                     .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
                     .MaxBy(static h => h.Attempt);
 
-                if (submission?.Assignment.Rubric is { Criteria: { } rubricCriteria, })
-                {
-                    foreach (var outcome in rubricCriteria.Select(static criteria => criteria.Outcome))
+                if (submission is
                     {
-                        if (outcome is not null && FhictConstants.ProfessionalTasks.ContainsKey(outcome.Id) && rubricCriteria.Any())
+                        Assignment.Rubric: not null,
+                        RubricAssessments.Nodes: not null,
+                    })
+                {
+                    var rubricCriteria = submission.Assignment.Rubric.Criteria?.ToArray();
+
+                    if (rubricCriteria != null)
+                    {
+                        foreach (var outcome in rubricCriteria.Select(static criteria => criteria.Outcome).Where(static c => c != null))
                         {
-                            var assessmentRatings = submission.RubricAssessments.Nodes.FirstOrDefault()?.AssessmentRatings;
-
-                            if (assessmentRatings is not null)
+                            //Validate that outcome is a HboI KPI 
+                            if (outcome != null
+                                && (FhictConstants.ProfessionalTasks.ContainsKey(outcome.Id) || FhictConstants.ProfessionalSkills.ContainsKey(outcome.Id))
+                                && rubricCriteria.Any())
                             {
-                                var gradeStatus = assessmentRatings
-                                    .Where(ar => ar?.Criterion?.Outcome?.Id == outcome.Id)
-                                    .Select(static ar => ar.Points)
-                                    .FirstOrDefault();
+                                var assessmentRatings = submission.RubricAssessments.Nodes.FirstOrDefault()?.AssessmentRatings;
 
-                                if (gradeStatus != null)
+                                if (assessmentRatings is not null)
                                 {
-                                    var kpiName = outcome.Title;
-                                    var assignmentName = submission.Assignment.Name;
-                                    var htmlUrl = submission.Assignment.HtmlUrl;
-                                    var assessmentRating = assessmentRatings.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome.Id);
-                                    var outcomeGradeLevel = GetMasteryLevel(assessmentRating);
+                                    var grade = assessmentRatings
+                                        .Where(ar => ar?.Criterion?.Outcome?.Id == outcome.Id)
+                                        .Select(static ar => ar.Points)
+                                        .FirstOrDefault();
 
-                                    var kpiTableEntryIndex = kpiTableEntries.FindIndex(kte => kte.Kpi == kpiName);
-
-                                    if (outcomeGradeLevel is not null)
+                                    if (grade != null)
                                     {
-                                        if (kpiTableEntryIndex > -1)
+                                        var kpiName = outcome.Title;
+                                        var assignmentName = submission.Assignment.Name;
+                                        var htmlUrl = submission.Assignment.HtmlUrl;
+                                        var assessmentRating = assessmentRatings.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome.Id);
+                                        var outcomeGradeLevel = GetMasteryLevel(assessmentRating);
+
+                                        var kpiTableEntryIndex = kpiTableEntries.FindIndex(kte => kte.Kpi == kpiName);
+
+                                        if (outcomeGradeLevel is not null)
                                         {
-                                            UpdateKpiTableEntry(kpiTableEntries, kpiTableEntryIndex, assignmentName, GetGradeStatus(gradeStatus.Value), htmlUrl);
-                                        }
-                                        else
-                                        {
-                                            AddKpiTableEntry(kpiTableEntries, kpiName, outcomeGradeLevel.Value, assignmentName, GetGradeStatus(gradeStatus.Value), htmlUrl);
+                                            if (kpiTableEntryIndex > -1)
+                                            {
+                                                UpdateKpiTableEntry(kpiTableEntries, kpiTableEntryIndex, assignmentName, GetGradeStatus(grade.Value), htmlUrl);
+                                            }
+                                            else
+                                            {
+                                                AddKpiTableEntry(kpiTableEntries, kpiName, outcomeGradeLevel.Value, assignmentName, GetGradeStatus(grade.Value), htmlUrl);
+                                            }
                                         }
                                     }
                                 }
@@ -164,6 +176,18 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
             if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))
             {
                 return professionalTask.MasteryLevel switch
+                {
+                    0 => OutcomeGradeLevel.One,
+                    1 => OutcomeGradeLevel.Two,
+                    2 => OutcomeGradeLevel.Three,
+                    3 => OutcomeGradeLevel.Four,
+                    _ => null,
+                };
+            }
+            
+            if (FhictConstants.ProfessionalSkills.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalSkill))
+            {
+                return professionalSkill.MasteryLevel switch
                 {
                     0 => OutcomeGradeLevel.One,
                     1 => OutcomeGradeLevel.Two,
