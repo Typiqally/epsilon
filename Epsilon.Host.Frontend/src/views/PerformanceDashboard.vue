@@ -1,5 +1,6 @@
 <template>
     <div v-if="data" class="performance-dashboard">
+        <CompetenceDocumentDownloadButton></CompetenceDocumentDownloadButton>
         <EnrollmentTermButtons
             :terms="terms"
             @on-term-selected="setTermFilter" />
