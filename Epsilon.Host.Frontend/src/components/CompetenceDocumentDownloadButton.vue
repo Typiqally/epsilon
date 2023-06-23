@@ -25,7 +25,7 @@ const api = new Api()
 
 const isDownloading = ref(false)
 
-async function downloadCompetenceDocument() {
+async function downloadCompetenceDocument(): Promise<void> {
     // Setting downloading ref to true, triggering loading icon
     isDownloading.value = true
 
