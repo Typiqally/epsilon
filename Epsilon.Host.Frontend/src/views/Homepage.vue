@@ -22,7 +22,13 @@
             <TabPanel>
                 <PerformanceDashboard :till-date="getCorrectedTermDate" />
             </TabPanel>
-            <TabPanel>Here comes the comp profile :=</TabPanel>
+            <TabPanel>
+                <div>
+                    <h1 align="left">Persona</h1>
+                    <br />
+                    <QuillEditor theme="snow" @ready="onEditorReady($event)" />
+                </div>
+            </TabPanel>
         </TabPanels>
     </TabGroup>
 </template>
@@ -34,9 +40,11 @@ import {
     EnrollmentTerm,
     HttpResponse,
 } from "../logic/Api"
-
 import PerformanceDashboard from "./PerformanceDashboard.vue"
 import DropdownBtn from "@/components/DropdownBtn.vue"
+import { QuillEditor } from "@vueup/vue-quill"
+import axios from "axios"
+import "@vueup/vue-quill/dist/vue-quill.snow.css"
 import { onMounted, Ref, ref } from "vue"
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue"
 import { computed } from "vue"
@@ -46,9 +54,24 @@ const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 const terms: Ref<EnrollmentTerm[]> = ref([])
 const selectedTerm: Ref<EnrollmentTerm | undefined> = ref(undefined)
 
+const personaHtml = ref("")
+
 const App = new Api()
 
-onMounted(() => {
+const onEditorReady = (quill: any) => {
+    quill.root.innerHTML = personaHtml.value
+}
+
+onMounted(async () => {
+    try {
+        const response = await axios.get(
+            "https://localhost:7084/component/persona_page"
+        )
+        personaHtml.value = response.data.personaHtml
+    } catch (error) {
+        console.error("Failed to retrieve persona page HTML:", error)
+    }
+
     App.filter
         .participatedTermsList()
         .then((r: HttpResponse<EnrollmentTerm[]>) => {
