@@ -1,4 +1,3 @@
-using DocumentFormat.OpenXml;
 using Epsilon.Abstractions.Service;
 using Epsilon.Canvas.Abstractions.Model;
 using Epsilon.Canvas.Abstractions.Model.GraphQl;

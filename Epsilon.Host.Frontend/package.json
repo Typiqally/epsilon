@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint --ext .ts,vue --ignore-path .gitignore .",
-    "modelGeneration": "NODE_TLS_REJECT_UNAUTHORIZED=0 pnpm dlx swagger-typescript-api -p https://localhost:7084/swagger/v1/swagger.json  -o src/logic -n Api.ts"
+    "modelGeneration": "pnpm dlx swagger-typescript-api -p https://localhost:7084/swagger/v1/swagger.json  -o src/logic -n Api.ts"
   },
   "dependencies": {
     "apexcharts": "^3.37.3",

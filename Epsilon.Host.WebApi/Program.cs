@@ -3,6 +3,8 @@ using Epsilon.Abstractions.Service;
 using Epsilon.Canvas;
 using Epsilon.Component;
 using Epsilon.Service;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +21,8 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.AddRouting(static options => options.LowercaseUrls = true);
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -45,13 +49,25 @@ builder.Services.AddScoped<ICompetenceComponentFetcher<KpiTable>, KpiTableCompon
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto, });
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwaggerUI();
 }
 
-app.UseSwagger();
+app.UseSwagger(static options =>
+{
+    options.PreSerializeFilters.Add(static (swagger, request) =>
+    {
+        if (request.Headers.TryGetValue("X-Forwarded-Proto", out var scheme)
+            && request.Headers.TryGetValue("X-Forwarded-Prefix", out var prefix))
+        {
+            swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{scheme}://{request.Host}/{prefix}", }, };
+        }
+    });
+});
 
 app.UseHttpsRedirection();
 
