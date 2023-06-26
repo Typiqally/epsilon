@@ -102,10 +102,7 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
 
                                 if (assessmentRatings is not null)
                                 {
-                                    var grade = assessmentRatings
-                                        .Where(ar => ar?.Criterion?.Outcome?.Id == outcome.Id)
-                                        .Select(static ar => ar.Points)
-                                        .FirstOrDefault();
+                                    var grade = assessmentRatings.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome.Id)?.Grade;
 
                                     if (grade != null)
                                     {
@@ -121,11 +118,11 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
                                         {
                                             if (kpiTableEntryIndex > -1)
                                             {
-                                                UpdateKpiTableEntry(kpiTableEntries, kpiTableEntryIndex, assignmentName, GetGradeStatus(grade.Value), htmlUrl);
+                                                UpdateKpiTableEntry(kpiTableEntries, kpiTableEntryIndex, assignmentName, grade, htmlUrl);
                                             }
                                             else
                                             {
-                                                AddKpiTableEntry(kpiTableEntries, kpiName, outcomeGradeLevel.Value, assignmentName, GetGradeStatus(grade.Value), htmlUrl);
+                                                AddKpiTableEntry(kpiTableEntries, kpiName, outcomeGradeLevel.Value, assignmentName, grade, htmlUrl);
                                             }
                                         }
                                     }
@@ -171,45 +168,31 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
     
     private static OutcomeGradeLevel? GetMasteryLevel(AssessmentRating? assessmentRating)
     {
+        static OutcomeGradeLevel? GetGradeLevel(int masteryLevel)
+        {
+            return masteryLevel switch
+            {
+                0 => OutcomeGradeLevel.One,
+                1 => OutcomeGradeLevel.Two,
+                2 => OutcomeGradeLevel.Three,
+                3 => OutcomeGradeLevel.Four,
+                _ => null,
+            };
+        }
+
         if (assessmentRating != null)
         {
             if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))
             {
-                return professionalTask.MasteryLevel switch
-                {
-                    0 => OutcomeGradeLevel.One,
-                    1 => OutcomeGradeLevel.Two,
-                    2 => OutcomeGradeLevel.Three,
-                    3 => OutcomeGradeLevel.Four,
-                    _ => null,
-                };
+                return GetGradeLevel(professionalTask.MasteryLevel);
             }
-            
+
             if (FhictConstants.ProfessionalSkills.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalSkill))
             {
-                return professionalSkill.MasteryLevel switch
-                {
-                    0 => OutcomeGradeLevel.One,
-                    1 => OutcomeGradeLevel.Two,
-                    2 => OutcomeGradeLevel.Three,
-                    3 => OutcomeGradeLevel.Four,
-                    _ => null,
-                };
+                return GetGradeLevel(professionalSkill.MasteryLevel);
             }
         }
 
         return null;
-    }
-    
-    private static string GetGradeStatus(double grade)
-    {
-        return grade switch
-        {
-            >= 5.0 => "O",
-            >= 4.0 => "G",
-            >= 3.0 => "S",
-            >= 0.0 => "U",
-            _ => "-",
-        };
     }
 }
