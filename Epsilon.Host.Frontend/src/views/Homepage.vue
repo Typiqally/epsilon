@@ -26,7 +26,14 @@
                 <div>
                     <h1 align="left">Persona</h1>
                     <br />
-                    <QuillEditor theme="snow" @ready="onEditorReady($event)" />
+                    <QuillEditor
+                        theme="snow"
+                        toolbar="full"
+                        @ready="onEditorReady($event)" />
+                    <br />
+                    <button class="save-button" @click="saveEditorContent">
+                        Save
+                    </button>
                 </div>
             </TabPanel>
         </TabPanels>
@@ -55,11 +62,19 @@ const terms: Ref<EnrollmentTerm[]> = ref([])
 const selectedTerm: Ref<EnrollmentTerm | undefined> = ref(undefined)
 
 const personaHtml = ref("")
+const quillEditor = ref<any>(null)
 
 const App = new Api()
 
-const onEditorReady = (quill: any) => {
-    quill.root.innerHTML = personaHtml.value
+const onEditorReady = (editorInstance: any) => {
+    quillEditor.value = editorInstance
+    editorInstance.root.innerHTML = personaHtml.value
+}
+
+const saveEditorContent = () => {
+    const quill = quillEditor.value;
+    const html = quill.root.innerHTML;
+    console.log(html);
 }
 
 onMounted(async () => {
@@ -169,5 +184,10 @@ const getCorrectedTermDate = computed(() => {
 
 .slider-item[data-headlessui-state="selected"] {
     background-color: white;
+}
+
+.save-button {
+    text-align: right;
+    background-color: #32cd32;
 }
 </style>
