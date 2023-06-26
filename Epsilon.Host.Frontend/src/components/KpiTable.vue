@@ -37,7 +37,7 @@ function formatDate(date: Date): string {
         </tr>
         <tr v-for="KPI of Kpis" :key="KPI">
             <td :style="{
-                border: '3px solid #' + KPI.level.color,
+                border: '3px solid ' + KPI.masteryLevel.color,
             }"> 
                 {{ KPI.kpi }}
             </td>

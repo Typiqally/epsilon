@@ -1,31 +1,13 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Epsilon.Canvas.Abstractions.Model;
 
 namespace Epsilon.Abstractions.Component;
 
 public record KpiTable(
-    IEnumerable<KpiTableEntry> Entries,
-    IDictionary<OutcomeGradeLevel, KpiTableEntryLevel> GradeStatus  
+    IEnumerable<KpiTableEntry> Entries
 ) : IWordCompetenceComponent
 {
-    public static readonly IDictionary<OutcomeGradeLevel, KpiTableEntryLevel> DefaultGradeStatus = new Dictionary<OutcomeGradeLevel, KpiTableEntryLevel>
-    {
-        {
-            OutcomeGradeLevel.One, new KpiTableEntryLevel("One", "CBF5DD")
-        },
-        {
-            OutcomeGradeLevel.Two, new KpiTableEntryLevel("Two", "64E3A1")
-        },
-        {
-            OutcomeGradeLevel.Three, new KpiTableEntryLevel("Three", "27A567")
-        },
-        {
-            OutcomeGradeLevel.Four, new KpiTableEntryLevel("Four", "198450")
-        },
-    };
-    
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
         var body = new Body();
@@ -34,7 +16,7 @@ public record KpiTable(
         var table = new Table();
 
         // Define column header texts
-        var columnsHeaders = new List<string> { "KPI", "Assignments", "Grades", };
+        var columnsHeaders = new Dictionary<string, string> { { "KPI", "3000" }, { "Assignments", "5000" }, { "Grades", "1000" }, }; 
 
         // Create the table header row
         var headerRow = new TableRow();
@@ -42,7 +24,7 @@ public record KpiTable(
         // Create the header cells
         foreach (var columnHeader in columnsHeaders)
         {
-            headerRow.AppendChild(CreateTableCellWithBorders("3000", new Paragraph(new Run(new Text(columnHeader)))));
+            headerRow.AppendChild(CreateTableCellWithBorders(columnHeader.Value, new Paragraph(new Run(new Text(columnHeader.Key)))));
         }
 
         // Add the header row to the table
@@ -77,7 +59,7 @@ public record KpiTable(
                 assignmentsRun.AppendChild(new Break());
             }
             
-            tableRow.AppendChild(CreateTableCellWithBorders("3000", assignmentsParagraph));
+            tableRow.AppendChild(CreateTableCellWithBorders("5000", assignmentsParagraph));
 
             // Grades column
             var grades = entry.Assignments.Select(static a => a.Grade);
@@ -90,7 +72,7 @@ public record KpiTable(
                 gradesRun.AppendChild(new Break());
             }
         
-            tableRow.AppendChild(CreateTableCellWithBorders("3000", gradesParagraph));
+            tableRow.AppendChild(CreateTableCellWithBorders("1000", gradesParagraph));
             
             // Add the row to the table
             table.AppendChild(tableRow);

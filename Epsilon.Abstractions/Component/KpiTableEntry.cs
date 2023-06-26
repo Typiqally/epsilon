@@ -1,7 +1,9 @@
+using Epsilon.Abstractions.Model;
+
 namespace Epsilon.Abstractions.Component;
 
 public record KpiTableEntry(
     string Kpi,
-    KpiTableEntryLevel Level,
+    MasteryLevel MasteryLevel,
     IEnumerable<KpiTableEntryAssignment> Assignments
 );

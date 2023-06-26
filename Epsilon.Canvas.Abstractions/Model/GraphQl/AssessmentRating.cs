@@ -9,12 +9,12 @@ public record AssessmentRating(
 {
     public bool IsMastery => Points >= Criterion?.MasteryPoints;
     
-    public string Grade => Points switch
+    public string? Grade => Points switch
     {
         >= 5.0 => "O",
         >= 4.0 => "G",
         >= 3.0 => "S",
         >= 0.0 => "U",
-        _ => "-",
+        _ => null,
     };
 }
