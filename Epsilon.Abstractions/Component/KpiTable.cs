@@ -30,10 +30,10 @@ public record KpiTable(
     {
         var body = new Body();
 
-        // Create a table, with columns for the outcomes and corresponding assignments and grades
+        // Create a table to display outcomes, assignments, and grades
         var table = new Table();
 
-        // Columns header texts
+        // Define column header texts
         var columnsHeaders = new List<string> { "KPI", "Assignments", "Grades", };
 
         // Create the table header row
@@ -48,17 +48,17 @@ public record KpiTable(
         // Add the header row to the table
         table.AppendChild(headerRow);
 
-        // Create the table body rows and cells in which the first cell is the outcome and the rest are the assignments and grades
+        // Create the table body rows and cells
         foreach (var entry in Entries)
         {
             var tableRow = new TableRow();
             
-            // KPI column
+            // Outcome (KPI) column
             tableRow.AppendChild(CreateTableCellWithBorders("3000", new Paragraph(new Run(new Text(entry.Kpi)))));
             
             // Assignments column
-            var aParagraph = new Paragraph();
-            var aRun = aParagraph.AppendChild(new Run());
+            var assignmentsParagraph = new Paragraph();
+            var assignmentsRun = assignmentsParagraph.AppendChild(new Run());
             
             foreach (var assignment in entry.Assignments)
             {
@@ -68,63 +68,42 @@ public record KpiTable(
                 var runProperties = new RunProperties(
                     new Underline { Val = UnderlineValues.Single, });
                 
-                aRun.AppendChild(new Hyperlink(new Run(runProperties, new Text(assignment.Name)))
+                assignmentsRun.AppendChild(new Hyperlink(new Run(runProperties, new Text(assignment.Name)))
                 {
-                    History = OnOffValue.FromBoolean(true), Id = relationshipId,
+                    History = OnOffValue.FromBoolean(true),
+                    Id = relationshipId,
                 });
-                
-                aRun.AppendChild(new Break());
+            
+                assignmentsRun.AppendChild(new Break());
             }
             
-            tableRow.AppendChild(CreateTableCellWithBorders("3000", aParagraph));
-            
+            tableRow.AppendChild(CreateTableCellWithBorders("3000", assignmentsParagraph));
+
             // Grades column
             var grades = entry.Assignments.Select(static a => a.Grade);
-            var gParagraph = new Paragraph();
-            var gRun = gParagraph.AppendChild(new Run());
-            
+            var gradesParagraph = new Paragraph();
+            var gradesRun = gradesParagraph.AppendChild(new Run());
+        
             foreach (var grade in grades)
             {
-                gRun.AppendChild(new Text(grade));
-                gRun.AppendChild(new Break());
+                gradesRun.AppendChild(new Text(grade));
+                gradesRun.AppendChild(new Break());
             }
-            
-            tableRow.AppendChild(CreateTableCellWithBorders("3000", gParagraph));
+        
+            tableRow.AppendChild(CreateTableCellWithBorders("3000", gradesParagraph));
             
             // Add the row to the table
             table.AppendChild(tableRow);
         }
-
-        // body.AppendChild(GetLegend());
+        
+        // Newline to separate the table from the rest of the document
         body.Append(new Paragraph(new Run(new Text(""))));
+        
+        // Add the table to the document
         body.AppendChild(table);
 
         mainDocumentPart.Document.AppendChild(body);
     }
-    
-    // private OpenXmlElement GetLegend()
-    // {
-    //     var table = new Table();
-    //     
-    //     foreach (var status in GradeStatus)
-    //     {
-    //         var row = new TableRow();
-    //         var cellName = CreateTableCellWithBorders("200");
-    //         cellName.Append(new Paragraph(new Run(new Text(status.Value.Level))));
-    //
-    //         var cellValue = CreateTableCellWithBorders("200");
-    //         cellValue.Append(new Paragraph(new Run(new Text(""))));
-    //         cellValue.FirstChild?.Append(new Shading
-    //         {
-    //             Fill = status.Value.Color,
-    //         });
-    //         row.AppendChild(cellName);
-    //         row.AppendChild(cellValue);
-    //         table.AppendChild(row);
-    //     }
-    //
-    //     return table;
-    // }
 
     private static TableCell CreateTableCellWithBorders(string? width, params OpenXmlElement[] elements)
     {
