@@ -3,7 +3,7 @@
         <Combobox
             :model-value="props.modelValue"
             @update:model-value="$emit('update:modelValue', $event)">
-            <div class="profileselect dropdown">
+            <div class="dropdown">
                 <ComboboxInput
                     class="dropdown-input"
                     :display-value="(person) => person.name"
@@ -13,8 +13,10 @@
                 </ComboboxButton>
             </div>
             <ComboboxOptions class="dropdown-options">
-                <div v-if="filteredItems.length === 0 && query !== ''">
-                    Nothing found.
+                <div
+                    v-if="filteredItems.length === 0 && query !== ''"
+                    class="dropdown-option">
+                    No students found
                 </div>
 
                 <ComboboxOption
@@ -26,13 +28,13 @@
                     class="dropdown-option">
                     <li
                         :class="{
-                            'active-list-item': active,
+                            'dropdown-option-active': active,
                             '': !active,
                         }">
                         <span>
                             {{ item.name }}
                         </span>
-                        <span v-if="selected">
+                        <span v-if="selected" class="dropdown-select-icon">
                             <CheckIcon aria-hidden="true" />
                         </span>
                     </li>
@@ -73,11 +75,7 @@ const filteredItems = computed(() =>
 )
 </script>
 
-<style scoped>
-.profileselect {
-    grid-template-columns: 1fr 60px;
-}
-
+<style scoped lang="scss">
 .combobox-wrapper {
     background-color: #fff;
     height: 3rem;
@@ -91,62 +89,70 @@ const filteredItems = computed(() =>
     border: none;
     border-radius: 0;
     align-self: flex-end;
-}
+    margin-left: 20px;
 
-.list-arrow:hover,
-.list-arrow:focus,
-.list-arrow:active {
-    border: none;
-    outline: none;
-}
+    &:hover,
+    &:focus,
+    &:active {
+        border: none;
+        outline: none;
+    }
 
-.list-arrow svg {
-    height: 20px;
-    max-height: 30px;
+    svg {
+        height: 20px;
+        max-height: 30px;
+    }
 }
 
 .dropdown {
-    display: grid;
+    position: relative;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     border: none;
     font-weight: 400;
     text-align: left;
-    min-width: 6rem;
+    width: 100%;
     height: 3rem;
     max-height: 3rem;
-}
 
-.dropdown-input {
-    border: none;
-    outline: none;
-    padding: 0.75rem;
-    height: 3rem;
-    min-width: 6rem;
-    font-size: 1rem;
-    border-radius: 6px;
-}
+    &-input {
+        border: none;
+        outline: none;
+        padding: 0.75rem;
+        height: 3rem;
+        min-width: fit-content;
+        font-size: 1rem;
+        border-radius: 6px;
+    }
 
-.dropdown-options {
-    list-style-type: none;
-    position: absolute;
-    background-color: #fff;
-    padding: 0.5rem;
-    min-width: 10rem;
-    border-radius: 6px;
-    border: 1px solid #d8d8d8;
-    text-align: left;
-    z-index: 999;
-}
+    &-options {
+        list-style-type: none;
+        position: relative;
+        background-color: #fff;
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid #d8d8d8;
+        text-align: left;
+        z-index: 999;
+    }
 
-.active-list-item {
-    background-color: #f2f3f8;
-}
+    &-option {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-.dropdown-option {
-    padding: 1rem 1.5rem;
-    cursor: pointer;
-    display: grid;
-    grid-template-columns: 1fr 25px;
-    text-align: left;
+        &-active {
+            background-color: #f2f3f8;
+        }
+    }
+
+    &-select-icon {
+        padding-left: 4px;
+        width: 20px;
+        height: 20px;
+    }
 }
 </style>
