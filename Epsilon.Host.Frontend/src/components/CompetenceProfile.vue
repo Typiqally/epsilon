@@ -24,12 +24,12 @@
                         }"></div>
                     {{ architectureLayer.name }}
                 </th>
-              <CompetenceProfileCell
-                  v-for="(activity, j) of props.domain.activities"
-                  :key="j"
-                  :name="`${architectureLayer.name} ${activity.name}`"
-                  :kpis="getKpis(i, j)"
-                  :levels="props.domain.masteryLevels!" />
+                <CompetenceProfileCell
+                    v-for="(activity, j) of props.domain.activities"
+                    :key="j"
+                    :name="`${architectureLayer.name} ${activity.name}`"
+                    :kpis="getKpis(i, j)"
+                    :levels="props.domain.masteryLevels!" />
             </tr>
         </tbody>
     </table>
@@ -45,7 +45,6 @@ import {
 
 import CompetenceProfileCell from "./CompetenceProfileCell.vue"
 
-
 const props = defineProps<{
     domain: IHboIDomain
     data: ProfessionalTaskResult[]
@@ -58,27 +57,6 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
             o.activity === parseInt(acId)
     )
 }
-function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
-    if (props.domain.masteryLevels == null) {
-        return undefined
-    }
-
-    const kpis = getKpis(arId, acId).sort((a, b) => {
-        return (
-            props.domain.masteryLevels?.find(
-                (masteryLevel) => masteryLevel.id == b?.masteryLevel
-            ).level -
-            props.domain.masteryLevels?.find((ml) => ml.id == a?.masteryLevel)
-                .level
-        )
-    })
-
-    return props.domain.masteryLevels.find(
-        (masteryLevel) => masteryLevel.id == kpis[0]?.masteryLevel
-    )
-}
-
-const colors: Array = [{}]
 </script>
 
 <style>
