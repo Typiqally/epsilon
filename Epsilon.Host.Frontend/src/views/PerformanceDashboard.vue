@@ -1,8 +1,5 @@
 <template>
     <div v-if="data" class="performance-dashboard">
-        <!-- <EnrollmentTermButtons
-            :terms="data.terms"
-            @on-term-selected="setTermFilter" /> -->
         <CompetenceProfileComponent
             :data="filteredProfessionalTaskOutcomes"
             :domain="data.hboIDomain" />
@@ -25,7 +22,6 @@ import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
 import CompetenceGraph from "@/components/CompetenceGraph.vue"
 import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
-// import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
 import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const props = defineProps<{
