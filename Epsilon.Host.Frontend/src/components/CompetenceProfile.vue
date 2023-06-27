@@ -89,17 +89,6 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
     height: 15px;
 }
 
-.competence-profile-data {
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    min-width: 5rem;
-    border: 1px solid #e6e6e6;
-    width: 750px;
-    font-weight: 400;
-    font-size: 0.9rem;
-    width: 6rem;
-}
-
 .profile-header-color {
     margin: 3px 10px 0;
     width: 15px;
