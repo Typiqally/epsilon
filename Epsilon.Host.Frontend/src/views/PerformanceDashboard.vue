@@ -1,8 +1,8 @@
 <template>
-    <!-- <div v-if="data" class="performance-dashboard">
-        <EnrollmentTermButtons
+    <div v-if="data" class="performance-dashboard">
+        <!-- <EnrollmentTermButtons
             :terms="data.terms"
-            @on-term-selected="setTermFilter" /> 
+            @on-term-selected="setTermFilter" />  -->
         <CompetenceProfileComponent
             :data="filteredProfessionalTaskOutcomes"
             :domain="data.hboIDomain" />
@@ -15,8 +15,7 @@
             :data="filteredProfessionalSkillOutcomes"
             :domain="data?.hboIDomain"></PersonalDevelopmentGraph>
     </div>
-    <RoundLoader v-else /> -->
-    <KpiTable />
+    <RoundLoader v-else />
 </template>
 
 <script lang="ts" setup>
@@ -28,7 +27,6 @@ import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
 // import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
 import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
-import KpiTable from "@/components/KpiTable.vue"
 
 const props = defineProps<{
     tillDate: Date | undefined
