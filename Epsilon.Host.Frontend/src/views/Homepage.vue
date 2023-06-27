@@ -3,26 +3,38 @@
         <img
             src="../assets/Epsilon_Logo_Blue-Blue.png"
             alt="logo"
-            class="logo" />
+            class="banner-logo" />
         <div class="selection-boxes">
-            <DropdownBtn
+            <div v-if="selectedStudent" class="student-select">
+                <img
+                    :src="selectedStudent.avatarUrl"
+                    :alt="selectedStudent.name"
+                    class="student-select-image" />
+                <SearchBox v-model="selectedStudent" :items="students" />
+            </div>
+            <ListBox
                 v-if="selectedTerm"
                 v-model="selectedTerm"
                 :items="terms" />
         </div>
     </div>
     <TabGroup as="template">
-        <div class="slider">
-            <TabList>
-                <Tab class="slider-item">Performance dashboard</Tab>
-                <Tab class="slider-item">Competence document</Tab>
-            </TabList>
+        <div class="tabs">
+            <div class="slider">
+                <TabList>
+                    <Tab class="slider-item">Performance dashboard</Tab>
+                    <Tab class="slider-item">Competence document</Tab>
+                </TabList>
+            </div>
+            <div>
+                <CompetenceDocumentDownloadButton />
+            </div>
         </div>
+        <hr class="tab-border"/>
         <TabPanels>
             <TabPanel>
                 <PerformanceDashboard :till-date="getCorrectedTermDate" />
             </TabPanel>
-            <TabPanel>Here comes the comp profile :=</TabPanel>
         </TabPanels>
     </TabGroup>
 </template>
@@ -33,15 +45,21 @@ import {
     CompetenceProfile,
     EnrollmentTerm,
     HttpResponse,
+    User,
 } from "../logic/Api"
 
 import PerformanceDashboard from "./PerformanceDashboard.vue"
-import DropdownBtn from "@/components/DropdownBtn.vue"
+import ListBox from "@/components/ListBox.vue"
+import SearchBox from "@/components/SearchBox.vue"
 import { onMounted, Ref, ref } from "vue"
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue"
 import { computed } from "vue"
+import CompetenceDocumentDownloadButton from "@/components/CompetenceDocumentDownloadButton.vue"
 
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
+
+const students: Ref<User[]> = ref([])
+const selectedStudent: Ref<User | undefined> = ref(undefined)
 
 const terms: Ref<EnrollmentTerm[]> = ref([])
 const selectedTerm: Ref<EnrollmentTerm | undefined> = ref(undefined)
@@ -55,6 +73,11 @@ onMounted(() => {
             terms.value = r.data
             selectedTerm.value = terms.value[0]
         })
+
+    App.filter.accessibleStudentsList().then((r: HttpResponse<User[]>) => {
+        students.value = r.data
+        selectedStudent.value = students.value[0]
+    })
 
     App.component
         .componentDetail("competence_profile", {
@@ -80,25 +103,26 @@ const getCorrectedTermDate = computed(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .homepage {
     width: 1366px;
 }
+
 .banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-
     background-color: #f2f3f8;
     height: 9rem;
     width: 100%;
     max-width: 1366px;
     border-radius: 0.5rem;
-}
-.logo {
-    height: 5rem;
-    margin-left: 2rem;
+
+    &-logo {
+        height: 5rem;
+        margin-left: 2rem;
+    }
 }
 
 .selection-boxes {
@@ -107,9 +131,25 @@ const getCorrectedTermDate = computed(() => {
     justify-content: flex-end;
 }
 
-.dropdown:focus,
-.dropdown:active {
-    outline: transparent;
+.student-select {
+    display: flex;
+
+    &-image {
+        width: 3rem;
+        height: 3rem;
+        aspect-ratio: 1/1;
+        border: none;
+        border-radius: 3rem;
+        margin-right: 0.75rem;
+        overflow: hidden;
+        background-color: #fff;
+    }
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .slider {
@@ -117,34 +157,42 @@ const getCorrectedTermDate = computed(() => {
     background-color: #f2f3f8;
     margin: 2rem 0;
     padding: 5px;
-    border-radius: 0.5rem;
+    border-radius: 8px;
     min-height: 40px;
     width: fit-content;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &-item {
+        color: black;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: transparent;
+        border: none;
+        position: relative;
+        z-index: 2;
+
+        &:active,
+        &:focus {
+            outline: transparent;
+        }
+
+        &:hover {
+            background-color: #d8d9dd;
+        }
+
+        &[data-headlessui-state="selected"] {
+            background-color: white;
+        }
+    }
 }
 
-.slider-item {
-    color: black;
-    border-radius: 0.4rem;
-    cursor: pointer;
-    background-color: transparent;
-    border: none;
-    position: relative;
-    z-index: 2;
-}
-
-.slider-item:active,
-.slider-item:focus {
-    outline: transparent;
-}
-
-.slider-item:hover {
-    background-color: #d8d9dd;
-}
-
-.slider-item[data-headlessui-state="selected"] {
-    background-color: white;
+.tab-border {
+    border: 1px solid #f2f3f8;
+    border-right: none;
+    //border-bottom: none;
+    border-left: none;
+    margin-bottom: 2.5rem;
 }
 </style>

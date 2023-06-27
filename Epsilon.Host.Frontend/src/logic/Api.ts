@@ -1,6 +1,5 @@
 /* eslint-disable */
 /* tslint:disable */
-
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -39,8 +38,6 @@ export interface EnrollmentTerm {
     /** @format date-time */
     end_at?: string | null
 }
-
-export type ICompetenceComponent = object
 
 export interface IHboIDomain {
     architectureLayers?: ArchitectureLayer[] | null
@@ -97,6 +94,13 @@ export interface ProfessionalTaskResult {
     assessedAt?: string
 }
 
+export interface User {
+    _id?: string | null
+    name?: string | null
+    /** @format uri */
+    avatarUrl?: string | null
+}
+
 export type QueryParamsType = Record<string | number, any>
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">
 
@@ -144,7 +148,7 @@ export enum ContentType {
 
 export class HttpClient<SecurityDataType = unknown> {
     public baseUrl: string = import.meta.env.VITE_EPSILON_API_ENDPOINT ?? "api"
-        private securityData: SecurityDataType | null = null
+    private securityData: SecurityDataType | null = null
     private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]
     private abortControllers = new Map<CancelToken, AbortController>()
     private customFetch = (...fetchParams: Parameters<typeof fetch>) => fetch(...fetchParams)
@@ -183,7 +187,7 @@ export class HttpClient<SecurityDataType = unknown> {
         const keys = Object.keys(query).filter((key) => "undefined" !== typeof query[key])
         return keys
             .map((key) =>
-                Array.isArray(query[key]) ? this.addArrayQueryParam(query, key) : this.addQueryParam(query, key),
+                Array.isArray(query[key]) ? this.addArrayQueryParam(query, key) : this.addQueryParam(query, key)
             )
             .join("&")
     }
@@ -206,8 +210,8 @@ export class HttpClient<SecurityDataType = unknown> {
                     property instanceof Blob
                         ? property
                         : typeof property === "object" && property !== null
-                            ? JSON.stringify(property)
-                            : `${property}`,
+                        ? JSON.stringify(property)
+                        : `${property}`
                 )
                 return formData
             }, new FormData()),
@@ -251,16 +255,16 @@ export class HttpClient<SecurityDataType = unknown> {
     }
 
     public request = async <T = any, E = any>({
-                                                  body,
-                                                  secure,
-                                                  path,
-                                                  type,
-                                                  query,
-                                                  format,
-                                                  baseUrl,
-                                                  cancelToken,
-                                                  ...params
-                                              }: FullRequestParams): Promise<HttpResponse<T, E>> => {
+        body,
+        secure,
+        path,
+        type,
+        query,
+        format,
+        baseUrl,
+        cancelToken,
+        ...params
+    }: FullRequestParams): Promise<HttpResponse<T, E>> => {
         const secureParams =
             ((typeof secure === "boolean" ? secure : this.baseApiParams.secure) &&
                 this.securityWorker &&
@@ -287,18 +291,18 @@ export class HttpClient<SecurityDataType = unknown> {
             const data = !responseFormat
                 ? r
                 : await response[responseFormat]()
-                    .then((data) => {
-                        if (r.ok) {
-                            r.data = data
-                        } else {
-                            r.error = data
-                        }
-                        return r
-                    })
-                    .catch((e) => {
-                        r.error = e
-                        return r
-                    })
+                      .then((data) => {
+                          if (r.ok) {
+                              r.data = data
+                          } else {
+                              r.error = data
+                          }
+                          return r
+                      })
+                      .catch((e) => {
+                          r.error = e
+                          return r
+                      })
 
             if (cancelToken) {
                 this.abortControllers.delete(cancelToken)
@@ -321,11 +325,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags Auth
          * @name ChallengeList
-         * @request GET:/Auth/challenge
+         * @request GET:/auth/challenge
          */
         challengeList: (params: RequestParams = {}) =>
             this.request<void, any>({
-                path: `/Auth/challenge`,
+                path: `/auth/challenge`,
                 method: "GET",
                 ...params,
             }),
@@ -335,11 +339,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags Auth
          * @name CallbackList
-         * @request GET:/Auth/callback
+         * @request GET:/auth/callback
          */
         callbackList: (params: RequestParams = {}) =>
             this.request<void, any>({
-                path: `/Auth/callback`,
+                path: `/auth/callback`,
                 method: "GET",
                 ...params,
             }),
@@ -350,7 +354,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags Component
          * @name ComponentDetail
-         * @request GET:/Component/{componentName}
+         * @request GET:/component/{componentName}
          */
         componentDetail: (
             componentName: string,
@@ -360,27 +364,12 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @format date-time */
                 endDate?: string
             },
-            params: RequestParams = {},
+            params: RequestParams = {}
         ) =>
             this.request<CompetenceProfile, any>({
-                path: `/Component/${componentName}`,
+                path: `/component/${componentName}`,
                 method: "GET",
                 query: query,
-                format: "json",
-                ...params,
-            }),
-
-        /**
-         * No description
-         *
-         * @tags Component
-         * @name TestList
-         * @request GET:/Component/Test
-         */
-        testList: (params: RequestParams = {}) =>
-            this.request<ICompetenceComponent, any>({
-                path: `/Component/Test`,
-                method: "GET",
                 format: "json",
                 ...params,
             }),
@@ -391,7 +380,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags Document
          * @name WordList
-         * @request GET:/Document/word
+         * @request GET:/document/word
          */
         wordList: (
             query?: {
@@ -400,10 +389,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
                 /** @format date-time */
                 endDate?: string
             },
-            params: RequestParams = {},
+            params: RequestParams = {}
         ) =>
             this.request<void, any>({
-                path: `/Document/word`,
+                path: `/document/word`,
                 method: "GET",
                 query: query,
                 ...params,
@@ -415,11 +404,26 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
          *
          * @tags Filter
          * @name ParticipatedTermsList
-         * @request GET:/Filter/participated-terms
+         * @request GET:/filter/participated-terms
          */
         participatedTermsList: (params: RequestParams = {}) =>
             this.request<EnrollmentTerm[], any>({
-                path: `/Filter/participated-terms`,
+                path: `/filter/participated-terms`,
+                method: "GET",
+                format: "json",
+                ...params,
+            }),
+
+        /**
+         * No description
+         *
+         * @tags Filter
+         * @name AccessibleStudentsList
+         * @request GET:/filter/accessible-students
+         */
+        accessibleStudentsList: (params: RequestParams = {}) =>
+            this.request<User[], any>({
+                path: `/filter/accessible-students`,
                 method: "GET",
                 format: "json",
                 ...params,

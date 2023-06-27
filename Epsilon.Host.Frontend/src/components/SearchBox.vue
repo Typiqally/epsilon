@@ -1,32 +1,34 @@
 <template>
-    <div><img src="../assets/vue.svg" alt="" class="student-image" /></div>
     <div class="combobox-wrapper">
         <Combobox
-            v-if="modelValue"
             :model-value="props.modelValue"
             @update:model-value="$emit('update:modelValue', $event)">
             <div class="profileselect dropdown">
                 <ComboboxInput
                     class="dropdown-input"
-                    :display-value="(modelValue) => modelValue.name"
-                    @update:model-value="$emit('update:modelValue', $event)" />
+                    :display-value="(person) => person.name"
+                    @change="query = $event.target.value" />
                 <ComboboxButton class="list-arrow">
                     <ChevronUpDownIcon aria-hidden="true" />
                 </ComboboxButton>
             </div>
             <ComboboxOptions class="dropdown-options">
-                <div v-if="filteredTerm.length === 0 && query !== ''">
+                <div v-if="filteredItems.length === 0 && query !== ''">
                     Nothing found.
                 </div>
 
                 <ComboboxOption
-                    v-for="item in items"
-                    v-slot="{ active, selected }"
-                    :key="item.name"
-                    class="dropdown-option"
+                    v-for="(item, id) in filteredItems"
+                    :key="id"
+                    v-slot="{ selected, active }"
+                    as="template"
                     :value="item"
-                    as="template">
-                    <li>
+                    class="dropdown-option">
+                    <li
+                        :class="{
+                            'active-list-item': active,
+                            '': !active,
+                        }">
                         <span>
                             {{ item.name }}
                         </span>
@@ -38,33 +40,6 @@
             </ComboboxOptions>
         </Combobox>
     </div>
-    <Listbox
-        v-if="modelValue"
-        :model-value="props.modelValue"
-        @update:model-value="$emit('update:modelValue', $event)">
-        <ListboxButton class="termselect dropdown">
-            <span> {{ modelValue.name }}</span>
-            <span class="list-arrow">
-                <ChevronUpDownIcon aria-hidden="true" />
-            </span>
-        </ListboxButton>
-        <ListboxOptions class="dropdown-options">
-            <ListboxOption
-                v-for="item in items"
-                v-slot="{ active, selected }"
-                :key="item.name"
-                class="dropdown-option"
-                :value="item"
-                as="template">
-                <li>
-                    <span>{{ item.name }}</span>
-                    <span v-if="selected">
-                        <CheckIcon aria-hidden="true" />
-                    </span>
-                </li>
-            </ListboxOption>
-        </ListboxOptions>
-    </Listbox>
 </template>
 
 <script lang="ts" setup>
@@ -76,10 +51,6 @@ import {
     ComboboxButton,
     ComboboxOptions,
     ComboboxOption,
-    Listbox,
-    ListboxButton,
-    ListboxOptions,
-    ListboxOption,
 } from "@headlessui/vue"
 import { ChevronUpDownIcon, CheckIcon } from "@heroicons/vue/20/solid"
 
@@ -88,11 +59,10 @@ const props = defineProps<{
     modelValue: { name: string }
 }>()
 
+const query = ref("")
 defineEmits(["update:modelValue"])
 
-const query = ref("")
-
-const filteredTerm = computed(() =>
+const filteredItems = computed(() =>
     query.value === ""
         ? props.items
         : props.items.filter((item) =>
@@ -105,25 +75,8 @@ const filteredTerm = computed(() =>
 </script>
 
 <style scoped>
-.student-image {
-    width: 3rem;
-    height: 3rem;
-    aspect-ratio: 1/1;
-    border: none;
-    border-radius: 3rem;
-    margin-right: 0.75rem;
-    overflow: hidden;
-    background-color: #fff;
-}
 .profileselect {
     grid-template-columns: 1fr 60px;
-}
-
-.termselect {
-    min-width: 8rem;
-    grid-template-columns: 1fr 20px;
-    gap: 1rem;
-    border-radius: 7px;
 }
 
 .combobox-wrapper {
@@ -140,13 +93,14 @@ const filteredTerm = computed(() =>
     border-radius: 0;
     align-self: flex-end;
 }
+
 .list-arrow:hover,
 .list-arrow:focus,
-.list-arrow:active,
-.termselect {
+.list-arrow:active {
     border: none;
     outline: none;
 }
+
 .list-arrow svg {
     height: 20px;
     max-height: 30px;
@@ -168,15 +122,16 @@ const filteredTerm = computed(() =>
     outline: none;
     padding: 0.75rem;
     height: 3rem;
-    width: 6rem;
+    min-width: 6rem;
     font-size: 1rem;
+    border-radius: 6px;
 }
 
 .dropdown-options {
     list-style-type: none;
     position: absolute;
     background-color: #fff;
-    padding: 1rem;
+    padding: 0.5rem;
     min-width: 10rem;
     border-radius: 6px;
     border: 1px solid #d8d8d8;
@@ -184,8 +139,12 @@ const filteredTerm = computed(() =>
     z-index: 999;
 }
 
+.active-list-item {
+    background-color: #f2f3f8;
+}
+
 .dropdown-option {
-    padding: 15px;
+    padding: 1rem 1.5rem;
     cursor: pointer;
     display: grid;
     grid-template-columns: 1fr 25px;

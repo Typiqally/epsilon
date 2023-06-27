@@ -1,5 +1,5 @@
 <template>
-    <a @click="downloadCompetenceDocument()">
+    <a class="download-btn" @click="downloadCompetenceDocument()">
         <template v-if="!isDownloading">
             <span class="icon-wrapper">
                 <font-awesome-icon
@@ -52,33 +52,33 @@ async function downloadCompetenceDocument(): Promise<void> {
 <style lang="scss" scoped>
 $icon-size: 40px;
 
-a {
+.download-btn {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 200px;
+    width: fit-content;
+    height: 50px;
+    padding: 0.6rem 1.2rem;
     color: black;
     background-color: #f2f3f8;
+    font-weight: 400;
     text-align: center;
-    padding: 1rem;
-    border-radius: 9px;
-}
+    border-radius: 8px;
+    cursor: pointer;
 
-a:hover {
-    color: white;
-    background-color: #848da4;
+    &:hover {
+        color: white;
+        background-color: #848da4;
+    }
 }
 
 .icon-wrapper {
-    width: $icon-size;
-    height: $icon-size;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-right: 1rem;
 }
 
 .loading-icon {
     width: $icon-size;
     height: $icon-size;
+    margin-right: 1rem;
 }
 </style>

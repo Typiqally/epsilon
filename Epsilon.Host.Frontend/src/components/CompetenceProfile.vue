@@ -72,7 +72,6 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
 }
 
 .competence-profile-header-row {
-    text-align: left;
     border: 1px solid #e6e6e6;
     border-left: transparent;
     padding-right: 4rem;
@@ -80,7 +79,6 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
 }
 
 .competence-profile-header-col {
-    text-align: center;
     border: 1px solid #e6e6e6;
     border-top: transparent;
     width: 6rem;
@@ -100,8 +98,6 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
     width: 750px;
     font-weight: 400;
     font-size: 0.9rem;
-    padding-right: 4rem;
-    display: flex;
     width: 6rem;
 }
 
