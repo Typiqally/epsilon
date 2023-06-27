@@ -51,7 +51,7 @@
         <ListboxOptions class="dropdown-options">
             <ListboxOption
                 v-for="item in items"
-                v-slot="{ active, selected }"
+                v-slot="{ selected }"
                 :key="item.name"
                 class="dropdown-option"
                 :value="item"
@@ -68,20 +68,19 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from "vue"
-import { ref, computed } from "vue"
+import { computed, defineProps, ref } from "vue"
 import {
     Combobox,
-    ComboboxInput,
     ComboboxButton,
-    ComboboxOptions,
+    ComboboxInput,
     ComboboxOption,
+    ComboboxOptions,
     Listbox,
     ListboxButton,
-    ListboxOptions,
     ListboxOption,
+    ListboxOptions,
 } from "@headlessui/vue"
-import { ChevronUpDownIcon, CheckIcon } from "@heroicons/vue/20/solid"
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid"
 
 const props = defineProps<{
     items: Array<{ name: string }>
@@ -115,6 +114,7 @@ const filteredTerm = computed(() =>
     overflow: hidden;
     background-color: #fff;
 }
+
 .profileselect {
     grid-template-columns: 1fr 60px;
 }
@@ -140,6 +140,7 @@ const filteredTerm = computed(() =>
     border-radius: 0;
     align-self: flex-end;
 }
+
 .list-arrow:hover,
 .list-arrow:focus,
 .list-arrow:active,
@@ -147,6 +148,7 @@ const filteredTerm = computed(() =>
     border: none;
     outline: none;
 }
+
 .list-arrow svg {
     height: 20px;
     max-height: 30px;
