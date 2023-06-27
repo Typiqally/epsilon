@@ -36,21 +36,22 @@ function formatDate(date: Date): string {
             <th>Grades</th>
         </tr>
         <tr v-for="KPI of Kpis" :key="KPI">
-            <td :style="{
-                border: '3px solid ' + KPI.masteryLevel.color,
-            }"> 
+            <td
+                :style="{
+                    border: '3px solid ' + KPI.masteryLevel.color,
+                }">
                 {{ KPI.kpi }}
             </td>
             <td>
                 <div
                     v-for="assignment of KPI.assignments"
-                    :style="{ textAlign: 'start' }"
-                >
+                    :key="assignment"
+                    :style="{ textAlign: 'start' }">
                     <a :href="assignment.link">{{ assignment.name }}</a>
                 </div>
             </td>
             <td>
-                <div v-for="assignment of KPI.assignments">
+                <div v-for="assignment of KPI.assignments" :key="assignment">
                     {{ assignment.grade }}
                 </div>
             </td>
