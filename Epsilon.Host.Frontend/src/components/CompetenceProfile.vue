@@ -74,7 +74,6 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
 .competence-profile-header-row {
     border: 1px solid #e6e6e6;
     border-left: transparent;
-    padding-right: 4rem;
     display: flex;
 }
 
