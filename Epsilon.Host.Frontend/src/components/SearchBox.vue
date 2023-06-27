@@ -43,16 +43,14 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from "vue"
-import { ref, computed } from "vue"
+import { computed, defineProps, ref } from "vue"
 import {
     Combobox,
-    ComboboxInput,
     ComboboxButton,
-    ComboboxOptions,
+    ComboboxInput,
     ComboboxOption,
 } from "@headlessui/vue"
-import { ChevronUpDownIcon, CheckIcon } from "@heroicons/vue/20/solid"
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid"
 
 const props = defineProps<{
     items: Array<{ name: string }>

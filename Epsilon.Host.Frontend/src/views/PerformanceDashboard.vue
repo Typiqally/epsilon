@@ -79,7 +79,6 @@ onMounted(() => {
 <style scoped>
 .performance-dashboard {
     grid-template-columns: 1fr;
-
 }
 
 @media screen and (min-width: 580px) {
