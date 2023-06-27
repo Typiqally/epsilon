@@ -48,6 +48,7 @@ import {
     Combobox,
     ComboboxButton,
     ComboboxInput,
+    ComboboxOptions,
     ComboboxOption,
 } from "@headlessui/vue"
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/vue/20/solid"
