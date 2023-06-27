@@ -59,46 +59,38 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
 }
 </script>
 
-<style>
+<style lang="scss">
 .competence-profile {
     border-collapse: collapse;
     width: 750px;
-}
 
-.competence-profile-header {
-    padding: 0.5rem;
-    font-weight: 400;
-    font-size: 0.9rem;
-}
+    tr:last-of-type .competence-profile-header-row,
+    tr:last-of-type .competence-profile-data {
+        border-bottom: 1px solid #e6e6e6;
+    }
 
-.competence-profile-header-row {
-    border: 1px solid #e6e6e6;
-    border-left: transparent;
-    padding-right: 4rem;
-    display: flex;
-}
+    &-header {
+        padding: 0.5rem;
+        font-weight: 400;
+        font-size: 0.9rem;
 
-.competence-profile-header-col {
-    border: 1px solid #e6e6e6;
-    border-top: transparent;
-    width: 6rem;
-}
+        &-col {
+            border: 1px solid #e6e6e6;
+            border-top: transparent;
+            width: 6rem;
+        }
 
-.profile-header-color {
-    margin: 3px 10px 0;
-    width: 15px;
-    height: 15px;
-}
+        &-row {
+            border: 1px solid #e6e6e6;
+            border-bottom: none;
+            border-left: none;
+            display: flex;
+        }
+    }
 
-.competence-profile-data {
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    min-width: 5rem;
-    border: 1px solid #e6e6e6;
-    width: 750px;
-    font-weight: 400;
-    font-size: 0.9rem;
-    width: 6rem;
+    &-data:last-child {
+        border-right: 1px solid #e6e6e6;
+    }
 }
 
 .profile-header-color {

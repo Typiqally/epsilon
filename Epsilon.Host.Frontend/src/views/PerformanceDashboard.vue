@@ -1,8 +1,5 @@
 <template>
     <div v-if="data" class="performance-dashboard">
-        <!-- <EnrollmentTermButtons
-            :terms="data.terms"
-            @on-term-selected="setTermFilter" /> -->
         <CompetenceProfileComponent
             :data="filteredProfessionalTaskOutcomes"
             :domain="data.hboIDomain" />
@@ -15,7 +12,7 @@
             :data="filteredProfessionalSkillOutcomes"
             :domain="data?.hboIDomain"></PersonalDevelopmentGraph>
     </div>
-    <RoundLoader v-else />
+    <RoundLoader v-else class="loading-icon" />
 </template>
 
 <script lang="ts" setup>
@@ -25,7 +22,6 @@ import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
 import CompetenceGraph from "@/components/CompetenceGraph.vue"
 import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
-// import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
 import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 
 const props = defineProps<{
@@ -79,6 +75,11 @@ onMounted(() => {
 <style scoped>
 .performance-dashboard {
     grid-template-columns: 1fr;
+}
+
+.loading-icon {
+    width: 64px;
+    height: 64px;
 }
 
 @media screen and (min-width: 580px) {

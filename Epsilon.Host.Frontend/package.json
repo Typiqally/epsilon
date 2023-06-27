@@ -12,9 +12,6 @@
     "modelGeneration": "pnpm dlx swagger-typescript-api -p https://localhost:7084/swagger/v1/swagger.json  -o src/logic -n Api.ts"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.4.0",
-    "@fortawesome/free-solid-svg-icons": "^6.4.0",
-    "@fortawesome/vue-fontawesome": "^3.0.3",
     "@headlessui/vue": "^1.7.14",
     "@heroicons/vue": "^2.0.18",
     "apexcharts": "^3.41.0",

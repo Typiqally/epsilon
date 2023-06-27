@@ -1,9 +1,7 @@
 <template>
     <svg
         id="loader-1"
-        height="64px"
         viewBox="0 0 40 40"
-        width="64px"
         x="0px"
         xml:space="preserve"
         xmlns="http://www.w3.org/2000/svg"
@@ -29,11 +27,3 @@
         </path>
     </svg>
 </template>
-
-<script>
-export default {
-    name: "RoundLoader",
-}
-</script>
-
-<style scoped></style>
