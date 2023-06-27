@@ -1,25 +1,18 @@
 <template>
-    <a class="download-btn" @click="downloadCompetenceDocument()">
-        <template v-if="!isDownloading">
-            <span class="icon-wrapper">
-                <font-awesome-icon
-                    icon="file-arrow-down"
-                    size="lg"
-                    alt="download-button-icon" />
-            </span>
-        </template>
-        <template v-else>
-            <RoundLoader class="loading-icon" />
-        </template>
+    <a class="download-btn" @click="downloadCompetenceDocument">
+        <span class="icon-wrapper">
+            <ArrowDownTrayIcon v-if="!isDownloading" />
+            <RoundLoader v-else />
+        </span>
         Download document
     </a>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue"
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 import RoundLoader from "@/components/RoundLoader.vue"
 import { Api } from "../logic/Api"
+import { ArrowDownTrayIcon } from "@heroicons/vue/20/solid"
 
 const api = new Api()
 
@@ -50,8 +43,6 @@ async function downloadCompetenceDocument(): Promise<void> {
 </script>
 
 <style lang="scss" scoped>
-$icon-size: 40px;
-
 .download-btn {
     display: flex;
     justify-content: space-between;
@@ -74,11 +65,7 @@ $icon-size: 40px;
 
 .icon-wrapper {
     margin-right: 1rem;
-}
-
-.loading-icon {
-    width: $icon-size;
-    height: $icon-size;
-    margin-right: 1rem;
+    width: 24px;
+    height: 24px;
 }
 </style>
