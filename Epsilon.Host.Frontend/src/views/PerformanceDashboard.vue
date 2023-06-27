@@ -15,7 +15,7 @@
             :data="filteredProfessionalSkillOutcomes"
             :domain="data?.hboIDomain"></PersonalDevelopmentGraph>
     </div>
-    <RoundLoader v-else />
+    <RoundLoader v-else class="loading-icon" />
 </template>
 
 <script lang="ts" setup>
@@ -79,6 +79,11 @@ onMounted(() => {
 <style scoped>
 .performance-dashboard {
     grid-template-columns: 1fr;
+}
+
+.loading-icon {
+    width: 64px;
+    height: 64px;
 }
 
 @media screen and (min-width: 580px) {
