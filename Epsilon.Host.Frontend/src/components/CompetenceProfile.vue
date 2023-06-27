@@ -24,13 +24,12 @@
                         }"></div>
                     {{ architectureLayer.name }}
                 </th>
-                <td
-                    v-for="(activity, j) of props.domain.activities"
-                    :key="j"
-                    :style="{ backgroundColor: getCellColor(i, j)?.color }"
-                    class="competence-profile-data">
-                    {{ getKpis(i, j).length }}
-                </td>
+              <CompetenceProfileCell
+                  v-for="(activity, j) of props.domain.activities"
+                  :key="j"
+                  :name="`${architectureLayer.name} ${activity.name}`"
+                  :kpis="getKpis(i, j)"
+                  :levels="props.domain.masteryLevels!" />
             </tr>
         </tbody>
     </table>
@@ -41,9 +40,11 @@ import {
     Activity,
     ArchitectureLayer,
     IHboIDomain,
-    MasteryLevel,
     ProfessionalTaskResult,
 } from "../logic/Api"
+
+import CompetenceProfileCell from "./CompetenceProfileCell.vue"
+
 
 const props = defineProps<{
     domain: IHboIDomain
@@ -57,7 +58,6 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
             o.activity === parseInt(acId)
     )
 }
-
 function getCellColor(arId: string, acId: string): MasteryLevel | undefined {
     if (props.domain.masteryLevels == null) {
         return undefined
@@ -118,6 +118,20 @@ const colors: Array = [{}]
     font-size: 0.9rem;
     padding: 0.5rem;
     min-width: 5rem;
+    border: 1px solid #e6e6e6;
+    width: 750px;
+    font-weight: 400;
+    font-size: 0.9rem;
+    padding-right: 4rem;
+    display: flex;
+    width: 6rem;
+}
+
+.profile-header-color {
+    margin: 3px 10px 0;
+    width: 15px;
+    height: 15px;
+    font-size: 0.9rem;
     border: 1px solid #e6e6e6;
 }
 </style>

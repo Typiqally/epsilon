@@ -2,6 +2,15 @@ name: "Code analysis"
 
 on:
   pull_request:
+    paths:
+      - '**.js'
+      - '**.yml'
+      - '**.cs'
+      - '**.json'
+      - '**.csproj'
+      - '**.ts'
+      - '**.vue'
+      - '**.css'
   schedule:
     - cron: '22 18 * * 5'
 
@@ -20,17 +29,17 @@ jobs:
         language: [ 'csharp', 'javascript' ]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: ${{ matrix.language }}
-        queries: security-extended,security-and-quality
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended,security-and-quality
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
 
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
