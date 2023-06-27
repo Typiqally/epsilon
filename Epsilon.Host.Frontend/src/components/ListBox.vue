@@ -12,7 +12,7 @@
         <ListboxOptions class="dropdown-options">
             <ListboxOption
                 v-for="item in items"
-                v-slot="{ active, selected }"
+                v-slot="{ selected }"
                 :key="item.name"
                 class="dropdown-option"
                 :value="item"

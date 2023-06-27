@@ -30,7 +30,7 @@
                 <CompetenceDocumentDownloadButton />
             </div>
         </div>
-        <hr class="tab-border"/>
+        <hr class="tab-border" />
         <TabPanels>
             <TabPanel>
                 <PerformanceDashboard :till-date="getCorrectedTermDate" />
