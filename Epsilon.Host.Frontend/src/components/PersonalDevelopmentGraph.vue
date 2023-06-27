@@ -2,7 +2,7 @@
     <ApexChart
         :options="chartOptions"
         :series="series"
-        height="350"
+        height="300"
         type="bar"
         width="200" />
 </template>
@@ -90,7 +90,7 @@ function loadChartData(): void {
     chartOptions.xaxis.categories = []
     if (props.domain.professionalSkills != null) {
         props.domain.professionalSkills.forEach((s) => {
-            chartOptions.xaxis.categories.push(s.name as never)
+            chartOptions.xaxis.categories.push(s.shortName as never)
         })
     }
 

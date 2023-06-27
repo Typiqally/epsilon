@@ -12,25 +12,32 @@
     "modelGeneration": "pnpm dlx swagger-typescript-api -p https://localhost:7084/swagger/v1/swagger.json  -o src/logic -n Api.ts"
   },
   "dependencies": {
-    "apexcharts": "^3.37.3",
+    "@fortawesome/fontawesome-svg-core": "^6.4.0",
+    "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@headlessui/vue": "^1.7.14",
+    "@heroicons/vue": "^2.0.18",
+    "apexcharts": "^3.41.0",
+    "sass": "^1.63.6",
+    "sass-loader": "^13.3.2",
     "typescript": "^4.9.5",
-    "vue": "^3.2.45",
-    "vue-router": "^4.1.6",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.2",
     "vue3-apexcharts": "^1.4.1"
   },
   "devDependencies": {
-    "@types/node": "^18.15.3",
-    "@typescript-eslint/eslint-plugin": "^5.55.0",
-    "@typescript-eslint/parser": "^5.55.0",
-    "@vitejs/plugin-vue": "^4.0.0",
-    "@vue/eslint-config-typescript": "^11.0.2",
-    "eslint": "^8.36.0",
+    "@types/node": "^18.16.18",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "@vue/eslint-config-typescript": "^11.0.3",
+    "eslint": "^8.43.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-vue": "^9.9.0",
-    "prettier": "^2.8.7",
+    "eslint-plugin-vue": "^9.15.1",
+    "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
-    "vite": "^4.1.0",
-    "vue-eslint-parser": "^9.1.1"
+    "vite": "^4.3.9",
+    "vue-eslint-parser": "^9.3.1"
   }
 }

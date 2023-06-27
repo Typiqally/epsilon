@@ -8,11 +8,11 @@ public class HboIDomain2018 : IHboIDomain
     public static readonly ArchitectureLayer HardwareInterfacing = new ArchitectureLayer(3, "Hardware Interfacing", "H", "#8D9292");
     public static readonly ArchitectureLayer Infrastructure = new ArchitectureLayer(4, "Infrastructure", "I", "#6EA7D4");
 
-    public static readonly Activity ManageAndControl = new Activity(0, "Manage & Control");
-    public static readonly Activity Analysis = new Activity(1, "Analysis");
-    public static readonly Activity Advise = new Activity(2, "Advise");
-    public static readonly Activity Design = new Activity(3, "Design");
-    public static readonly Activity Realisation = new Activity(4, "Realisation");
+    public static readonly Activity ManageAndControl = new Activity(0, "Manage & Control", "MC");
+    public static readonly Activity Analysis = new Activity(1, "Analysis", "Ana");
+    public static readonly Activity Advise = new Activity(2, "Advise", "Adv");
+    public static readonly Activity Design = new Activity(3, "Design", "Des");
+    public static readonly Activity Realisation = new Activity(4, "Realisation", "Rea");
 
     public static readonly MasteryLevel LevelOne = new MasteryLevel(0, 1, "#8EAADB");
     public static readonly MasteryLevel LevelTwo = new MasteryLevel(1, 2, "#A8D08D");

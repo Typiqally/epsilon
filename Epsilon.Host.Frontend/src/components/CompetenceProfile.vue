@@ -17,6 +17,11 @@
                 :key="i">
                 <th
                     class="competence-profile-header competence-profile-header-row">
+                    <div
+                        class="profile-header-color"
+                        :style="{
+                            backgroundColor: architectureLayer.color,
+                        }"></div>
                     {{ architectureLayer.name }}
                 </th>
                 <CompetenceProfileCell
@@ -57,28 +62,50 @@ function getKpis(arId: string, acId: string): ProfessionalTaskResult[] {
 <style>
 .competence-profile {
     border-collapse: collapse;
+    width: 750px;
 }
 
 .competence-profile-header {
     padding: 0.5rem;
-    font-weight: 600;
+    font-weight: 400;
+    font-size: 0.9rem;
 }
 
 .competence-profile-header-row {
-    text-align: left;
     border: 1px solid #e6e6e6;
     border-left: transparent;
+    padding-right: 4rem;
+    display: flex;
 }
 
 .competence-profile-header-col {
-    text-align: center;
     border: 1px solid #e6e6e6;
     border-top: transparent;
+    width: 6rem;
+}
+
+.profile-header-color {
+    margin: 3px 10px 0;
+    width: 15px;
+    height: 15px;
 }
 
 .competence-profile-data {
+    font-size: 0.9rem;
     padding: 0.5rem;
     min-width: 5rem;
-    border: 0 solid #e6e6e6;
+    border: 1px solid #e6e6e6;
+    width: 750px;
+    font-weight: 400;
+    font-size: 0.9rem;
+    width: 6rem;
+}
+
+.profile-header-color {
+    margin: 3px 10px 0;
+    width: 15px;
+    height: 15px;
+    font-size: 0.9rem;
+    border: 1px solid #e6e6e6;
 }
 </style>

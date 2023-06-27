@@ -1,8 +1,8 @@
 <template>
     <!-- <div v-if="data" class="performance-dashboard">
         <EnrollmentTermButtons
-            :terms="terms"
-            @on-term-selected="setTermFilter" />
+            :terms="data.terms"
+            @on-term-selected="setTermFilter" /> 
         <CompetenceProfileComponent
             :data="filteredProfessionalTaskOutcomes"
             :domain="data.hboIDomain" />
@@ -20,47 +20,35 @@
 </template>
 
 <script lang="ts" setup>
-import {
-    Api,
-    CompetenceProfile,
-    EnrollmentTerm,
-    HttpResponse,
-} from "../logic/Api"
+import { Api, CompetenceProfile, HttpResponse } from "../logic/Api"
 import CompetenceProfileComponent from "@/components/CompetenceProfile.vue"
 import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
 import CompetenceGraph from "@/components/CompetenceGraph.vue"
 import { computed, onMounted, Ref, ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
-import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
+// import EnrollmentTermButtons from "@/components/EnrollmentTermButtons.vue"
 import PersonalDevelopmentGraph from "@/components/PersonalDevelopmentGraph.vue"
 import KpiTable from "@/components/KpiTable.vue"
 
+const props = defineProps<{
+    tillDate: Date | undefined
+}>()
+
 const data: Ref<CompetenceProfile | undefined> = ref(undefined)
-const terms: Ref<EnrollmentTerm[]> = ref([])
 
 const App = new Api()
-const selectedTerm = ref<EnrollmentTerm | undefined>(undefined)
-
-function getCorrectedTermDate(): string | undefined {
-    const index = terms.value?.indexOf(selectedTerm.value) as number
-    if (index > 0) {
-        return terms.value?.at(index - 1)?.start_at
-    } else {
-        return terms.value?.at(index)?.end_at
-    }
-}
 
 const filteredProfessionalTaskOutcomes = computed(() => {
     if (!data.value?.professionalTaskOutcomes) {
         return []
     }
 
-    if (!getCorrectedTermDate()) {
+    if (!props.tillDate) {
         return data.value?.professionalTaskOutcomes
     }
 
     return data.value.professionalTaskOutcomes.filter(
-        (o) => o.assessedAt < getCorrectedTermDate()
+        (o) => o.assessedAt < props.tillDate
     )
 })
 
@@ -69,23 +57,16 @@ const filteredProfessionalSkillOutcomes = computed(() => {
         return []
     }
 
-    if (!getCorrectedTermDate()) {
+    if (!props.tillDate) {
         return data.value?.professionalSkillOutcomes
     }
 
     return data.value?.professionalSkillOutcomes?.filter(
-        (o) => o.assessedAt < getCorrectedTermDate()
+        (o) => o.assessedAt < props.tillDate
     )
 })
 
 onMounted(() => {
-    App.filter
-        .participatedTermsList()
-        .then((r: HttpResponse<EnrollmentTerm[]>) => {
-            terms.value = r.data
-            setTermFilter(terms.value?.at(0) as unknown as EnrollmentTerm)
-        })
-
     App.component
         .componentDetail("competence_profile", {
             startDate: "02-26-2023",
@@ -95,10 +76,6 @@ onMounted(() => {
             data.value = r.data
         })
 })
-
-function setTermFilter(term: EnrollmentTerm): void {
-    selectedTerm.value = term
-}
 </script>
 
 <style scoped>
@@ -110,7 +87,7 @@ function setTermFilter(term: EnrollmentTerm): void {
     .performance-dashboard {
         display: grid;
         grid-template-columns: 1fr 5fr 1fr;
-        gap: 4rem 0;
+        gap: 2rem 0;
         align-items: center;
         justify-items: center;
     }
