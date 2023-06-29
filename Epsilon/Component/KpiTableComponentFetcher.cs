@@ -71,7 +71,7 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
         var outcomesQuery = GetUserKpis.Replace("$studentIds", studentId, StringComparison.InvariantCultureIgnoreCase);
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
 
-        var kpiTableEntries = new List<KpiTableEntry>();
+        var kpiTableEntries = new Dictionary<int, KpiTableEntry>() { };
 
         foreach (var course in outcomes.Data!.Courses!)
         {
@@ -97,21 +97,20 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
 
                             if (grade != null)
                             {
-                                var assignmentName = submission.Assignment.Name;
+                                var assignmentName = submission!.Assignment!.Name!;
                                 var htmlUrl = submission.Assignment.HtmlUrl;
                                 var assessmentRating = assessmentRatings?.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome?.Id);
 
                                 if (assessmentRating is not null)
                                 {
-                                    var kpiTableEntryIndex = kpiTableEntries.FindIndex(kte => kte.Kpi == outcome?.Title);
 
-                                    if (kpiTableEntryIndex > -1)
+                                    if (kpiTableEntries.ContainsKey(outcome.Id))
                                     {
-                                        UpdateKpiTableEntry(kpiTableEntries, kpiTableEntryIndex, assignmentName, grade, htmlUrl);
+                                        UpdateKpiTableEntry(kpiTableEntries, outcome, submission.Assignment, grade);
                                     }
                                     else
                                     {
-                                        AddKpiTableEntry(kpiTableEntries, outcome, assignmentName, grade, htmlUrl);
+                                        AddKpiTableEntry(kpiTableEntries, outcome, submission.Assignment, grade);
                                     }
                                 }
                             }
@@ -120,10 +119,7 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
                 }
             }
         }
-
-        kpiTableEntries = kpiTableEntries
-            .ToList();
-
+        
         return new KpiTable(kpiTableEntries);
     }
 
@@ -136,19 +132,19 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
                                          FhictConstants.ProfessionalSkills.ContainsKey(outcome.Id)));
     }
 
-    private static void UpdateKpiTableEntry(IList<KpiTableEntry> kpiTableEntries, int index, string assignmentName, string gradeStatus, Uri htmlUrl)
+    private static void UpdateKpiTableEntry(Dictionary<int, KpiTableEntry> kpiTableEntries, Outcome outcome, Assignment assignment, string gradeStatus)
     {
-        var existingEntry = kpiTableEntries[index];
-        var updatedAssignments = existingEntry.Assignments.Append(
-            new KpiTableEntryAssignment(assignmentName, gradeStatus, htmlUrl)
+        var kpiEntry = kpiTableEntries.GetValueOrDefault(outcome.Id);
+        var updatedAssignments = kpiEntry.Assignments.Append(
+            new KpiTableEntryAssignment(assignment.Name, gradeStatus, assignment.HtmlUrl)
         );
+        var updatedEntry = kpiEntry with { Assignments = updatedAssignments, };
 
-        var updatedEntry = existingEntry with { Assignments = updatedAssignments, };
-
-        kpiTableEntries[index] = updatedEntry;
+        kpiTableEntries.Remove(outcome.Id);
+        kpiTableEntries.Add(outcome.Id, updatedEntry);
     }
 
-    private static void AddKpiTableEntry(ICollection<KpiTableEntry> kpiTableEntries, Outcome outcome, string assignmentName, string gradeStatus, Uri htmlUrl)
+    private static void AddKpiTableEntry(Dictionary<int, KpiTableEntry> kpiTableEntries, Outcome outcome, Assignment assignment, string gradeStatus)
     {
         MasteryLevel? masteryLevel = null;
         ProfessionalSkillLevel? professionalSkill = null;
@@ -161,9 +157,9 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
 
         if (masteryLevel != null)
         {
-            var assignment = new KpiTableEntryAssignment(assignmentName, gradeStatus, htmlUrl);
-            var kpiTableEntry = new KpiTableEntry(outcome.Title, masteryLevel, new List<KpiTableEntryAssignment> { assignment, });
-            kpiTableEntries.Add(kpiTableEntry);
+            var kpiAssignment = new KpiTableEntryAssignment(assignment.Name, gradeStatus, assignment.HtmlUrl);
+            var kpiTableEntry = new KpiTableEntry(outcome.Title, masteryLevel, new List<KpiTableEntryAssignment> { kpiAssignment, });
+            kpiTableEntries.Add(outcome.Id, kpiTableEntry);
         }
     }
 }

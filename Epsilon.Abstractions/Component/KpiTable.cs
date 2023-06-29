@@ -5,7 +5,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 namespace Epsilon.Abstractions.Component;
 
 public record KpiTable(
-    IEnumerable<KpiTableEntry> Entries
+    IDictionary<int, KpiTableEntry> KpiTableEntries
 ) : IWordCompetenceComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
@@ -31,18 +31,18 @@ public record KpiTable(
         table.AppendChild(headerRow);
 
         // Create the table body rows and cells
-        foreach (var entry in Entries.OrderByDescending(static e => e.Kpi))
+        foreach (var entry in KpiTableEntries.ToList().OrderByDescending(static e => e.Value.Kpi))
         {
             var tableRow = new TableRow();
             
             // Outcome (KPI) column
-            tableRow.AppendChild(CreateTableCellWithBorders("3000", new Paragraph(new Run(new Text(entry.Kpi)))));
+            tableRow.AppendChild(CreateTableCellWithBorders("3000", new Paragraph(new Run(new Text(entry.Value.Kpi)))));
             
             // Assignments column
             var assignmentsParagraph = new Paragraph();
             var assignmentsRun = assignmentsParagraph.AppendChild(new Run());
             
-            foreach (var assignment in entry.Assignments)
+            foreach (var assignment in entry.Value.Assignments)
             {
                 var rel = mainDocumentPart.AddHyperlinkRelationship(assignment.Link, true);
                 var relationshipId = rel.Id;
@@ -62,7 +62,7 @@ public record KpiTable(
             tableRow.AppendChild(CreateTableCellWithBorders("5000", assignmentsParagraph));
 
             // Grades column
-            var grades = entry.Assignments.Select(static a => a.Grade);
+            var grades = entry.Value.Assignments.Select(static a => a.Grade);
             var gradesParagraph = new Paragraph();
             var gradesRun = gradesParagraph.AppendChild(new Run());
         
