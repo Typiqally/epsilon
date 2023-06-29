@@ -38,7 +38,7 @@ watch(
     }
 )
 
-function cellColor(kpis): MasteryLevel | undefined {
+function cellColor(kpis: ProfessionalTaskResult[]): MasteryLevel | undefined {
     const sortedKpis = kpis.sort(
         (a, b) =>
             props.levels.find(
@@ -53,22 +53,16 @@ function cellColor(kpis): MasteryLevel | undefined {
 </script>
 
 <style scoped>
-.cell-changed .cell-value {
-    animation: 700ms 1 ease rotate-upwards;
+.cell-changed {
+    animation: 1s 1 ease flash;
 }
 
-@keyframes rotate-upwards {
+@keyframes flash {
     0% {
-        transform: scale(130%);
-        transform: translate3d(0, 1.75em, -10em) rotateY(-225deg);
-        opacity: 0;
-    }
-    20% {
-        opacity: 0;
+        filter: brightness(120%);
     }
     100% {
-        transform: scale(100%);
-        transform: translate3d(0, 0, 0) rotateY(0deg);
+        filter: brightness(100%);
     }
 }
 </style>

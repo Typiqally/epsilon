@@ -7,7 +7,7 @@
         <div class="selection-boxes">
             <div v-if="selectedStudent" class="student-select">
                 <img
-                    :src="selectedStudent.avatarUrl"
+                    :src="avatarUrl"
                     :alt="selectedStudent.name"
                     class="student-select-image" />
                 <SearchBox v-model="selectedStudent" :items="students" />
@@ -87,6 +87,16 @@ onMounted(() => {
         .then((r: HttpResponse<CompetenceProfile>) => {
             data.value = r.data
         })
+})
+
+const avatarUrl = computed(() => {
+    const studentAvatarUrl = selectedStudent.value?.avatarUrl
+
+    if (studentAvatarUrl) {
+        return studentAvatarUrl
+    }
+
+    return "src/assets/default_avatar.png"
 })
 
 const getCorrectedTermDate = computed(() => {

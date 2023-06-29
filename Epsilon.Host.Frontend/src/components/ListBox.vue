@@ -1,31 +1,33 @@
 <template>
-    <Listbox
-        v-if="modelValue"
-        :model-value="props.modelValue"
-        @update:model-value="$emit('update:modelValue', $event)">
-        <ListboxButton class="termselect dropdown">
-            <span> {{ modelValue.name }}</span>
-            <span class="list-arrow">
-                <ChevronUpDownIcon aria-hidden="true" />
-            </span>
-        </ListboxButton>
-        <ListboxOptions class="dropdown-options">
-            <ListboxOption
-                v-for="item in items"
-                v-slot="{ selected }"
-                :key="item.name"
-                class="dropdown-option"
-                :value="item"
-                as="template">
-                <li>
-                    <span>{{ item.name }}</span>
-                    <span v-if="selected">
-                        <CheckIcon aria-hidden="true" />
-                    </span>
-                </li>
-            </ListboxOption>
-        </ListboxOptions>
-    </Listbox>
+    <div class="list-box-wrapper">
+        <Listbox
+            v-if="modelValue"
+            :model-value="props.modelValue"
+            @update:model-value="$emit('update:modelValue', $event)">
+            <ListboxButton class="dropdown">
+                <span> {{ modelValue.name }}</span>
+                <span class="list-arrow">
+                    <ChevronUpDownIcon aria-hidden="true" />
+                </span>
+            </ListboxButton>
+            <ListboxOptions class="dropdown-options">
+                <ListboxOption
+                    v-for="item in items"
+                    v-slot="{ selected }"
+                    :key="item.name"
+                    class="dropdown-option"
+                    :value="item"
+                    as="template">
+                    <li>
+                        <span>{{ item.name }}</span>
+                        <span v-if="selected" class="dropdown-select-icon">
+                            <CheckIcon aria-hidden="true" />
+                        </span>
+                    </li>
+                </ListboxOption>
+            </ListboxOptions>
+        </Listbox>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -45,12 +47,13 @@ const props = defineProps<{
 defineEmits(["update:modelValue"])
 </script>
 
-<style scoped>
-.termselect {
-    min-width: 8rem;
-    grid-template-columns: 1fr 20px;
-    gap: 1rem;
+<style scoped lang="scss">
+.list-box-wrapper {
+    background-color: #fff;
+    height: 3rem;
     border-radius: 7px;
+    margin-right: 2rem;
+    min-width: 6rem;
 }
 
 .list-arrow {
@@ -58,47 +61,72 @@ defineEmits(["update:modelValue"])
     border: none;
     border-radius: 0;
     align-self: flex-end;
-}
-.list-arrow:hover,
-.list-arrow:focus,
-.list-arrow:active,
-.termselect {
-    border: none;
-    outline: none;
-}
-.list-arrow svg {
-    height: 20px;
-    max-height: 30px;
+    margin-left: 20px;
+
+    &:hover,
+    &:focus,
+    &:active {
+        border: none;
+        outline: none;
+    }
+
+    svg {
+        height: 20px;
+        max-height: 30px;
+    }
 }
 
 .dropdown {
-    display: grid;
+    position: relative;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     border: none;
     font-weight: 400;
     text-align: left;
-    min-width: 6rem;
+    width: 100%;
     height: 3rem;
     max-height: 3rem;
-}
+    background: white;
+    outline: none;
 
-.dropdown-options {
-    list-style-type: none;
-    position: absolute;
-    background-color: #fff;
-    padding: 1rem;
-    min-width: 10rem;
-    border-radius: 6px;
-    border: 1px solid #d8d8d8;
-    text-align: left;
-    z-index: 999;
-}
+    &-input {
+        border: none;
+        outline: none;
+        padding: 0.75rem;
+        height: 3rem;
+        min-width: fit-content;
+        font-size: 1rem;
+        border-radius: 6px;
+    }
 
-.dropdown-option {
-    padding: 15px;
-    cursor: pointer;
-    display: grid;
-    grid-template-columns: 1fr 25px;
-    text-align: left;
+    &-options {
+        list-style-type: none;
+        position: relative;
+        background-color: #fff;
+        width: 100%;
+        border-radius: 6px;
+        border: 1px solid #d8d8d8;
+        text-align: left;
+        z-index: 999;
+    }
+
+    &-option {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        &:hover {
+            background-color: #f2f3f8;
+        }
+    }
+
+    &-select-icon {
+        padding-left: 4px;
+        width: 20px;
+        height: 20px;
+    }
 }
 </style>
