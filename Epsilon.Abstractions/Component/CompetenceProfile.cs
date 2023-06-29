@@ -93,9 +93,8 @@ public record CompetenceProfile(
                     cell.Append(new Paragraph(new Run(new Text($"{kpiCount}"))));
                     row.AppendChild(cell);
                 }
-
-                table.AppendChild(row);
             }
+            table.AppendChild(row);
         }
         return table;
     }
