@@ -16,6 +16,9 @@
         "src/*"
       ]
     },
+    "types": [
+      "vite/client"
+    ],
     "lib": [
       "esnext",
       "dom",
@@ -26,7 +29,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/**/*.vue",
+    "src/**/*.vue"
   ],
   "exclude": [
     "node_modules"
