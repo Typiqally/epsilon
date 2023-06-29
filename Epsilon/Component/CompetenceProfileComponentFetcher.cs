@@ -58,14 +58,15 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
 
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
 
-        var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018());
+        var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018(), startDate, endDate);
 
         return competenceProfile;
     }
 
     private static CompetenceProfile ConvertToComponent(
         CanvasGraphQlQueryResponse queryResponse,
-        IHboIDomain domain
+        IHboIDomain domain,
+        DateTime startDate, DateTime endDate
     )
     {
         var taskResults = new List<ProfessionalTaskResult>();
@@ -73,19 +74,17 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
 
         if (queryResponse.Data != null)
         {
-            foreach (var course in queryResponse.Data.Courses)
+            foreach (var course in queryResponse.Data.Courses!)
             {
-                foreach (var submissionsConnection in course.SubmissionsConnection.Nodes)
+                foreach (var submission in course.SubmissionsConnection!.Nodes.Select(sm => sm.SubmissionsHistories.Nodes
+                                                                                              .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
+                                                                                              .MaxBy(static h => h.Attempt)))
                 {
-                    var submission = submissionsConnection.SubmissionsHistories.Nodes
-                        .Where(static h => h.RubricAssessments.Nodes.Any())
-                        .MaxBy(static h => h.Attempt);
-
                     if (submission != null)
                     {
-                        var rubricAssessments = submission.RubricAssessments.Nodes;
+                        var rubricAssessments = submission.RubricAssessments?.Nodes;
 
-                        foreach (var assessmentRating in rubricAssessments.SelectMany(static rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar =>
+                        foreach (var assessmentRating in rubricAssessments?.SelectMany(static rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar =>
                                      ar is { Points: not null, Criterion.MasteryPoints: not null, Criterion.Outcome: not null, } && ar.Points >= ar.Criterion.MasteryPoints)))
                         {
                             if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))

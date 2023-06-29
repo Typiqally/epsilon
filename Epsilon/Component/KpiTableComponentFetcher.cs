@@ -75,12 +75,10 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
 
         foreach (var course in outcomes.Data!.Courses!)
         {
-            foreach (var submissionsConnection in course.SubmissionsConnection!.Nodes)
+            foreach (var submission in course.SubmissionsConnection!.Nodes.Select(sm => sm.SubmissionsHistories.Nodes
+                                                                                          .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
+                                                                                          .MaxBy(static h => h.Attempt)))
             {
-                var submission = submissionsConnection.SubmissionsHistories.Nodes
-                    .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
-                    .MaxBy(static h => h.Attempt);
-
                 if (submission is
                     {
                         Assignment.Rubric: not null,
@@ -122,24 +120,24 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
                 }
             }
         }
-        
+
         kpiTableEntries = kpiTableEntries
-            .OrderBy(static kte => kte.MasteryLevel.Level)
-            .ThenBy(static kte => kte.Kpi)
-            .ToList();
-        
+                          .OrderBy(static kte => kte.MasteryLevel.Level)
+                          .ThenBy(static kte => kte.Kpi)
+                          .ToList();
+
         return new KpiTable(kpiTableEntries);
     }
-    
+
     private static IEnumerable<Outcome?> GetValidOutcomes(IEnumerable<Criteria> rubricCriteria)
     {
         return rubricCriteria
-            .Select(static criteria => criteria.Outcome)
-            .Where(static outcome => outcome is not null &&
-                (FhictConstants.ProfessionalTasks.ContainsKey(outcome.Id) ||
-                 FhictConstants.ProfessionalSkills.ContainsKey(outcome.Id)));
+               .Select(static criteria => criteria.Outcome)
+               .Where(static outcome => outcome is not null &&
+                                        (FhictConstants.ProfessionalTasks.ContainsKey(outcome.Id) ||
+                                         FhictConstants.ProfessionalSkills.ContainsKey(outcome.Id)));
     }
-    
+
     private static void UpdateKpiTableEntry(IList<KpiTableEntry> kpiTableEntries, int index, string assignmentName, string gradeStatus, Uri htmlUrl)
     {
         var existingEntry = kpiTableEntries[index];
@@ -147,10 +145,7 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
             new KpiTableEntryAssignment(assignmentName, gradeStatus, htmlUrl)
         );
 
-        var updatedEntry = existingEntry with
-        {
-            Assignments = updatedAssignments,
-        };
+        var updatedEntry = existingEntry with { Assignments = updatedAssignments, };
 
         kpiTableEntries[index] = updatedEntry;
     }
@@ -159,7 +154,7 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
     {
         MasteryLevel? masteryLevel = null;
         ProfessionalSkillLevel? professionalSkill = null;
-    
+
         if (FhictConstants.ProfessionalTasks.TryGetValue(outcome.Id, out var professionalTask)
             || FhictConstants.ProfessionalSkills.TryGetValue(outcome.Id, out professionalSkill))
         {
