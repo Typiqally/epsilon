@@ -58,15 +58,14 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
 
         var outcomes = await _graphQlService.Query<CanvasGraphQlQueryResponse>(outcomesQuery);
 
-        var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018(), startDate, endDate);
+        var competenceProfile = ConvertToComponent(outcomes, new HboIDomain2018());
 
         return competenceProfile;
     }
 
     private static CompetenceProfile ConvertToComponent(
         CanvasGraphQlQueryResponse queryResponse,
-        IHboIDomain domain,
-        DateTime startDate, DateTime endDate
+        IHboIDomain domain
     )
     {
         var taskResults = new List<ProfessionalTaskResult>();
@@ -76,8 +75,8 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
         {
             foreach (var course in queryResponse.Data.Courses!)
             {
-                foreach (var submission in course.SubmissionsConnection!.Nodes.Select(sm => sm.SubmissionsHistories.Nodes
-                                                                                              .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
+                foreach (var submission in course.SubmissionsConnection!.Nodes.Select(static sm => sm.SubmissionsHistories.Nodes
+                                                                                              .Where(static h => h.RubricAssessments.Nodes.Any())
                                                                                               .MaxBy(static h => h.Attempt)))
                 {
                     if (submission != null)
