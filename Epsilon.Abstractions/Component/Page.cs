@@ -4,15 +4,15 @@ using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Epsilon.Abstractions.Component;
 
-public record PersonaPage(string PersonaHtml) : IWordCompetenceComponent
+public record Page(string Html) : IWordCompetenceComponent
 {
     public void AddToWordDocument(MainDocumentPart mainDocumentPart)
     {
-        var personaHtmlBuffer = Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes($"<html>{PersonaHtml}</html>")).ToArray();
-        using var personaHtmlStream = new MemoryStream(personaHtmlBuffer);
+        var htmlBuffer = Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes($"<html>{Html}</html>")).ToArray();
+        using var htmlStream = new MemoryStream(htmlBuffer);
 
         var formatImportPart = mainDocumentPart.AddAlternativeFormatImportPart(AlternativeFormatImportPartType.Html);
-        formatImportPart.FeedData(personaHtmlStream);
+        formatImportPart.FeedData(htmlStream);
 
         mainDocumentPart.Document.AppendChild(new Body(
             new AltChunk

@@ -12,17 +12,17 @@ public class CompetenceComponentService : ICompetenceComponentService
         _componentFetchers = componentFetchers;
     }
 
-    public async IAsyncEnumerable<ICompetenceComponent> GetComponents(DateTime startDate, DateTime endDate)
+    public async IAsyncEnumerable<ICompetenceComponent> GetComponents(string name, DateTime startDate, DateTime endDate)
     {
         foreach (var componentFetcher in _componentFetchers.Values)
         {
-            yield return await componentFetcher.FetchUnknown(startDate, endDate);
+            yield return await componentFetcher.FetchUnknown(name, startDate, endDate);
         }
     }
 
-    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>(DateTime startDate, DateTime endDate) where TComponent : ICompetenceComponent
+    public async IAsyncEnumerable<TComponent> GetComponents<TComponent>(string name, DateTime startDate, DateTime endDate) where TComponent : ICompetenceComponent
     {
-        await foreach (var component in GetComponents(startDate, endDate))
+        await foreach (var component in GetComponents(name,startDate, endDate))
         {
             if (component is TComponent componentOfT)
             {
@@ -35,7 +35,7 @@ public class CompetenceComponentService : ICompetenceComponentService
     {
         if (_componentFetchers.TryGetValue(name, out var fetcher))
         {
-            return await fetcher.FetchUnknown(startDate, endDate);
+            return await fetcher.FetchUnknown(name, startDate, endDate);
         }
 
         return null;

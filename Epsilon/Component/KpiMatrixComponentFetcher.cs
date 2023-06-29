@@ -64,7 +64,7 @@ public class KpiMatrixComponentFetcher : CompetenceComponentFetcher<KpiMatrixCol
         _configuration = configuration;
     }
 
-    public override async Task<KpiMatrixCollection> Fetch(DateTime startDate, DateTime endDate)
+    public override async Task<KpiMatrixCollection> Fetch(string componentName, DateTime startDate, DateTime endDate)
     {
         var studentId = _configuration["Canvas:StudentId"];
         var outcomesQuery = GetUserKpiMatrixOutcomes.Replace("$studentIds", $"{studentId}", StringComparison.InvariantCultureIgnoreCase);
