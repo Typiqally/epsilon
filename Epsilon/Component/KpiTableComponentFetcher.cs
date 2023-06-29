@@ -97,8 +97,6 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
 
                             if (grade != null)
                             {
-                                var assignmentName = submission!.Assignment!.Name!;
-                                var htmlUrl = submission.Assignment.HtmlUrl;
                                 var assessmentRating = assessmentRatings?.FirstOrDefault(ar => ar?.Criterion?.Outcome?.Id == outcome?.Id);
 
                                 if (assessmentRating is not null)
