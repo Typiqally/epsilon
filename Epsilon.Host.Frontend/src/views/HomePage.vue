@@ -41,14 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import {
-    Api,
-    CompetenceProfile,
-    EnrollmentTerm,
-    HttpResponse,
-    User,
-} from "@/logic/Api"
-
+import { Api, EnrollmentTerm, HttpResponse, User } from "@/logic/Api"
 import DefaultAvatar from "@/assets/default_avatar.png"
 import PerformanceDashboard from "./PerformanceDashboard.vue"
 import ListBox from "@/components/ListBox.vue"
@@ -57,8 +50,6 @@ import { onMounted, Ref, ref } from "vue"
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from "@headlessui/vue"
 import { computed } from "vue"
 import CompetenceDocumentDownloadButton from "@/components/CompetenceDocumentDownloadButton.vue"
-
-const data: Ref<CompetenceProfile | undefined> = ref(undefined)
 
 const students: Ref<User[]> = ref([])
 const selectedStudent: Ref<User | undefined> = ref(undefined)
@@ -80,15 +71,6 @@ onMounted(() => {
         students.value = r.data
         selectedStudent.value = students.value[0]
     })
-
-    App.component
-        .componentDetail("competence_profile", {
-            startDate: "02-26-2023",
-            endDate: "05-26-2023",
-        })
-        .then((r: HttpResponse<CompetenceProfile>) => {
-            data.value = r.data
-        })
 })
 
 const avatarUrl = computed(() => {
