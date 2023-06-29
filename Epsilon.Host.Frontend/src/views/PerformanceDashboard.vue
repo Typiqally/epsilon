@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Api, CompetenceProfile, HttpResponse } from "../logic/Api"
+import { Api, CompetenceProfile, HttpResponse } from "@/logic/Api"
 import CompetenceProfileComponent from "@/components/CompetenceProfile.vue"
 import CompetenceProfileLegend from "@/components/CompetenceProfileLegend.vue"
 import CompetenceGraph from "@/components/CompetenceGraph.vue"

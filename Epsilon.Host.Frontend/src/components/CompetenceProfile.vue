@@ -41,7 +41,7 @@ import {
     ArchitectureLayer,
     IHboIDomain,
     ProfessionalTaskResult,
-} from "../logic/Api"
+} from "@/logic/Api"
 
 import CompetenceProfileCell from "./CompetenceProfileCell.vue"
 

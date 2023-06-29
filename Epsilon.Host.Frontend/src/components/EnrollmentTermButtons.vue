@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { EnrollmentTerm } from "../logic/Api"
+import { EnrollmentTerm } from "@/logic/Api"
 
 const props = defineProps<{
     terms: EnrollmentTerm[]

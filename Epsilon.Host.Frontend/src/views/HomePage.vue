@@ -46,7 +46,7 @@ import {
     EnrollmentTerm,
     HttpResponse,
     User,
-} from "../logic/Api"
+} from "@/logic/Api"
 
 import PerformanceDashboard from "./PerformanceDashboard.vue"
 import ListBox from "@/components/ListBox.vue"
