@@ -35,6 +35,7 @@
             <TabPanel>
                 <PerformanceDashboard :till-date="getCorrectedTermDate" />
             </TabPanel>
+            <TabPanel>Competence document</TabPanel>
         </TabPanels>
     </TabGroup>
 </template>
