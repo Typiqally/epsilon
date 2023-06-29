@@ -31,7 +31,7 @@ public record KpiTable(
         table.AppendChild(headerRow);
 
         // Create the table body rows and cells
-        foreach (var entry in Entries)
+        foreach (var entry in Entries.OrderByDescending(static e => e.Kpi))
         {
             var tableRow = new TableRow();
             

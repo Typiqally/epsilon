@@ -122,9 +122,7 @@ public class KpiTableComponentFetcher : CompetenceComponentFetcher<KpiTable>
         }
 
         kpiTableEntries = kpiTableEntries
-                          .OrderBy(static kte => kte.MasteryLevel.Level)
-                          .ThenBy(static kte => kte.Kpi)
-                          .ToList();
+            .ToList();
 
         return new KpiTable(kpiTableEntries);
     }
