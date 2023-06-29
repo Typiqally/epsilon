@@ -72,14 +72,12 @@ public class KpiMatrixComponentFetcher : CompetenceComponentFetcher<KpiMatrixCol
 
 
         var assignments = new List<KpiMatrixAssignment>();
-        foreach (var course in outcomes.Data!.Courses!)
+        foreach (var course in outcomes!.Data!.Courses!)
         {
-            foreach (var submissionsConnection in course.SubmissionsConnection!.Nodes)
+            foreach (var submission in course.SubmissionsConnection!.Nodes.Select(sm => sm.SubmissionsHistories.Nodes
+                                                                                          .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
+                                                                                          .MaxBy(static h => h.Attempt)))
             {
-                var submission = submissionsConnection.SubmissionsHistories.Nodes
-                    .Where(sub => sub.SubmittedAt > startDate && sub.SubmittedAt < endDate)
-                    .MaxBy(static h => h.Attempt);
-
                 if (submission is
                     {
                         Assignment.Rubric: not null,

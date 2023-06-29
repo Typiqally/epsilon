@@ -73,19 +73,17 @@ public class CompetenceProfileComponentFetcher : CompetenceComponentFetcher<Comp
 
         if (queryResponse.Data != null)
         {
-            foreach (var course in queryResponse.Data.Courses)
+            foreach (var course in queryResponse.Data.Courses!)
             {
-                foreach (var submissionsConnection in course.SubmissionsConnection.Nodes)
+                foreach (var submission in course.SubmissionsConnection!.Nodes.Select(static sm => sm.SubmissionsHistories.Nodes
+                                                                                              .Where(static h => h.RubricAssessments.Nodes.Any())
+                                                                                              .MaxBy(static h => h.Attempt)))
                 {
-                    var submission = submissionsConnection.SubmissionsHistories.Nodes
-                        .Where(static h => h.RubricAssessments.Nodes.Any())
-                        .MaxBy(static h => h.Attempt);
-
                     if (submission != null)
                     {
-                        var rubricAssessments = submission.RubricAssessments.Nodes;
+                        var rubricAssessments = submission.RubricAssessments?.Nodes;
 
-                        foreach (var assessmentRating in rubricAssessments.SelectMany(static rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar =>
+                        foreach (var assessmentRating in rubricAssessments?.SelectMany(static rubricAssessment => rubricAssessment.AssessmentRatings.Where(static ar =>
                                      ar is { Points: not null, Criterion.MasteryPoints: not null, Criterion.Outcome: not null, } && ar.Points >= ar.Criterion.MasteryPoints)))
                         {
                             if (FhictConstants.ProfessionalTasks.TryGetValue(assessmentRating.Criterion.Outcome.Id, out var professionalTask))

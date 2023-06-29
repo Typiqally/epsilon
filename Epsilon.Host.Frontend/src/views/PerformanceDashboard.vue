@@ -82,6 +82,11 @@ onMounted(() => {
     height: 64px;
 }
 
+.loading-icon {
+    width: 64px;
+    height: 64px;
+}
+
 @media screen and (min-width: 580px) {
     .performance-dashboard {
         display: grid;

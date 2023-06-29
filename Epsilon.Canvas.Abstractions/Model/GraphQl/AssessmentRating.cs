@@ -8,4 +8,13 @@ public record AssessmentRating(
 )
 {
     public bool IsMastery => Points >= Criterion?.MasteryPoints;
+
+    public string? Grade => Points switch
+    {
+        >= 5.0 => "Outstanding",
+        >= 4.0 => "Good",
+        >= 3.0 => "Sufficient",
+        >= 0.0 => "Insufficient",
+        _ => null,
+    };
 }
