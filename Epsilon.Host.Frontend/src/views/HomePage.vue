@@ -48,6 +48,7 @@ import {
     User,
 } from "@/logic/Api"
 
+import DefaultAvatar from "@/assets/default_avatar.png"
 import PerformanceDashboard from "./PerformanceDashboard.vue"
 import ListBox from "@/components/ListBox.vue"
 import SearchBox from "@/components/SearchBox.vue"
@@ -96,7 +97,7 @@ const avatarUrl = computed(() => {
         return studentAvatarUrl
     }
 
-    return "src/assets/default_avatar.png"
+    return DefaultAvatar
 })
 
 const getCorrectedTermDate = computed(() => {
