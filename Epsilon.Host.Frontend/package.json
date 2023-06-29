@@ -12,7 +12,7 @@
     "modelGeneration": "pnpm dlx swagger-typescript-api -p https://localhost:7084/swagger/v1/swagger.json  -o src/logic -n Api.ts"
   },
   "dependencies": {
-    "@headlessui/vue": "^1.7.14",
+    "@headlessui/vue": "1.7.2",
     "@heroicons/vue": "^2.0.18",
     "apexcharts": "^3.41.0",
     "sass": "^1.63.6",
