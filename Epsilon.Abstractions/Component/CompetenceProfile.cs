@@ -24,7 +24,6 @@ public record CompetenceProfile(
         body.Append(new Paragraph(new Run(new Text(""))));
 
 
-
         mainDocumentPart.Document.AppendChild(body);
     }
 
@@ -40,18 +39,13 @@ public record CompetenceProfile(
                         architectureId = group.Key,
                         activities = group
                                      .GroupBy(static act => act.Activity)
-                                     .Select(static group => new
-                                     {
-                                         activityId = group.Key,
-                                         count = group.Count(),
-                                         masteryLevel = group.Max(static m => m.MasteryLevel),
-                                     }).OrderBy(static i => i.activityId).ToList(),
+                                     .Select(static group => new { activityId = group.Key, count = group.Count(), masteryLevel = group.Max(static m => m.MasteryLevel), })
+                                     .OrderBy(static i => i.activityId).ToList(),
                     }).OrderBy(static i => i.architectureId).ToList();
-        
+
         // Set table properties for formatting.
         table.AppendChild(new TableProperties(
-            new TableWidth {
-                Width = "8", Type = TableWidthUnitValues.Auto, }));
+            new TableWidth { Width = "8", Type = TableWidthUnitValues.Auto, }));
 
         var headerRow = new TableRow();
 
@@ -61,8 +55,7 @@ public record CompetenceProfile(
         foreach (var activity in HboIDomain.Activities)
         {
             var cell = CreateTableCellWithBorders("500");
-            cell.FirstChild.Append(new TextDirection 
-                { Val = TextDirectionValues.LeftToRightTopToBottom2010,});
+            cell.FirstChild.Append(new TextDirection { Val = TextDirectionValues.LeftToRightTopToBottom2010, });
 
             cell.Append(new Paragraph(new Run(new Text(activity.Name))));
             headerRow.AppendChild(cell);
@@ -70,40 +63,40 @@ public record CompetenceProfile(
 
         table.AppendChild(headerRow);
 
-        // Add the outcome rows.
-        foreach (var architecture in tasks)
+        foreach (var architectureLayer in HboIDomain.ArchitectureLayers)
         {
             var row = new TableRow();
             // Add the outcome title cell.
-            row.AppendChild(CreateTableCellWithBorders("2500", new Paragraph(new Run(new 
-                Text(HboIDomain.ArchitectureLayers.First(x => x.Id == architecture.architectureId).Name)))));
-
-            // Add the assignment cells.
-            foreach (var activityValue in HboIDomain.Activities)
+            row.AppendChild(CreateTableCellWithBorders("2500",
+                new Paragraph(new Run(new
+                    Text(architectureLayer.Name)))));
+            foreach (var architecture in tasks.Where(t => t.architectureId == architectureLayer.Id))
             {
-                var fillColor= "#fffff";
-                var kpiCount = 0;
-                var cell = CreateTableCellWithBorders("500");
-                if (architecture.activities.Exists(x => x.activityId == activityValue.Id))
+                // Add the assignment cells.
+                foreach (var activityValue in HboIDomain.Activities)
                 {
-                    var activity =
-                        architecture
-                            .activities
-                            .First(x => x.activityId == activityValue.Id);
-                    // Set cell color based on GradeStatus.
-                    fillColor = HboIDomain.MasteryLevels.FirstOrDefault(x => x.Id == activity.masteryLevel).Color;
-                    kpiCount = activity.count;
+                    var fillColor = "#fffff";
+                    var kpiCount = 0;
+                    var cell = CreateTableCellWithBorders("500");
+                    if (architecture.activities.Exists(x => x.activityId == activityValue.Id))
+                    {
+                        var activity =
+                            architecture
+                                .activities
+                                .First(x => x.activityId == activityValue.Id);
+                        // Set cell color based on GradeStatus.
+                        fillColor = HboIDomain.MasteryLevels.FirstOrDefault(x => x.Id == activity.masteryLevel).Color;
+                        kpiCount = activity.count;
+                    }
+
+                    cell.FirstChild?.Append(new Shading { Fill = fillColor, });
+                    cell.Append(new Paragraph(new Run(new Text($"{kpiCount}"))));
+                    row.AppendChild(cell);
                 }
 
-                cell.FirstChild?.Append(new Shading
-                { Fill = fillColor, });
-                cell.Append(new Paragraph(new Run(new Text($"{kpiCount}"))));
-                row.AppendChild(cell);
+                table.AppendChild(row);
             }
-
-            table.AppendChild(row);
         }
-
         return table;
     }
 
@@ -126,19 +119,17 @@ public record CompetenceProfile(
 
         // Set table properties for formatting.
         table.AppendChild(new TableProperties(
-            new TableWidth {
-                Width = "4", Type = TableWidthUnitValues.Auto, }));
+            new TableWidth { Width = "4", Type = TableWidthUnitValues.Auto, }));
 
         // Create the table header row.
         var headerRow = new TableRow();
 
-        
+
         foreach (var skill in HboIDomain.ProfessionalSkills)
         {
             var cell = CreateTableCellWithBorders("500");
-            cell.FirstChild.Append(new TextDirection 
-                { Val = TextDirectionValues.LeftToRightTopToBottom2010,});
-            
+            cell.FirstChild.Append(new TextDirection { Val = TextDirectionValues.LeftToRightTopToBottom2010, });
+
 
             cell.Append(new Paragraph(new Run(new Text(skill.Name))));
             headerRow.AppendChild(cell);
@@ -146,16 +137,16 @@ public record CompetenceProfile(
 
         table.AppendChild(headerRow);
         var valueRow = new TableRow();
-        
+
         foreach (var skill in HboIDomain.ProfessionalSkills)
         {
             var value = skills.First(x => x.skillId == skill.Id);
             var cell = CreateTableCellWithBorders("500");
-            cell.FirstChild?.Append(new Shading
-                { Fill = value.maxMastery.Color, });
+            cell.FirstChild?.Append(new Shading { Fill = value.maxMastery.Color, });
             cell.Append(new Paragraph(new Run(new Text($"{value.count}"))));
             valueRow.AppendChild(cell);
         }
+
         table.AppendChild(valueRow);
 
         return table;
@@ -173,10 +164,7 @@ public record CompetenceProfile(
 
             var cellValue = CreateTableCellWithBorders("600");
             cellValue.Append(new Paragraph(new Run(new Text(""))));
-            cellValue.FirstChild?.Append(new Shading
-            {
-                Fill = level.Color,
-            });
+            cellValue.FirstChild?.Append(new Shading { Fill = level.Color, });
             row.AppendChild(cellName);
             row.AppendChild(cellValue);
             table.AppendChild(row);
@@ -190,22 +178,10 @@ public record CompetenceProfile(
         var cell = new TableCell();
         var cellProperties = new TableCellProperties();
         var borders = new TableCellBorders(
-            new LeftBorder
-            {
-                Val = BorderValues.Single,
-            },
-            new RightBorder
-            {
-                Val = BorderValues.Single,
-            },
-            new TopBorder
-            {
-                Val = BorderValues.Single,
-            },
-            new BottomBorder
-            {
-                Val = BorderValues.Single,
-            });
+            new LeftBorder { Val = BorderValues.Single, },
+            new RightBorder { Val = BorderValues.Single, },
+            new TopBorder { Val = BorderValues.Single, },
+            new BottomBorder { Val = BorderValues.Single, });
 
         foreach (var element in elements)
         {
@@ -214,10 +190,7 @@ public record CompetenceProfile(
 
         if (width != null)
         {
-            cellProperties.Append(new TableCellWidth
-            {
-                Type = TableWidthUnitValues.Dxa, Width = width,
-            });
+            cellProperties.Append(new TableCellWidth { Type = TableWidthUnitValues.Dxa, Width = width, });
         }
 
         cellProperties.Append(borders);
