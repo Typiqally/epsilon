@@ -9,13 +9,9 @@
 
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts"
-import {
-    IHboIDomain,
-    MasteryLevel,
-    ProfessionalSkillResult,
-} from "../logic/Api"
+import { IHboIDomain, MasteryLevel, ProfessionalSkillResult } from "@/logic/Api"
 import { onMounted, watchEffect } from "vue"
-import { DecayingAverageLogic } from "../logic/DecayingAverageLogic"
+import { DecayingAverageLogic } from "@/logic/DecayingAverageLogic"
 
 const props = defineProps<{
     domain: IHboIDomain

@@ -10,12 +10,12 @@
 
 <script lang="ts" setup>
 import ApexChart from "vue3-apexcharts"
-import { IHboIDomain, ProfessionalTaskResult } from "../logic/Api"
+import { IHboIDomain, ProfessionalTaskResult } from "@/logic/Api"
 import { onMounted, watchEffect } from "vue"
 import {
     DecayingAverageLogic,
     DecayingAveragePerLayer,
-} from "../logic/DecayingAverageLogic"
+} from "@/logic/DecayingAverageLogic"
 
 let series: Array<{
     name: string

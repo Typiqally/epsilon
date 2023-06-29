@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { IHboIDomain, MasteryLevel } from "../logic/Api"
+import { IHboIDomain, MasteryLevel } from "@/logic/Api"
 
 const props = defineProps<{
     domain: IHboIDomain

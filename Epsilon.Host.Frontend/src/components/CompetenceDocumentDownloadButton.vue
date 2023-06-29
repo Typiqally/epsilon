@@ -11,7 +11,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import RoundLoader from "@/components/RoundLoader.vue"
-import { Api } from "../logic/Api"
+import { Api } from "@/logic/Api"
 import { ArrowDownTrayIcon } from "@heroicons/vue/20/solid"
 
 const api = new Api()

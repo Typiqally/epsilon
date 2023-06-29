@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { watch, ref } from "vue"
-import { MasteryLevel, ProfessionalTaskResult } from "../logic/Api"
+import { MasteryLevel, ProfessionalTaskResult } from "@/logic/Api"
 
 const hasChanged = ref(false)
 
