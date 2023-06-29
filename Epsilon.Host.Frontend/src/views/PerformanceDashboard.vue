@@ -80,9 +80,6 @@ onMounted(() => {
 .loading-icon {
     width: 64px;
     height: 64px;
-        <!-- <EnrollmentTermButtons
-            :terms="data.terms"
-            @on-term-selected="setTermFilter" />  -->
 }
 
 .loading-icon {

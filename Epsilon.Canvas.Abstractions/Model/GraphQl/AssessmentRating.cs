@@ -8,7 +8,7 @@ public record AssessmentRating(
 )
 {
     public bool IsMastery => Points >= Criterion?.MasteryPoints;
-    
+
     public string? Grade => Points switch
     {
         >= 5.0 => "Outstanding",
