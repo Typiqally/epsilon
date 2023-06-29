@@ -2,15 +2,15 @@
     <div v-if="data" class="performance-dashboard">
         <CompetenceProfileComponent
             :data="filteredProfessionalTaskOutcomes"
-            :domain="data.hboIDomain" />
-        <CompetenceProfileLegend :domain="data.hboIDomain" />
+            :domain="data.hboIDomain!" />
+        <CompetenceProfileLegend :domain="data.hboIDomain!" />
         <div />
         <CompetenceGraph
             :data="filteredProfessionalTaskOutcomes"
-            :domain="data.hboIDomain" />
+            :domain="data.hboIDomain!" />
         <PersonalDevelopmentGraph
-            :data="filteredProfessionalSkillOutcomes"
-            :domain="data?.hboIDomain"></PersonalDevelopmentGraph>
+            :data="filteredProfessionalSkillOutcomes!"
+            :domain="data?.hboIDomain!"></PersonalDevelopmentGraph>
     </div>
     <RoundLoader v-else class="loading-icon" />
 </template>
