@@ -11,10 +11,10 @@ public record AssessmentRating(
     
     public string? Grade => Points switch
     {
-        >= 5.0 => "O",
-        >= 4.0 => "G",
-        >= 3.0 => "S",
-        >= 0.0 => "U",
+        >= 5.0 => "Outstanding",
+        >= 4.0 => "Good",
+        >= 3.0 => "Sufficient",
+        >= 0.0 => "Insufficient",
         _ => null,
     };
 }
